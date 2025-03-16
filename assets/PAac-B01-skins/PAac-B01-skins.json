@@ -1,0 +1,13 @@
+{
+    "source": "ACES_OT_VWG_SampleFrames.0005.exr",
+    "authors": [
+        "Unknown"
+    ],
+    "references": [
+        "https://github.com/ampas/ACES_ODT_SampleFrames/blob/main/ACES_OT_VWG_SampleFrames/ACES_OT_VWG_SampleFrames.0005.exr"
+    ],
+    "capture-gamut": "Unknown",
+    "primary-color": "neutral",
+    "context": "",
+    "type": "plate"
+}

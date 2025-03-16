@@ -1,0 +1,14 @@
+{
+    "source": "A009C002_190210_R0EI.0187.ari",
+    "authors": [
+        "Martin Smekal"
+    ],
+    "references": [
+        "https://community.acescentral.com/t/rgb-saturation-gamut-mapping-approach-and-a-comp-vfx-perspective/2715/79",
+        "https://www.dropbox.com/sh/u6z2a0jboo4vno8/AADS5vFfUYuSAokonqmh3cZma/martin-smekal"
+    ],
+    "capture-gamut": "ARRI Wide Gamut 3",
+    "primary-color": "blue",
+    "context": "shot with ARRI Alexa Mini. Debayered to ARRI Wide Gamut 3 - D65 - LogC3 at EI 800 - 3600K in Nuke.",
+    "type": "plate"
+}

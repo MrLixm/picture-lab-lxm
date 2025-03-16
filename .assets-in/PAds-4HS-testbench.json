@@ -1,0 +1,13 @@
+{
+    "source": "https://www.dropbox.com/sh/u6z2a0jboo4vno8/AAB-MwLdFVW_KNmWEpO3kfAUa/daniele-siragusano/ACES_GamutMapping_Images.zip?dl=1",
+    "authors": [
+        "Daniele Siragusano"
+    ],
+    "references": [
+        "https://www.dropbox.com/sh/u6z2a0jboo4vno8/AAB-MwLdFVW_KNmWEpO3kfAUa/daniele-siragusano/ACES_GamutMapping_Images.zip?dl=0"
+    ],
+    "capture-gamut": "ARRI Wide Gamut 3",
+    "primary-color": "rainbow",
+    "context": "A contact sheet of multiple shots with different light color. Shot with ARRI Alexa. Debayered to ARRI Wide Gamut 3 - D65 - LogC3 at EI 800 - 5600K in Nuke.",
+    "type": "plate"
+}

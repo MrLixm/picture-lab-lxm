@@ -1,0 +1,14 @@
+{
+    "source": "ARRI_Helen_John_ALEXA_35_AWG4_LogC4.tif",
+    "authors": [
+        "ARRI"
+    ],
+    "references": [
+        "https://app.frame.io/reviews/0ce0eb35-62ed-450f-bec5-2ee6ecc748c1/17fb4437-e317-44c7-a06c-353cf17db304",
+        "https://www.arri.com/en/learn-help/learn-help-camera-system/camera-sample-footage-reference-image"
+    ],
+    "capture-gamut": "ARRI Wide Gamut 4",
+    "primary-color": "neutral",
+    "context": "shot with ALEXA 35 (K445 Default texture), debayered by ARRI with their Reference tool.",
+    "type": "plate"
+}

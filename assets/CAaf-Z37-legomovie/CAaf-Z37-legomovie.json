@@ -1,0 +1,14 @@
+{
+    "source": "Alex Fry - TheLegoMovie_OT_VWG_zmk17_020_aces.0287.exr",
+    "authors": [
+        "Alex Fry",
+        "Warner Bros Entertainment"
+    ],
+    "references": [
+        "https://www.dropbox.com/sh/zea11rkxkivv7w7/AADM8TB9tmpI9qdLB5JvRb-ra?dl=0&e=1&preview=Alex+Fry+-+TheLegoMovie_OT_VWG_zmk17_020_aces.0287.exr"
+    ],
+    "capture-gamut": "DCI-P3",
+    "primary-color": "yellow",
+    "context": "A frame from cg rendered \"The Lego Movie\". The movie is assumed to be rendered with DCI-P3 primaries. No idea if the frame is exported from grading or compositing.",
+    "type": "cgi"
+}

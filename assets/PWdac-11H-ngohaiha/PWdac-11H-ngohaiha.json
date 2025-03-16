@@ -1,0 +1,17 @@
+{
+    "source": "A037_C062_02253S_001.R3D",
+    "authors": [
+        "Jon Pais",
+        "Ngô Hài Hà"
+    ],
+    "references": [
+        "https://daejeonchronicles.com/2024/02/26/free-download-red-komodo-r3d-raw-sample-footage/",
+        "https://mega.nz/folder/21hVVTqD?fbclid=IwAR2oVyMynl0Rh9eSrEgqi8lp8OU_T8fFWv1QdWHC2qQd1_64m5ganIuSkqM#H5xfn0IrPmVHGolYDYrBng",
+        "https://www.youtube.com/watch?v=kKSrUCp4NsA"
+    ],
+    "capture-gamut": "RED Komodo 6K",
+    "primary-color": "neutral",
+    "license": "Non-commercial use only.",
+    "context": "shot with RED Komodo 6K and Meike Super35 50mm T2.1 Cinema Prime. debayered in Nuke with default setting (ISO=400,5169K,tint=2.868,exposure=0) + decodeResolution=half-high.",
+    "type": "plate"
+}

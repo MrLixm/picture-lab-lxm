@@ -1,0 +1,14 @@
+{
+    "source": "A021_11201612_C042.braw",
+    "authors": [
+        "Sjoerd Wess"
+    ],
+    "references": [
+        "https://www.youtube.com/watch?v=APyPjhnpX7c",
+        "https://tally.so/r/wgGd2J"
+    ],
+    "capture-gamut": "Blackmagic Generation 5",
+    "primary-color": "dark",
+    "context": "shot with Blackmagic CC6KPRO, debayered in Nuke with default setting + ISO=1250,5600K,tint=10,exposure=1,colorspace=Blackmagic Design Film Gen 5.",
+    "type": "plate"
+}

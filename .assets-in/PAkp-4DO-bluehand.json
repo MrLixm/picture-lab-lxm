@@ -1,0 +1,13 @@
+{
+    "source": "K001_C016_09154F_001.R3D",
+    "authors": [
+        "Kris Prygrocki"
+    ],
+    "references": [
+        "https://www.dropbox.com/sh/u6z2a0jboo4vno8/AAAHzdIqyBSvmgQz2e1nOVmUa/kris-prygrocki"
+    ],
+    "capture-gamut": "Red Wide Gamut",
+    "primary-color": "blue",
+    "context": "shot with DSMC2 MONSTRO 8K VV. Debayered in Nuke with resolution=half-high,kelvin=4300K,tint=0,iso=640,colrospace=REDWideGamutRGB,gamma-curve=half-float-linear",
+    "type": "plate"
+}

@@ -1,0 +1,15 @@
+{
+    "source": "20220925_0713.ORF",
+    "authors": [
+        "Rykzon"
+    ],
+    "references": [
+        "https://discuss.pixls.us/t/learning-with-darktable/36797",
+        "https://discuss.pixls.us/uploads/short-url/nedgpOFpITmamYUQjgwe4aHpb5f.ORF"
+    ],
+    "license": "This file is licensed Creative Commons, By-Attribution, Share-Alike: https://creativecommons.org/licenses/by-sa/4.0/",
+    "capture-gamut": "Olympus E-M1 Mark II",
+    "primary-color": "neutral",
+    "context": "Digital photography took with Olympus E-M1 Mark II. Converted to dng then debayered in python using rawpy. Check metadata for details.",
+    "type": "plate"
+}
