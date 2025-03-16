@@ -4,6 +4,7 @@ Generates sets which are combination of multiple assets.
 
 import abc
 import dataclasses
+import json
 import logging
 import math
 import runpy
@@ -30,7 +31,7 @@ assert OIIOTOOL_PATH.exists()
 ASSET_INGEST_PATH = THISDIR / "asset-in-ingest.py"
 _ASSET_INGEST = runpy.run_path(str(ASSET_INGEST_PATH), run_name="__passthrough__")
 # to upgrade at each code change that affect the data writen to the output image
-__version__ = f"2-{_ASSET_INGEST['__version__']}"
+__version__ = f"3-{_ASSET_INGEST['__version__']}"
 
 OVERWRITE_EXISTING = True
 
@@ -149,10 +150,10 @@ def generate_mosaic(
         "--wildcardoff",
         "--attrib",
         "sheet/authors",
-        str(author_by_file),
+        str(json.dumps(author_by_file)),
         "--attrib",
         "sheet/context",
-        str(context_by_file),
+        str(json.dumps(context_by_file)),
         "--attrib",
         f"{lxmpicturelab.METADATA_PREFIX}/__version__",
         __version__,
