@@ -1,0 +1,16 @@
+[project]
+name = "picture-lab-lxm"
+version = "0.1.0"
+description = "Compare and experiment with different picture formation algorithms."
+requires-python = ">=3.10"
+dependencies = [
+    "numpy==1.26.*",
+    "opencolorio>=2.4.1",
+    "openimageio>=3.0.4.0",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "jinja2>=3.1.6",
+]
