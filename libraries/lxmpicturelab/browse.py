@@ -25,6 +25,17 @@ def get_imagery_assets(root_dir: Path = None) -> list[ImageryAsset]:
     return [ImageryAsset(path) for path in root_dir.rglob("*.json")]
 
 
+def get_imagery_asset(identifier: str, root_dir: Path = None) -> ImageryAsset | None:
+    """
+    Get the asset matching the given identifier.
+    """
+    assets = get_imagery_assets(root_dir)
+    for asset in assets:
+        if asset.identifier == identifier:
+            return asset
+    return None
+
+
 def get_imagery_sets(root_dir: Path = None) -> dict[str, Path]:
     """
     Retrieve all the existing sets images file stored in the given directory.
@@ -34,3 +45,14 @@ def get_imagery_sets(root_dir: Path = None) -> dict[str, Path]:
     """
     root_dir = root_dir or SETS_DIR
     return {path.parent.name: path for path in root_dir.rglob("*.exr")}
+
+
+def get_imagery_set(identifier: str, root_dir: Path = None) -> Path | None:
+    """
+    Get the set image matching the given identifier.
+    """
+    imgsets = get_imagery_sets(root_dir)
+    for imgset_id, imgset_path in imgsets.items():
+        if imgset_id == identifier:
+            return imgset_path
+    return None
