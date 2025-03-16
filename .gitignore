@@ -47,3 +47,4 @@ tmp/
 # temporary while i'm not sure if I can upload the images
 assets/**/*.*
 !assets/**/*.json
+sets/
