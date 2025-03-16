@@ -594,6 +594,33 @@ def main(argv: list[str] | None = None):
     )
     srcassets.append(srcasset)
 
+    asset = get_imagery_asset("PAfm-SWE-neongirl")
+    srcasset = SourceAsset(
+        path=asset.image_path,
+        filename="PAfm-SWE-neongirl",
+        generators=[GeneratorExposureBands(0.3), GeneratorFull(864)],
+        metadata=asset.metadata,
+    )
+    srcassets.append(srcasset)
+
+    asset = get_imagery_asset("PAac-B01-skins")
+    srcasset = SourceAsset(
+        path=asset.image_path,
+        filename="PAac-B01-skins",
+        generators=[GeneratorExposureBands(0.01), GeneratorFull(864)],
+        metadata=asset.metadata,
+    )
+    srcassets.append(srcasset)
+
+    asset = get_imagery_asset("PAjg-MZY-nightstreet")
+    srcasset = SourceAsset(
+        path=asset.image_path,
+        filename="PAjg-MZY-nightstreet",
+        generators=[GeneratorExposureBands(0.3), GeneratorFull(864)],
+        metadata=asset.metadata,
+    )
+    srcassets.append(srcasset)
+
     renderer_work_dir = cli.renderer_dir
     renderer_work_dir.mkdir(exist_ok=True)
     LOGGER.info(f"building renderers to '{renderer_work_dir}'")
