@@ -22,6 +22,7 @@ from lxmpicturelab.renderer import OcioConfigRenderer
 from lxmpicturelab.oiiotoolio import oiiotool_export
 from lxmpicturelab.oiiotoolio import oiiotool_generate_expo_bands
 from lxmpicturelab.oiiotoolio import oiiotool_auto_mosaic
+from lxmpicturelab.imgasset import ImageryAssetMetadata
 
 LOGGER = logging.getLogger(__name__)
 
@@ -213,6 +214,7 @@ class SourceAsset:
     path: Path
     filename: str
     generators: list[BaseGenerator]
+    metadata: ImageryAssetMetadata
 
 
 def _build_AgX_renderer(work_dir: Path) -> OcioConfigRenderer:
@@ -546,28 +548,51 @@ def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None):
     cli = get_cli(argv)
 
-    assets = [
-        SourceAsset(
-            path=get_imagery_set("al.sorted-color.bg-black"),
-            filename="lxmpicturelab-set.al",
-            generators=[GeneratorFull(2048)],
+    srcassets = []
+
+    srcasset_path = get_imagery_set("al.sorted-color.bg-black")
+    srcasset = SourceAsset(
+        path=srcasset_path,
+        filename="lxmpicturelab-set.al",
+        generators=[GeneratorFull(2048)],
+        metadata=ImageryAssetMetadata(
+            source=srcasset_path.name,
+            authors=["Liam Collod", "various"],
+            references=["https://github.com/MrLixm/picture-lab-lxm"],
+            capture_gamut="various",
+            primary_color=lxmpicturelab.imgasset.AssetPrimaryColor.rainbow,
+            type=lxmpicturelab.imgasset.ImageryAssetType.cgi,
+            context="An heterogeneous collection of various images.",
         ),
-        SourceAsset(
-            path=get_imagery_asset("CGts-W0L-sweep").image_path,
-            filename="CGts-W0L-sweep",
-            generators=[GeneratorFull(864)],
-        ),
-        SourceAsset(
-            path=get_imagery_asset("CAlc-D8T-dragon").image_path,
-            filename="CAlc-D8T-dragon",
-            generators=[GeneratorExposureBands(0.45), GeneratorFull(864)],
-        ),
-        SourceAsset(
-            path=get_imagery_asset("PAmsk-R65-christmas").image_path,
-            filename="PAmsk-R65-christmas",
-            generators=[GeneratorExposureBands(0.3), GeneratorFull(864)],
-        ),
-    ]
+    )
+    srcassets.append(srcasset)
+
+    asset = get_imagery_asset("CGts-W0L-sweep")
+    srcasset = SourceAsset(
+        path=asset.image_path,
+        filename="CGts-W0L-sweep",
+        generators=[GeneratorFull(864)],
+        metadata=asset.metadata,
+    )
+    srcassets.append(srcasset)
+
+    asset = get_imagery_asset("CAlc-D8T-dragon")
+    srcasset = SourceAsset(
+        path=asset.image_path,
+        filename="CAlc-D8T-dragon",
+        generators=[GeneratorExposureBands(0.45), GeneratorFull(864)],
+        metadata=asset.metadata,
+    )
+    srcassets.append(srcasset)
+
+    asset = get_imagery_asset("PAmsk-R65-christmas")
+    srcasset = SourceAsset(
+        path=asset.image_path,
+        filename="PAmsk-R65-christmas",
+        generators=[GeneratorExposureBands(0.3), GeneratorFull(864)],
+        metadata=asset.metadata,
+    )
+    srcassets.append(srcasset)
 
     renderer_work_dir = cli.renderer_dir
     renderer_work_dir.mkdir(exist_ok=True)
@@ -586,13 +611,17 @@ def main(argv: list[str] | None = None):
 
     stime = time.time()
 
-    for asset in assets:
+    for asset in srcassets:
         asset_results_dir = results_dir / asset.filename
         if asset_results_dir.exists():
             shutil.rmtree(asset_results_dir)
         asset_results_dir.mkdir()
 
-        metadata = {"name": asset.filename, "generators": {}}
+        metadata = {
+            "name": asset.filename,
+            "generators": {},
+            "metadata": asset.metadata.to_dict(),
+        }
         metadata_path = results_dir / f"{asset.filename}.json"
 
         for generator in asset.generators:
