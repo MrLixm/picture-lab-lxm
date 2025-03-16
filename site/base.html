@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>{% block title %}{{ SITENAME }}{% endblock %}</title>
+  <link rel="icon" href="{{ SITEICON }}" type="image/x-ico">
+  <meta property="og:description" content="{{ META_DESCRIPTION }}">
+  <meta property="twitter:description" content="{{ META_DESCRIPTION }}">
+  <meta property="og:image" content="{{ META_IMAGE }}">
+  <meta name="fediverse:creator" content="@liamcollod@mastodon.gamedev.place">
+  {%- for stylesheet in STYLESHEETS %}
+    <link rel="stylesheet" href="{{ stylesheet }}"/>
+  {%- endfor %}
+  {% block head %}
+  {% endblock %}
+</head>
+<body>
+<header>
+  <div class="row">
+    <a href="index.html"><h1>{{ SITENAME }}</h1></a>
+    <nav>
+      <a href="about.html">
+        <div class="nav-item {% if NAV_ACTIVE is defined and NAV_ACTIVE == "about" %}active{% endif %}">
+          <span>about</span>
+        </div>
+      </a>
+    </nav>
+  </div>
+  <nav class="comparisons">
+    {% for COMPARISON in COMPARISONS %}
+      <a href="{{ COMPARISON }}.html">
+        <div class="nav-item {% if NAV_ACTIVE is defined and NAV_ACTIVE == COMPARISON %}active{% endif %}">
+          <span>{{ COMPARISON }}</span>
+        </div>
+      </a>
+    {% endfor %}
+  </nav>
+</header>
+<main>
+  {% block main %}
+  {% endblock %}
+</main>
+</body>
+<footer>
+  <p>{{ FOOTER }} - Last built on {{ BUILD_DATE }}</p>
+</footer>
+</html>

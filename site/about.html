@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}{{ SITENAME }} - about{% endblock %}
+
+{% block main %}
+  <div class="extra-margins">
+    <h1>about</h1>
+    <p>This website provides resources to evaluate and compare the different
+      picture formation algorithm available online. Those kind of algorithm are
+      also referred as:</p>
+    <ul>
+      <li>display rendering transform</li>
+      <li>view transform</li>
+      <li>LUT</li>
+    </ul>
+    <p>In few words, picture formation is converting physical quantities
+      to a readable visual representation. The concept can be explored further
+      with:</p>
+    <ul>
+      <li><a href="https://github.com/sobotka/scise/wiki/Picture-Formation">https://github.com/sobotka/scise/wiki/Picture-Formation</a>
+      </li>
+      <li><a href="https://hg2dc.com/2025/03/13/question-34/">https://hg2dc.com/2025/03/13/question-34/</a>
+      </li>
+      <li>
+        <a href="https://github.com/jedypod/open-display-transform/wiki/doc-introduction">https://github.com/jedypod/open-display-transform/wiki/doc-introduction</a>
+      </li>
+    </ul>
+    <p>The code source for this website and the image generation can be
+      retrieved
+      at <a href="https://github.com/MrLixm/picture-lab-lxm">https://github.com/MrLixm/picture-lab-lxm</a>
+    </p>
+    <h2>Software</h2>
+    <p>This project is made possible thanks to the following (non-exhaustive)
+      free software:</p>
+    <ul>
+      <li><a href="https://www.python.org/">Python</a></li>
+      <li><a href="https://docs.astral.sh/uv/">uv</a></li>
+      <li><a href="https://openimageio.readthedocs.io">OpenImageIO</a></li>
+      <li><a href="https://opencolorio.org/">OpenColorIO</a></li>
+    </ul>
+    <h2>Assets</h2>
+    <p>Is referred by 'asset' the single image file of a specific scene.</p>
+    <p>Most of the assets were retrieved from the web where they were kindly
+      made accessible by their author. All rights belong to their respective
+      authors, and they are only shared here for education purposes.</p>
+    <p>The original image file are not shared on the source GitHub repository
+      yet, but it's possible to download them yourself by checking their
+      side-car metadata .json file.</p>
+    <h2>Renderers</h2>
+    <p>A renderer correspond to a color-transform that must be applied on pixel
+      data.
+      All renderers are color-managed for an sRGB output but will showcase
+      a different picture formation algorithm.</p>
+    <p>ℹ️ Note that the preferred sRGB transfer-function is 2.2 when possible,
+      but some Renderer may use the piecewise function.</p>
+    <p>The color transforms are serialized in an OpenColorIO
+      configuration, which will be ingested by OpenImageIO's oiiotool for
+      transforming the pixel data.</p>
+    <div class="renderers-box">
+      {% for Renderer in Renderers %}
+        <div class="renderer-item">
+          <h3>{{ Renderer.name }}</h3>
+          <div class="renderer-item-content">
+            <p>{{ Renderer.description|e }}</p>
+            <p>Source:
+              <a href="{{ Renderer.reference_url }}">{{ Renderer.reference_url }}</a>
+            </p>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>{{ Renderer.display }}</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>{{ Renderer.view }}</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td>{{ Renderer.look }}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

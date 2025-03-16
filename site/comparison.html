@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}{{ SITENAME }} - {{ Comparison.source }}{% endblock %}
+
+{% block main %}
+  <h1>{{ Comparison.source }}</h1>
+  <p>{{ Comparison.metadata.context }}</p>
+  <table>
+    <tr>
+      <th>authors</th>
+      <td>{{ ','.join(Comparison.metadata.authors) }}</td>
+    </tr>
+    <tr>
+      <th>capture gamut</th>
+      <td>{{ Comparison.metadata.capture_gamut }}</td>
+    </tr>
+    {%- for reference in Comparison.metadata.references %}
+    <tr>
+      <th>reference</th>
+      <td><a href="{{ reference }}">{{ reference }}</a></td>
+    </tr>
+    {%- endfor %}
+  </table>
+  {%- for generator in Comparison.generators %}
+    <h2>{{ generator.name }}</h2>
+    <div class="tiles-formations">
+      {%- for renderer_name, render_path in generator.renders.items() %}
+        <div class="tile-item">
+          <h3>{{ renderer_name }}</h3>
+          <a href="{{ render_path|escape }}">
+            {% set img_name = "image render with picture formation '" + renderer_name + "'" %}
+            <img src="{{ render_path|escape }}" alt="render using {{ img_name }}" title="{{ img_name }}">
+          </a>
+        </div>
+      {%- endfor %}
+    </div>
+  {%- endfor %}
+
+{% endblock %}
