@@ -1,0 +1,49 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+*.egg-info/
+*.egg
+MANIFEST
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# PyCharm
+.idea/
+
+# environment
+poetry.lock
+.venv/
+
+# logging files
+*.log
+
+# rez specific
+build/
+build.rxt
+
+# project specific
+vendor/**/*.whl
+tmp/
+.workbench/
+.build/
+.vendor/
+.assets-in/*
+!.assets-in/*.json
+# temporary while i'm not sure if I can upload the images
+assets/*
+!assets/**/*.json
