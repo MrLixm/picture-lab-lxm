@@ -21,7 +21,7 @@ from lxmpicturelab.download import download_file
 from lxmpicturelab.browse import ImageryAsset
 
 # to upgrade at each code change that affect the data writen to the output image
-__version__ = "2.0"
+__version__ = f"2-{lxmpicturelab.__version__}"
 
 LOGGER = logging.getLogger(__name__)
 
@@ -220,7 +220,7 @@ def ingest_assets(
 
     LOGGER.info(f"optimizing {len(assets_config)} assets ...")
     for index, (src_asset_path, colorspace) in enumerate(assets_config.items()):
-        prefix = f"[{index+1:>2}/{len(assets_config):>2}]"
+        prefix = f"[{index+1:0>2}/{len(assets_config):0>2}]"
 
         src_asset = ImageryAsset(src_asset_path)
         dst_asset_dir = dst_dir / src_asset.identifier
