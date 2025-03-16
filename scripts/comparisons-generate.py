@@ -226,6 +226,7 @@ def _build_AgX_renderer(work_dir: Path) -> OcioConfigRenderer:
     return OcioConfigRenderer(
         name=f"AgX",
         filename="AgX",
+        description="The original AgX algorithm by Troy Sobotka.",
         config_path=config_path,
         srgb_lin="Linear BT.709",
         display="sRGB",
@@ -250,6 +251,7 @@ def _build_AgX_blender_renderer(work_dir: Path) -> OcioConfigRenderer:
     return OcioConfigRenderer(
         name=f"AgX Blender-4.2.7",
         filename="AgX.blender",
+        description="The improved AgX algorithm implemented in Blender.",
         config_path=config_path,
         srgb_lin="Linear Rec.709",
         display="sRGB",
@@ -273,6 +275,7 @@ def _build_AgXc_renderer(work_dir: Path) -> OcioConfigRenderer:
     return OcioConfigRenderer(
         name=f"AgXc v{config_version}",
         filename=f"AgXc.{config_version}",
+        description="Another custom variant of AgX.",
         config_path=config_path,
         srgb_lin="Linear sRGB",
         display="sRGB",
@@ -302,6 +305,7 @@ def _build_AgXc_rc_renderer(work_dir: Path) -> OcioConfigRenderer:
     return OcioConfigRenderer(
         name=f"AgXc v{config_version}",
         filename=f"AgXc.{config_version}",
+        description="Another custom variant of AgX, closer to Blender variant. Not yet released.",
         config_path=config_path,
         srgb_lin="sRGB-linear",
         display="sRGB-2.2",
@@ -336,6 +340,7 @@ def _build_TCAM_renderer(work_dir: Path) -> OcioConfigRenderer:
     return OcioConfigRenderer(
         name=f"TCAMv3",
         filename=f"TCAMv3",
+        description="Filmlight's algorithm which is best working in the context of their grading tools.",
         config_path=config_path,
         srgb_lin="CGI: Linear : Rec.709",
         display="sRGB Display: 2.2 Gamma : Rec.709 Truelight CAM v3",
@@ -406,6 +411,7 @@ def _build_ARRI_renderer(work_dir: Path) -> OcioConfigRenderer:
     return OcioConfigRenderer(
         name=f"ARRI Reveal",
         filename="ARRIreveal",
+        description='The ARRI "color-science" pipeline, based on their provided display LUTs.',
         config_path=aces_config_path,
         srgb_lin="Linear Rec.709 (sRGB)",
         display="sRGB - 2.2",
@@ -423,6 +429,7 @@ def _build_ACES13gm_renderer(work_dir: Path) -> OcioConfigRenderer:
     return OcioConfigRenderer(
         name=f"ACES v1.3 + Gamut Mapping",
         filename="ACESv1.3-gm",
+        description='The Academy Color Encoding System on major version 1, with their "Gamut Compression" look.',
         config_path=config_path,
         srgb_lin="Linear Rec.709 (sRGB)",
         display="sRGB - Display",
@@ -441,6 +448,7 @@ def _build_ACES2gm_renderer(work_dir: Path) -> OcioConfigRenderer:
     return OcioConfigRenderer(
         name=f"ACES v2.0 + Gamut Mapping",
         filename="ACESv2.0-gm",
+        description='The Academy Color Encoding System on major version 2, with their "Gamut Compression" look.',
         config_path=config_path,
         srgb_lin="Linear Rec.709 (sRGB)",
         display="sRGB - Display",
@@ -491,6 +499,7 @@ def build_renderers(renderer_work_dir: Path) -> list[OcioConfigRenderer]:
         renderer,
         name=f"ACES v2.0 ",
         filename="ACESv2.0",
+        description="The Academy Color Encoding System on major version 2.",
         srgb_lin="Linear Rec.709 (sRGB)",
         display="sRGB - Display",
         view="ACES 2.0 - SDR 100 nits (Rec.709)",
@@ -502,6 +511,7 @@ def build_renderers(renderer_work_dir: Path) -> list[OcioConfigRenderer]:
         renderer,
         name=f"Native (no image formation)",
         filename="native",
+        description="No picture formation is applied, anything outside the target volume is clipped.",
         srgb_lin="Linear Rec.709 (sRGB)",
         display="sRGB - Display",
         view="Un-tone-mapped",

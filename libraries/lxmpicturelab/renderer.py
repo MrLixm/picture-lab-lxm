@@ -38,6 +38,7 @@ class OcioConfigRenderer:
 
     name: str
     filename: str
+    description: str
 
     config_path: Path
     # this is a trick because there is more chance an OCIO config includes
@@ -55,7 +56,9 @@ class OcioConfigRenderer:
         if self.src_colorspace == ACES20651_COLORSPACE:
             command = oiiotool_AP0_to_sRGB()
         else:
-            raise NotImplementedError("Only ACES2065-1 encoded data is supported at this time.")
+            raise NotImplementedError(
+                "Only ACES2065-1 encoded data is supported at this time."
+            )
 
         return command + oiiotool_ocio_display_convert(
             config=self.config_path,
@@ -71,6 +74,7 @@ class OcioConfigRenderer:
         return cls(
             name=structure["name"],
             filename=structure["filename"],
+            description=structure["description"],
             config_path=Path(structure["config_path"]),
             srgb_lin=structure["srgb_lin"],
             display=structure["display"],
