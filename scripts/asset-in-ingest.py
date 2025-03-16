@@ -9,7 +9,6 @@ import logging
 import os
 import shutil
 import subprocess
-import sys
 from pathlib import Path
 
 import lxmpicturelab
@@ -245,12 +244,7 @@ def ingest_assets(
 
 
 if __name__ == "__main__":
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format="{levelname: <7} | {asctime} [{name}] {message}",
-        style="{",
-        stream=sys.stdout,
-    )
+    lxmpicturelab.configure_logging()
     with timeit("main() finished in ", LOGGER.info):
         ingest_assets(
             assets_config=ASSETS_IN,

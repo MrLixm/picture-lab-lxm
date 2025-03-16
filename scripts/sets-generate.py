@@ -9,7 +9,6 @@ import math
 import runpy
 import shutil
 import subprocess
-import sys
 from pathlib import Path
 from typing import Any
 from typing import Callable
@@ -254,12 +253,7 @@ def main(
 
 
 if __name__ == "__main__":
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format="{levelname: <7} | {asctime} [{name}] {message}",
-        style="{",
-        stream=sys.stdout,
-    )
+    lxmpicturelab.configure_logging()
     with timeit("main() finished in ", LOGGER.info):
         main(
             dst_dir=SETS_DIR,
