@@ -1,1 +1,1 @@
-METADATA_PREFIX = "lxmimagelab"
+METADATA_PREFIX = "lxmpicturelab"
