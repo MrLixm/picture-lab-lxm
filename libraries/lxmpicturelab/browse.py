@@ -16,11 +16,9 @@ VENDOR_DIR = REPO_ROOT / ".vendor"
 WORKBENCH_DIR = REPO_ROOT / ".workbench"
 
 
-def get_imagery_assets(asset_dir: Path = None) -> list[ImageryAsset]:
+def get_imagery_assets(root_dir: Path = None) -> list[ImageryAsset]:
     """
-    Retrieve all the ImageryAssets stored in the given directory.
+    Retrieve all the existing ImageryAssets stored in the given directory.
     """
-    asset_dir = asset_dir or ASSET_DIR
-    return [
-        ImageryAsset(file) for file in asset_dir.glob("*") if file.suffix == ".json"
-    ]
+    root_dir = root_dir or ASSET_DIR
+    return [ImageryAsset(path) for path in root_dir.rglob("*.json")]
