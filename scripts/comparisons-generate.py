@@ -525,27 +525,6 @@ def build_renderers(renderer_work_dir: Path) -> list[OcioConfigRenderer]:
     return renderers
 
 
-def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
-    argv = argv or sys.argv[1:]
-    parser = argparse.ArgumentParser(
-        description="Generates image to compare image formation algorithm.",
-    )
-    parser.add_argument(
-        "--results-dir",
-        type=Path,
-        default=WORK_DIR / "results",
-        help="filesystem path to write the result images to.",
-    )
-    parser.add_argument(
-        "--renderer-dir",
-        type=Path,
-        default=WORK_DIR / "renderers",
-        help="filesystem path to write renderers resource data to.",
-    )
-    parsed = parser.parse_args(argv)
-    return parsed
-
-
 def oiiotool_get_metadata(image_path: Path, metadata: str) -> str:
     command = [str(OIIOTOOL), str(image_path), "--echo", f"\"{{TOP.'{metadata}'}}\""]
     LOGGER.debug(f"subprocess.run({command})")
@@ -557,9 +536,7 @@ def oiiotool_get_metadata(image_path: Path, metadata: str) -> str:
     return result.stdout.strip()
 
 
-def main(argv: list[str] | None = None):
-    cli = get_cli(argv)
-
+def build_source_assets() -> list[SourceAsset]:
     srcassets = []
 
     srcasset_path = get_imagery_set("al.sorted-color.bg-black")
@@ -643,6 +620,35 @@ def main(argv: list[str] | None = None):
         metadata=asset.metadata,
     )
     srcassets.append(srcasset)
+
+    return srcassets
+
+
+def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
+    argv = argv or sys.argv[1:]
+    parser = argparse.ArgumentParser(
+        description="Generates image to compare image formation algorithm.",
+    )
+    parser.add_argument(
+        "--results-dir",
+        type=Path,
+        default=WORK_DIR / "results",
+        help="filesystem path to write the result images to.",
+    )
+    parser.add_argument(
+        "--renderer-dir",
+        type=Path,
+        default=WORK_DIR / "renderers",
+        help="filesystem path to write renderers resource data to.",
+    )
+    parsed = parser.parse_args(argv)
+    return parsed
+
+
+def main(argv: list[str] | None = None):
+    cli = get_cli(argv)
+
+    srcassets = build_source_assets()
 
     renderer_work_dir = cli.renderer_dir
     renderer_work_dir.mkdir(exist_ok=True)
