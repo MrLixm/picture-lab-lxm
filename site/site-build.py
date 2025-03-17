@@ -267,10 +267,9 @@ def publish_context(build_dir: Path, commit_msg: tuple[str, str]):
             LOGGER.warning("nothing to commit, skipping publishing ...")
             return
 
-        LOGGER.info(f"changes found:\n{'=' * 8}")
-        LOGGER.info(changes)
+        LOGGER.info(f"git changes found:\n{changes}")
 
-        LOGGER.info(f"git commit -m {commit_msg[0]} -m {commit_msg[1]}")
+        LOGGER.info(f"git commit -m '{commit_msg[0]}' -m '{commit_msg[1]}'")
         subprocess.check_call(
             ["git", "commit", "-m", commit_msg[0], "-m", commit_msg[1]], cwd=build_dir
         )
