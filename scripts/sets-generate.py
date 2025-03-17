@@ -59,12 +59,12 @@ def _sort_assets_color(asset: ImageAsset):
 
 SET_VARIANTS = [
     SetVariant(
-        identifier="al.sorted-color.bg-black",
+        identifier="lxmpicturelab.al.sorted-color.bg-black",
         bg_color=(0, 0, 0),
         asset_sorter=_sort_assets_color,
     ),
     SetVariant(
-        identifier="al.sorted-color.bg-midgrey",
+        identifier="lxmpicturelab.al.sorted-color.bg-midgrey",
         bg_color=(0.18, 0.18, 0.18),
         asset_sorter=_sort_assets_color,
     ),
@@ -234,7 +234,7 @@ def main(
 
         variant_dir.mkdir(exist_ok=True)
 
-        mosaic_name = f"lxmpicturelab-set.{variant_name}.{__version__}.exr"
+        mosaic_name = f"{variant_name}.{__version__}.exr"
         mosaic_path = variant_dir / mosaic_name
 
         LOGGER.info(
@@ -246,7 +246,7 @@ def main(
                 target_path=mosaic_path,
                 background_color=bg_color,
             )
-            preview_path = mosaic_path.with_suffix(".jpg")
+            preview_path = mosaic_path.with_suffix(".preview.jpg")
             generate_preview(
                 mosaic_path=mosaic_path,
                 target_path=preview_path,
