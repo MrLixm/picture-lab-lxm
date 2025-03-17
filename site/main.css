@@ -8,6 +8,7 @@
 
 :root {
     --bgcolor_l0: 0, 0, 0;
+    --bgcolor_l1: 25,25, 25;
     --color_l0: 240, 240, 240;
     --color_l-1: 200, 200, 200;
     --color_l-2: 150, 150, 150;
@@ -18,11 +19,15 @@
     color: rgb(var(--color_l0));
 }
 table, th, td {
+    font-family: monospace;
     border: 1px solid;
-    border-color: rgb(var(--color_l-2));
+    border-color: rgba(var(--color_l-2), 0.5);
     text-align: left;
     padding: 5px;
     border-collapse: collapse;
+}
+th {
+    background-color: rgb(var(--bgcolor_l1));
 }
 p {
     margin: unset;

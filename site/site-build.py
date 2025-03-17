@@ -234,8 +234,10 @@ def main(argv: list[str] | None = None):
 
     # copy static resources
 
-    os.symlink(CSS_PATH, build_dir / CSS_PATH.name)
-    # shutil.copy(CSS_PATH, build_dir / CSS_PATH.name)
+    if publish:
+        shutil.copy(CSS_PATH, build_dir / CSS_PATH.name)
+    else:
+        os.symlink(CSS_PATH, build_dir / CSS_PATH.name)
     for resource_path in STATIC_RESOURCES:
         shutil.copy(resource_path, build_dir / resource_path.name)
 
