@@ -8,7 +8,8 @@
 
 :root {
     --bgcolor_l0: 0, 0, 0;
-    --bgcolor_l1: 25,25, 25;
+    --bgcolor_l1: 25, 25, 25;
+    --bgcolor_l2: 65, 65, 65;
     --color_l0: 240, 240, 240;
     --color_l-1: 200, 200, 200;
     --color_l-2: 150, 150, 150;
@@ -21,7 +22,7 @@
 table, th, td {
     font-family: monospace;
     border: 1px solid;
-    border-color: rgba(var(--color_l-2), 0.5);
+    border-color: rgb(var(--bgcolor_l2));
     text-align: left;
     padding: 5px;
     border-collapse: collapse;
@@ -62,6 +63,9 @@ div.extra-margins {
     div.extra-margins {
         margin: unset;
     }
+}
+img {
+    width: 100%;
 }
 
 .adm-note {
@@ -137,7 +141,7 @@ footer {
 
 /*
 ==============
-PAGES specific
+comaprison pages
 */
 
 div.tiles-formations {
@@ -168,8 +172,41 @@ div.tiles-formations div.tile-item h3 {
 div.tiles-formations div.tile-item:hover h3 {
     display: initial;
 }
-div.tiles-formations div.tile-item img {
-    width: 100%;
+
+/* tabs system
+Reference: https://codepen.io/alvarotrigo/pen/bGoPzmw
+*/
+
+.tab-wrap {
+    display: flex;
+    flex-wrap: wrap;
+}
+.tab-input {
+    position: absolute;
+    opacity: 0;
+}
+.tab-label {
+    width: auto;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+}
+.tab-label:hover {
+    background-color: rgb(var(--bgcolor_l1));
+}
+.tab-input:focus + .tab-label:hover {
+    z-index: 1;
+}
+.tab-input:checked + .tab-label {
+    border-bottom: 2px solid rgb(var(--bgcolor_l2));
+}
+.tab-content {
+    display: none;
+    padding-top: 10px;
+    order: 99;
+}
+.tab-input:checked + .tab-label + .tab-content {
+    display: block;
 }
 
 
