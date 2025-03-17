@@ -1,5 +1,6 @@
 import abc
 import argparse
+import ast
 import dataclasses
 import json
 import logging
@@ -545,19 +546,41 @@ def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
     return parsed
 
 
+def oiiotool_get_metadata(image_path: Path, metadata: str) -> str:
+    command = [str(OIIOTOOL), str(image_path), "--echo", f"\"{{TOP.'{metadata}'}}\""]
+    LOGGER.debug(f"subprocess.run({command})")
+    result = subprocess.run(command, capture_output=True, text=True)
+    if result.returncode != 0:
+        LOGGER.error(result.stderr)
+        LOGGER.error(result.stdout)
+        raise RuntimeError("Failed to execute oiiotool")
+    return result.stdout.strip()
+
+
 def main(argv: list[str] | None = None):
     cli = get_cli(argv)
 
     srcassets = []
 
     srcasset_path = get_imagery_set("al.sorted-color.bg-black")
+    # read authors metadata from file
+    author_metadata = oiiotool_get_metadata(srcasset_path, "sheet/authors")
+    author_metadata = ast.literal_eval(author_metadata)
+    author_metadata = json.loads(author_metadata)
+    assets_by_author = {}
+    for asset_name, authors in author_metadata.items():
+        for author in authors:
+            assets_by_author.setdefault(author, set()).add(asset_name)
+    authors = [
+        f"{author} ({','.join(assets)})" for author, assets in assets_by_author.items()
+    ]
     srcasset = SourceAsset(
         path=srcasset_path,
         filename="lxmpicturelab-set.al",
         generators=[GeneratorFull(2048)],
         metadata=ImageryAssetMetadata(
             source=srcasset_path.name,
-            authors=["Liam Collod", "various"],
+            authors=authors,
             references=["https://github.com/MrLixm/picture-lab-lxm"],
             capture_gamut="various",
             primary_color=lxmpicturelab.imgasset.AssetPrimaryColor.rainbow,
