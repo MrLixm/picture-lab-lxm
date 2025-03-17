@@ -34,8 +34,12 @@ ASSETS = {
     "lxmpicturelab.al.sorted-color.bg-black": ["--generator-full", "2048"],
     "CGts-W0L-sweep": ["--generator-full", "864"],
     "CAlc-D8T-dragon": ["--generator-exposures", "0.45", "--generator-full", "864"],
+    "CAtm-FGH-specbox": ["--generator-full", "1080"],
     "PAmsk-R65-christmas": ["--generator-exposures", "0.3", "--generator-full", "864"],
     "PAfm-SWE-neongirl": ["--generator-exposures", "0.3", "--generator-full", "864"],
+    "PAkp-4DO-bluehand": ["--generator-full", "864"],
+    "PAtm-2QQ-space": ["--generator-exposures", "0.3", "--generator-full", "864"],
+    "PWarr-VWE-helenjohn": ["--generator-exposures", "0.1", "--generator-full", "864"],
     "PAac-B01-skins": ["--generator-exposures", "0.01", "--generator-full", "864"],
     "PAjg-MZY-nightstreet": ["--generator-exposures", "0.3", "--generator-full", "864"],
 }
