@@ -59,6 +59,12 @@ div.extra-margins {
     }
 }
 
+.adm-note {
+    border-left: 2px solid rgb(var(--primary));
+    background-color: rgba(var(--primary), 0.3);
+    padding: 10px;
+}
+
 
 /*
 ==============
