@@ -28,18 +28,18 @@ IMAGEGEN_SCRIPT_PATH = THISDIR.parent / "scripts" / "comparisons-generate.py"
 
 CSS_PATH = THISDIR / "main.css"
 
-STATIC_RESOURCES = [
-    THISDIR / "MartianMono.variable.ttf",
-    THISDIR / "lxmpicturelab-cover.jpg",
-    THISDIR / "lxmpicturelab-icon.svg",
-]
+STATIC_RESOURCES = {
+    "MartianMono.variable.ttf": "MartianMono.variable.ttf",
+    "img/lxmpicturelab-cover.jpg": "img/lxmpicturelab-cover.jpg",
+    "img/lxmpicturelab-icon.svg": "img/lxmpicturelab-icon.svg",
+}
 
 SITENAME = "lxmpicturelab"
 SITEURL = f"https://mrlixm.github.io/{SITENAME}"
-SITEICON = "lxmpicturelab-icon.svg"
+SITEICON = "img/lxmpicturelab-icon.svg"
 
 META_DESCRIPTION = "Comparison of different picture formation algorithms."
-META_IMAGE = "lxmpicturelab-cover.jpg"
+META_IMAGE = "img/lxmpicturelab-cover.jpg"
 
 FOOTER = "Static website created by Liam Collod using Python"
 
@@ -271,8 +271,11 @@ def main(argv: list[str] | None = None):
         shutil.copy(CSS_PATH, build_dir / CSS_PATH.name)
     else:
         os.symlink(CSS_PATH, build_dir / CSS_PATH.name)
-    for resource_path in STATIC_RESOURCES:
-        shutil.copy(resource_path, build_dir / resource_path.name)
+    for src_path, dst_path in STATIC_RESOURCES.items():
+        src_path = Path(THISDIR, src_path)
+        dst_path = Path(BUILDIR, dst_path)
+        LOGGER.debug(f"shutil.copy({src_path}, {dst_path})")
+        shutil.copy(src_path, dst_path)
 
     LOGGER.info("site build finished")
 
