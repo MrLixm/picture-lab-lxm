@@ -22,7 +22,7 @@ from lxmpicturelab.browse import ImageryAsset
 # to upgrade at each code change that affect the data writen to the output image
 __version__ = f"2-{lxmpicturelab.__version__}"
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger(Path(__file__).stem)
 
 OIIOTOOL_PATH = Path(shutil.which("oiiotool"))
 assert OIIOTOOL_PATH.exists()

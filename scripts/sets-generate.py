@@ -23,7 +23,7 @@ from lxmpicturelab.utils import timeit
 
 THISDIR = Path(__file__).parent
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger(Path(__file__).stem)
 
 OIIOTOOL_PATH = Path(shutil.which("oiiotool"))
 assert OIIOTOOL_PATH.exists()

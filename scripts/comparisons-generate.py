@@ -25,7 +25,7 @@ from lxmpicturelab.oiiotoolio import oiiotool_generate_expo_bands
 from lxmpicturelab.oiiotoolio import oiiotool_auto_mosaic
 from lxmpicturelab.imgasset import ImageryAssetMetadata
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger(Path(__file__).stem)
 
 OIIOTOOL = Path(shutil.which("oiiotool"))
 assert OIIOTOOL.exists()
