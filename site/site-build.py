@@ -201,7 +201,7 @@ def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
     return parsed
 
 
-def check_git_repo_state(repo: Path) -> str:
+def check_git_repo_state(repo: Path) -> tuple[str, str]:
     """
     Check the git repository is in the expected state for publishing.
 
@@ -235,13 +235,13 @@ def check_git_repo_state(repo: Path) -> str:
         raise RuntimeError("current git branch is behind of its remote (needs pull). ")
 
     return (
-        f"chore(doc): sphinx build copied to gh-pages\n\n"
-        f"from commit {git_last_commit} on branch {git_current_branch}"
+        f"chore(doc): automatic build to gh-pages",
+        f"from commit {git_last_commit} on branch {git_current_branch}",
     )
 
 
 @contextlib.contextmanager
-def publish_context(build_dir: Path, commit_msg: str):
+def publish_context(build_dir: Path, commit_msg: tuple[str, str]):
     """
     Perform actions that will be published to the gh-page branch.
 
@@ -265,8 +265,10 @@ def publish_context(build_dir: Path, commit_msg: str):
         LOGGER.info(f"changes found:\n{'=' * 8}")
         LOGGER.info(changes)
 
-        LOGGER.info(f"git commit -m {commit_msg}")
-        subprocess.check_call(["git", "commit", "-m", commit_msg], cwd=build_dir)
+        LOGGER.info(f"git commit -m {commit_msg[0]} -m {commit_msg[1]}")
+        subprocess.check_call(
+            ["git", "commit", "-m", commit_msg[0], "-m", commit_msg[1]], cwd=build_dir
+        )
         LOGGER.info("git push origin gh-pages")
         subprocess.check_call(["git", "push", "origin", "gh-pages"], cwd=build_dir)
 
@@ -390,12 +392,12 @@ def main(argv: list[str] | None = None):
     if publish:
         LOGGER.warning("about to publish website; make sure this is intentional")
         try:
-            commit_msg = check_git_repo_state(THISDIR)
+            commit_msgs = check_git_repo_state(THISDIR)
         except Exception as error:
             print(f"GIT ERROR: {error}", file=sys.stderr)
             sys.exit(1)
 
-        with publish_context(build_dir, commit_msg):
+        with publish_context(build_dir, commit_msgs):
             build(build_dir=build_dir, work_dir=work_dir, publish=True)
         LOGGER.info("✅ site publish finished")
         LOGGER.info(f"🌐 check '{SITEURL}' in few minutes")
