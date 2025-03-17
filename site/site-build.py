@@ -253,6 +253,11 @@ def publish_context(build_dir: Path, commit_msg: tuple[str, str]):
         ["git", "worktree", "add", str(build_dir), "gh-pages"], cwd=THISDIR
     )
     try:
+        # ensure to clean the gh-pages content at each build
+        subprocess.check_call(
+            ["git", "rm", "--quiet", "--ignore-unmatch", "-r", "*"], cwd=build_dir
+        )
+
         yield
 
         subprocess.check_call(["git", "add", "--all"], cwd=build_dir)
@@ -381,13 +386,15 @@ def main(argv: list[str] | None = None):
     build_dir: Path = cli.target_dir
     publish: bool = cli.publish
 
-    work_dir.mkdir(exist_ok=True)
-
     LOGGER.debug(f"build_dir={build_dir}")
     LOGGER.debug(f"work_dir={work_dir}")
 
     if build_dir.exists():
         shutil.rmtree(build_dir)
+    if publish and work_dir.exists():
+        shutil.rmtree(work_dir)
+
+    work_dir.mkdir(exist_ok=True)
 
     if publish:
         LOGGER.warning("about to publish website; make sure this is intentional")
