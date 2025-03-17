@@ -15,7 +15,6 @@ from typing import Any
 from typing import Callable
 
 import lxmpicturelab
-from lxmpicturelab.browse import ImageAsset
 from lxmpicturelab.browse import SETS_DIR
 from lxmpicturelab.browse import get_all_assets
 from lxmpicturelab.asset import AssetMetadata
@@ -35,7 +34,7 @@ assert OIIOTOOL_PATH.exists()
 ASSET_INGEST_PATH = THISDIR / "asset-in-ingest.py"
 _ASSET_INGEST = runpy.run_path(str(ASSET_INGEST_PATH), run_name="__passthrough__")
 # to upgrade at each code change that affect the data writen to the output image
-__version__ = f"3-{_ASSET_INGEST['__version__']}"
+__version__ = f"4-{_ASSET_INGEST['__version__']}"
 
 OVERWRITE_EXISTING = True
 
@@ -98,6 +97,7 @@ def generate_mosaic(
         margins: space in pixels between the border of the image and the tiles
     """
     header_height = 150
+    header_title = f"{dst_asset.image_path.stem} v{__version__}"
     header_disclaimer_txt = "all images belongs to their respective owner, credits viewable in the metadata."
     bg_color = ",".join(map(str, background_color))
 
@@ -140,9 +140,10 @@ def generate_mosaic(
         "{TOP.width}x{TOP.height}",
         "--over",
     ]
+    # text header
     command += [
         f"--text:x={margins}:y=60:size=45",
-        f"{dst_asset.image_path.stem}",
+        header_title,
         f"--text:x={margins}:y=95:size=25:color=0.4,0.4,0.4",
         header_disclaimer_txt,
     ]
@@ -260,7 +261,7 @@ def main(
 
         variant_dir.mkdir(exist_ok=True)
 
-        mosaic_path = variant_dir / f"{variant_name}.{__version__}.json"
+        mosaic_path = variant_dir / f"{variant_name}.json"
         mosaic_asset = ImageAsset(mosaic_path)
 
         LOGGER.info(
