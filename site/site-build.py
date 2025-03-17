@@ -40,7 +40,8 @@ STATIC_RESOURCES = {
 }
 
 SITENAME = "lxmpicturelab"
-SITEURL = f"https://mrlixm.github.io/{SITENAME}"
+REPONAME = "picture-lab-lxm"
+SITEURL = f"https://mrlixm.github.io/{REPONAME}"
 SITEICON = "img/lxmpicturelab-icon.svg"
 
 META_DESCRIPTION = "Comparison of different picture formation algorithms."
