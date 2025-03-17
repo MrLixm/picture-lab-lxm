@@ -1,8 +1,14 @@
 import logging
 import math
+import shutil
 from pathlib import Path
 
 LOGGER = logging.getLogger(__name__)
+
+
+OIIOTOOL = Path(shutil.which("oiiotool"))
+# if raises, means problem with dependencies python venv
+assert OIIOTOOL.exists()
 
 
 def oiiotool_export(
