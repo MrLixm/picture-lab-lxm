@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>lxmpicturelab - about</title>
+  <link rel="icon" href="https://mrlixm.github.io/lxmpicturelab/img/lxmpicturelab-icon.svg" type="image/x-ico">
+  <meta property="og:description" content="Comparison of different picture formation algorithms.">
+  <meta property="twitter:description" content="Comparison of different picture formation algorithms.">
+  <meta property="og:image" content="https://mrlixm.github.io/lxmpicturelab/img/lxmpicturelab-cover.jpg">
+  <meta name="fediverse:creator" content="@liamcollod@mastodon.gamedev.place">
+    <link rel="stylesheet" href="main.css"/>
+  
+  
+</head>
+<body>
+<header>
+  <div class="row">
+    <a href="index.html"><h1>lxmpicturelab</h1></a>
+    <nav>
+      <a href="about.html">
+        <div class="nav-item active">
+          <span>about</span>
+        </div>
+      </a>
+    </nav>
+  </div>
+  <nav class="comparisons">
+    
+      <a href="lxmpicturelab-set.al.html">
+        <div class="nav-item ">
+          <span>lxmpicturelab-set.al</span>
+        </div>
+      </a>
+    
+      <a href="CAlc-D8T-dragon.html">
+        <div class="nav-item ">
+          <span>CAlc-D8T-dragon</span>
+        </div>
+      </a>
+    
+      <a href="CGts-W0L-sweep.html">
+        <div class="nav-item ">
+          <span>CGts-W0L-sweep</span>
+        </div>
+      </a>
+    
+      <a href="PAac-B01-skins.html">
+        <div class="nav-item ">
+          <span>PAac-B01-skins</span>
+        </div>
+      </a>
+    
+      <a href="PAfm-SWE-neongirl.html">
+        <div class="nav-item ">
+          <span>PAfm-SWE-neongirl</span>
+        </div>
+      </a>
+    
+      <a href="PAjg-MZY-nightstreet.html">
+        <div class="nav-item ">
+          <span>PAjg-MZY-nightstreet</span>
+        </div>
+      </a>
+    
+      <a href="PAmsk-R65-christmas.html">
+        <div class="nav-item ">
+          <span>PAmsk-R65-christmas</span>
+        </div>
+      </a>
+    
+  </nav>
+</header>
+<main>
+  
+  <div class="extra-margins">
+    <h1>about</h1>
+    <p>This website provides resources to evaluate and compare the different
+      picture formation algorithm available online. Those kind of algorithm are
+      also referred as:</p>
+    <ul>
+      <li>display rendering transform</li>
+      <li>view transform</li>
+      <li>LUT</li>
+    </ul>
+    <p>In few words, picture formation is converting physical quantities
+      to a readable visual representation. The concept can be explored further
+      with:</p>
+    <ul>
+      <li><a href="https://github.com/sobotka/scise/wiki/Picture-Formation">https://github.com/sobotka/scise/wiki/Picture-Formation</a>
+      </li>
+      <li><a href="https://hg2dc.com/2025/03/13/question-34/">https://hg2dc.com/2025/03/13/question-34/</a>
+      </li>
+      <li>
+        <a href="https://github.com/jedypod/open-display-transform/wiki/doc-introduction">https://github.com/jedypod/open-display-transform/wiki/doc-introduction</a>
+      </li>
+    </ul>
+    <p class="adm-note">The code source for this website and the image
+      generation can be retrieved
+      at <a href="https://github.com/MrLixm/picture-lab-lxm">https://github.com/MrLixm/picture-lab-lxm</a>.
+    </p>
+    <h2>Software</h2>
+    <p>This project is made possible thanks to the following (non-exhaustive)
+      free software:</p>
+    <ul>
+      <li><a href="https://www.python.org/">Python</a></li>
+      <li><a href="https://docs.astral.sh/uv/">uv</a></li>
+      <li><a href="https://openimageio.readthedocs.io">OpenImageIO</a></li>
+      <li><a href="https://opencolorio.org/">OpenColorIO</a></li>
+      <li><a href="https://remixicon.com/">Remix Icon</a></li>
+    </ul>
+    <h2>Assets</h2>
+    <p>Is referred by 'asset' the single image file of a specific scene.</p>
+    <p>Most of the assets were retrieved from the web where they were kindly
+      made accessible by their author. All rights belong to their respective
+      authors, and they are only shared here for education purposes.</p>
+    <p class="adm-note">The original image files are not yet shared on the
+      source GitHub repository (for licensing reasons).
+      But it's possible to download them yourself by
+      checking their side-car metadata .json file.</p>
+    <h2>Renderers</h2>
+    <p>A renderer correspond to a color-transform that must be applied on pixel
+      data.
+      All renderers are color-managed for an sRGB output but will showcase
+      a different picture formation algorithm.</p>
+    <p>ℹ️ Note that the preferred sRGB transfer-function is 2.2 when possible,
+      but some Renderer may use the piecewise function.</p>
+    <p>The color transforms are serialized in an OpenColorIO
+      configuration, which will be ingested by OpenImageIO's oiiotool for
+      transforming the pixel data.</p>
+    <div class="renderers-box">
+      
+        <div class="renderer-item">
+          <h3>ACES v1.3 + Gamut Mapping</h3>
+          <div class="renderer-item-content">
+            <p>The Academy Color Encoding System on major version 1, with their &#34;Gamut Compression&#34; look.</p>
+            <p>Source:
+              <a href="https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v2.1.0-v2.2.0/studio-config-v2.1.0_aces-v1.3_ocio-v2.1.ocio">https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v2.1.0-v2.2.0/studio-config-v2.1.0_aces-v1.3_ocio-v2.1.ocio</a>
+            </p>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>sRGB - Display</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>ACES 1.0 - SDR Video</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td>ACES 1.3 Reference Gamut Compression</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      
+        <div class="renderer-item">
+          <h3>ACES v2.0 + Gamut Mapping</h3>
+          <div class="renderer-item-content">
+            <p>The Academy Color Encoding System on major version 2, with their &#34;Gamut Compression&#34; look.</p>
+            <p>Source:
+              <a href="https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio">https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio</a>
+            </p>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>sRGB - Display</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>ACES 2.0 - SDR 100 nits (Rec.709)</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td>ACES 1.3 Reference Gamut Compression</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      
+        <div class="renderer-item">
+          <h3>ACES v2.0 </h3>
+          <div class="renderer-item-content">
+            <p>The Academy Color Encoding System on major version 2.</p>
+            <p>Source:
+              <a href="https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio">https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio</a>
+            </p>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>sRGB - Display</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>ACES 2.0 - SDR 100 nits (Rec.709)</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      
+        <div class="renderer-item">
+          <h3>AgX Blender-4.2.7</h3>
+          <div class="renderer-item-content">
+            <p>The improved AgX algorithm implemented in Blender.</p>
+            <p>Source:
+              <a href="https://projects.blender.org/blender/blender/archive/v4.2.7.zip">https://projects.blender.org/blender/blender/archive/v4.2.7.zip</a>
+            </p>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>sRGB</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>AgX</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td>AgX - Punchy</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      
+        <div class="renderer-item">
+          <h3>AgX</h3>
+          <div class="renderer-item-content">
+            <p>The original AgX algorithm by Troy Sobotka.</p>
+            <p>Source:
+              <a href="https://github.com/sobotka/AgX/archive/refs/heads/main.zip">https://github.com/sobotka/AgX/archive/refs/heads/main.zip</a>
+            </p>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>sRGB</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>Appearance Punchy</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      
+        <div class="renderer-item">
+          <h3>AgXc v1.0.0.rc.5</h3>
+          <div class="renderer-item-content">
+            <p>Another custom variant of AgX, closer to Blender variant. Not yet released.</p>
+            <p>Source:
+              <a href="https://github.com/MrLixm/AgXc/archive/refs/heads/refacto/ocio-overhaul.zip">https://github.com/MrLixm/AgXc/archive/refs/heads/refacto/ocio-overhaul.zip</a>
+            </p>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>sRGB-2.2</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>AgXc.base Punchy</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      
+        <div class="renderer-item">
+          <h3>ARRI Reveal</h3>
+          <div class="renderer-item-content">
+            <p>The ARRI &#34;color-science&#34; pipeline, based on their provided display LUTs.</p>
+            <p>Source:
+              <a href="https://www.arri.com/resource/blob/280728/7933fd1ce4de9165b906936661ab54eb/arri-logc4-lut-package-data.zip">https://www.arri.com/resource/blob/280728/7933fd1ce4de9165b906936661ab54eb/arri-logc4-lut-package-data.zip</a>
+            </p>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>sRGB - 2.2</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>ARRI Reveal</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      
+        <div class="renderer-item">
+          <h3>Native (no image formation)</h3>
+          <div class="renderer-item-content">
+            <p>No picture formation is applied, anything outside the target volume is clipped.</p>
+            <p>Source:
+              <a href="https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio">https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio</a>
+            </p>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>sRGB - Display</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>Un-tone-mapped</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      
+        <div class="renderer-item">
+          <h3>TCAMv3</h3>
+          <div class="renderer-item-content">
+            <p>Filmlight&#39;s algorithm which is best working in the context of their grading tools.</p>
+            <p>Source:
+              <a href="https://www.filmlight.ltd.uk/resources/download.php">https://www.filmlight.ltd.uk/resources/download.php</a>
+            </p>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>sRGB Display: 2.2 Gamma : Rec.709 Truelight CAM v3</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>sRGB Display: 2.2 Gamma : Rec.709</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      
+    </div>
+    <h2>Contact</h2>
+    <p>For any feedback/requests, see contact options at
+      <a target="_blank" href="https://mrlixm.github.io/pages/contact/">https://mrlixm.github.io/pages/contact/</a>
+    </p>
+  </div>
+
+</main>
+</body>
+<footer>
+  <p>Static website created by Liam Collod using Python - Last built on 2025-03-17T15:12</p>
+</footer>
+</html>
