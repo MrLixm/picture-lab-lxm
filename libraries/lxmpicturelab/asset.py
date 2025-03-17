@@ -140,6 +140,14 @@ class AssetMetadata:
 
         return as_dict
 
+    def to_json_file(self, file_path: Path, **json_kwargs):
+        """
+        Serialize to a json file.
+        """
+        asdict = self.to_dict()
+        with file_path.open("w", encoding="utf-8") as file:
+            json.dump(asdict, file, **json_kwargs)
+
     @classmethod
     def from_dict(cls, serialized_dict: dict) -> "AssetMetadata":
         """
