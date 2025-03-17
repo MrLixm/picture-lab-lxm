@@ -209,6 +209,16 @@ Reference: https://codepen.io/alvarotrigo/pen/bGoPzmw
     display: block;
 }
 
+.tab-label {
+    display: flex;
+}
+.tab-label > svg {
+    display: inline-block;
+    margin-right: 5px;
+    width: 16px;
+    height: 16px;
+}
+
 
 /*
 ==============

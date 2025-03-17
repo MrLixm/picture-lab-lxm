@@ -15,8 +15,8 @@ import jinja2
 import unicodedata
 
 import lxmpicturelab
-from lxmpicturelab.renderer import OcioConfigRenderer
 from lxmpicturelab.imgasset import ImageryAssetMetadata
+from lxmpicturelab.renderer import OcioConfigRenderer
 
 LOGGER = logging.getLogger(Path(__file__).stem)
 
@@ -32,6 +32,8 @@ STATIC_RESOURCES = {
     "MartianMono.variable.ttf": "MartianMono.variable.ttf",
     "img/lxmpicturelab-cover.jpg": "img/lxmpicturelab-cover.jpg",
     "img/lxmpicturelab-icon.svg": "img/lxmpicturelab-icon.svg",
+    "img/icon-grid.svg": "img/icon-grid.svg",
+    "img/icon-swap-box.svg": "img/icon-swap-box.svg",
 }
 
 SITENAME = "lxmpicturelab"
@@ -185,7 +187,6 @@ def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None):
-
     cli = get_cli(argv)
     work_dir: Path = cli.work_dir
     build_dir: Path = cli.target_dir
