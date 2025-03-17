@@ -24,11 +24,11 @@
   {%- for generator in Comparison.generators %}
     <h2>{{ generator.name }}</h2>
     <div class="tiles-formations">
-      {%- for renderer_name, render_path in generator.renders.items() %}
+      {%- for renderer, render_path in generator.renders.items() %}
         <div class="tile-item">
-          <h3>{{ renderer_name }}</h3>
+          <h3>{{ renderer.name }}</h3>
           <a href="{{ render_path|escape }}">
-            {% set img_name = "image render with picture formation '" + renderer_name + "'" %}
+            {% set img_name = "image render with picture formation '" + renderer.name + "'" %}
             <img src="{{ render_path|escape }}" alt="render using {{ img_name }}" title="{{ img_name }}">
           </a>
         </div>

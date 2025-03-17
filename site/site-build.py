@@ -45,7 +45,7 @@ FOOTER = "Static website created by Liam Collod using Python"
 @dataclasses.dataclass
 class ComparisonGenerator:
     name: str
-    renders: dict[str, str]
+    renders: dict[OcioConfigRenderer, str]
     combined: str
 
 
@@ -56,14 +56,18 @@ class Comparison:
     metadata: ImageryAssetMetadata
 
     @classmethod
-    def from_json(cls, json_str: str):
+    def from_json(cls, json_str: str, renderers: list[OcioConfigRenderer]):
         as_dict = json.loads(json_str)
+        renderers_by_name = {renderer.name: renderer for renderer in renderers}
 
         generators = []
         for generator_name, generator_config in as_dict["generators"].items():
             generator = ComparisonGenerator(
                 name=generator_name,
-                renders=generator_config["renders"],
+                renders={
+                    renderers_by_name[renderer_name]: path
+                    for renderer_name, path in generator_config["renders"].items()
+                },
                 combined=generator_config["combined"],
             )
             generators.append(generator)
@@ -98,18 +102,21 @@ def build_comparisons(
         ]
         runpy.run_path(str(IMAGEGEN_SCRIPT_PATH), run_name="__main__")
 
-    comparisons = []
-    for comparison_metadadata_path in comparisons_dir.glob("*.json"):
-        comparison = Comparison.from_json(comparison_metadadata_path.read_text())
-        if comparison_metadadata_path.name.startswith("lxm"):
-            comparisons.insert(0, comparison)
-        else:
-            comparisons.append(comparison)
-
     renderers = []
     for renderer_metadadata_path in renderer_dir.glob("*.json"):
         renderer = OcioConfigRenderer.from_json(renderer_metadadata_path.read_text())
         renderers.append(renderer)
+
+    comparisons = []
+    for comparison_metadadata_path in comparisons_dir.glob("*.json"):
+        comparison = Comparison.from_json(
+            json_str=comparison_metadadata_path.read_text(),
+            renderers=renderers,
+        )
+        if comparison_metadadata_path.name.startswith("lxm"):
+            comparisons.insert(0, comparison)
+        else:
+            comparisons.append(comparison)
 
     LOGGER.debug(f"copytree('{comparisons_dir}', '{dst_dir}')")
     shutil.copytree(comparisons_dir, dst_dir, ignore=shutil.ignore_patterns("*.json"))

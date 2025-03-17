@@ -30,7 +30,7 @@ def oiiotool_AP0_to_sRGB():
     ]
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class OcioConfigRenderer:
     """
     Indicate how to evaluate an image formation sourced from an OCIO config file.
