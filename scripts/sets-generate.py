@@ -18,6 +18,10 @@ import lxmpicturelab
 from lxmpicturelab.browse import ImageAsset
 from lxmpicturelab.browse import SETS_DIR
 from lxmpicturelab.browse import get_all_assets
+from lxmpicturelab.asset import AssetMetadata
+from lxmpicturelab.asset import ImageAsset
+from lxmpicturelab.asset import AssetPrimaryColor
+from lxmpicturelab.asset import AssetType
 from lxmpicturelab.oiiotoolio import oiiotool_export
 from lxmpicturelab.utils import timeit
 
@@ -72,8 +76,8 @@ SET_VARIANTS = [
 
 
 def generate_mosaic(
-    assets: list[ImageAsset],
-    target_path: Path,
+    dst_asset: ImageAsset,
+    src_assets: list[ImageAsset],
     mosaic_columns: int = 5,
     tile_width: int = 1102,
     tile_height: int = 752,
@@ -85,8 +89,8 @@ def generate_mosaic(
 
     Args:
         background_color:
-        assets: list of image asset to build the mosaic with
-        target_path: filesystem path to the mosaic file to write to
+        dst_asset: the asset configuration of the mosaic to create
+        src_assets: list of image asset to build the mosaic with
         mosaic_columns: max number of columns
         tile_height: width each image (tile) must be fitted in
         tile_width: height each image (tile) must be fitted in
@@ -97,24 +101,24 @@ def generate_mosaic(
     header_disclaimer_txt = "all images belongs to their respective owner, credits viewable in the metadata."
     bg_color = ",".join(map(str, background_color))
 
-    if len(assets) <= mosaic_columns:
-        tiles_w, tiles_h = (len(assets), 1)
+    if len(src_assets) <= mosaic_columns:
+        tiles_w, tiles_h = (len(src_assets), 1)
     else:
         tiles_w = mosaic_columns
-        tiles_h = math.ceil(len(assets) / mosaic_columns)
+        tiles_h = math.ceil(len(src_assets) / mosaic_columns)
 
     command: list[str] = [str(OIIOTOOL_PATH)]
-    for asset in assets:
+    for src_asset in src_assets:
         command += [
             "-i",
-            str(asset.image_path),
+            str(src_asset.image_path),
             "--fit:filter=cubic",
             f"{tile_width}x{tile_height}",
             "--ch",
             "R,G,B,A=1.0",
             # bottom-left text with 30px margin
             "--text:x={TOP.x+30}:y={TOP.height+TOP.y-15}:shadow=4",
-            f"{asset.identifier}",
+            f"{src_asset.identifier}",
             # have the data-window cover the display-window
             "--croptofull",
         ]
@@ -138,22 +142,36 @@ def generate_mosaic(
     ]
     command += [
         f"--text:x={margins}:y=60:size=45",
-        f"{target_path.stem}",
+        f"{dst_asset.image_path.stem}",
         f"--text:x={margins}:y=95:size=25:color=0.4,0.4,0.4",
         header_disclaimer_txt,
     ]
+
     # metadata
-    author_by_file = {asset.identifier: asset.metadata.authors for asset in assets}
-    context_by_file = {asset.identifier: asset.metadata.context for asset in assets}
+    authors: dict[str, list[str]] = {}
+    for asset in src_assets:
+        for author in asset.metadata.authors:
+            authors.setdefault(author, []).append(asset.identifier)
+    authors: list[str] = [
+        f"{author} ({','.join(assets)})" for author, assets in authors.items()
+    ]
+    context_by_file = {asset.identifier: asset.metadata.context for asset in src_assets}
+    contexts = str(json.dumps(context_by_file))
+    metadata = AssetMetadata(
+        source="https://github.com/MrLixm/picture-lab-lxm",
+        authors=authors,
+        references=["https://github.com/MrLixm/picture-lab-lxm"],
+        capture_gamut="various",
+        primary_color=AssetPrimaryColor.rainbow,
+        type=AssetType.cgi,
+        context=contexts,
+    )
+    LOGGER.debug(f"writing metadata to '{dst_asset.json_path}'")
+    metadata.to_json_file(dst_asset.json_path, indent=4)
+
     command += [
         "--evaloff",
         "--wildcardoff",
-        "--attrib",
-        "sheet/authors",
-        str(json.dumps(author_by_file)),
-        "--attrib",
-        "sheet/context",
-        str(json.dumps(context_by_file)),
         "--attrib",
         f"{lxmpicturelab.METADATA_PREFIX}/__version__",
         __version__,
@@ -167,8 +185,16 @@ def generate_mosaic(
         "chromaticities",
         "0.7347,0.2653,0.0,1.0,0.0001,-0.077,0.32168,0.33767",
     ]
+    for metadata_name, metadata_value in metadata.to_dict().items():
+        command += [
+            "--attrib",
+            f"{lxmpicturelab.METADATA_PREFIX}/{metadata_name}",
+            json.dumps(metadata_value),
+        ]
+
+    # export
     command += oiiotool_export(
-        target_path,
+        dst_asset.image_path,
         bitdepth="float",
         compression="zips",
     )
@@ -234,21 +260,21 @@ def main(
 
         variant_dir.mkdir(exist_ok=True)
 
-        mosaic_name = f"{variant_name}.{__version__}.exr"
-        mosaic_path = variant_dir / mosaic_name
+        mosaic_path = variant_dir / f"{variant_name}.{__version__}.json"
+        mosaic_asset = ImageAsset(mosaic_path)
 
         LOGGER.info(
-            f"💫 generating mosaic from {len(assets)} assets to '{mosaic_path}'"
+            f"💫 generating mosaic from {len(assets)} assets to '{mosaic_asset.image_path}'"
         )
         with timeit(f"{prefix} ✅ generation took ", LOGGER.info):
             generate_mosaic(
-                assets=assets,
-                target_path=mosaic_path,
+                dst_asset=mosaic_asset,
+                src_assets=assets,
                 background_color=bg_color,
             )
             preview_path = mosaic_path.with_suffix(".preview.jpg")
             generate_preview(
-                mosaic_path=mosaic_path,
+                mosaic_path=mosaic_asset.image_path,
                 target_path=preview_path,
             )
 
