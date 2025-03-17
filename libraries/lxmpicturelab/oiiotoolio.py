@@ -147,3 +147,24 @@ def oiiotool_auto_mosaic(image_number: int) -> list[str]:
         f"{columns}x{rows}",
     ]
     return command
+
+
+def oiiotool_export_auto_mosaic(image_paths: list[Path], dst_path: Path):
+    """
+    Create a mosaic of the given images, automatically guessing rows/columns.
+
+    Write as jpg to disk.
+
+    Returns:
+        a full oiiotool command ready to execute.
+    """
+    command = [("-i", str(path)) for path in image_paths]
+    command = [arg for args in command for arg in args]
+    command += oiiotool_auto_mosaic(len(image_paths))
+    command += oiiotool_export(
+        target_path=dst_path,
+        bitdepth="uint8",
+        compression="jpeg:98",
+    )
+    command.insert(0, str(OIIOTOOL))
+    return command
