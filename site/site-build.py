@@ -1,4 +1,5 @@
 import argparse
+import contextlib
 import dataclasses
 import datetime
 import json
@@ -7,12 +8,13 @@ import os
 import re
 import runpy
 import shutil
+import subprocess
 import sys
+import unicodedata
 from pathlib import Path
 from typing import Callable
 
 import jinja2
-import unicodedata
 
 import lxmpicturelab
 from lxmpicturelab.imgasset import ImageryAssetMetadata
@@ -34,6 +36,7 @@ STATIC_RESOURCES = {
     "img/lxmpicturelab-icon.svg": "img/lxmpicturelab-icon.svg",
     "img/icon-grid.svg": "img/icon-grid.svg",
     "img/icon-swap-box.svg": "img/icon-swap-box.svg",
+    ".nojekyll": ".nojekyll",
 }
 
 SITENAME = "lxmpicturelab"
@@ -94,6 +97,9 @@ def build_comparisons(
     work_dir: Path,
     dst_dir: Path,
 ) -> tuple[list[Comparison], list[OcioConfigRenderer]]:
+    """
+    Generate the comparison images and their metadata.
+    """
     comparisons_dir = work_dir / "comparisons"
     renderer_dir = work_dir / "renderers"
     if not comparisons_dir.exists() or not renderer_dir.exists():
@@ -126,6 +132,15 @@ def build_comparisons(
     shutil.copytree(comparisons_dir, dst_dir, ignore=shutil.ignore_patterns("*.json"))
 
     return comparisons, renderers
+
+
+def gitget(command: list[str], cwd: Path) -> str:
+    """
+    Call git and return its output.
+    """
+    out = subprocess.check_output(["git"] + command, cwd=cwd, text=True)
+    out = out.rstrip("\n").rstrip(" ")
+    return out
 
 
 def slugify(value, allow_unicode=False):
@@ -186,37 +201,116 @@ def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
     return parsed
 
 
-def main(argv: list[str] | None = None):
-    cli = get_cli(argv)
-    work_dir: Path = cli.work_dir
-    build_dir: Path = cli.target_dir
-    publish: bool = cli.publish
+def check_git_repo_state(repo: Path) -> str:
+    """
+    Check the git repository is in the expected state for publishing.
+
+    Returns:
+        the commit name for publishing
+    """
+    git_status = gitget(["status", "--porcelain"], cwd=repo)
+    git_last_commit = gitget(["rev-parse", "HEAD"], cwd=repo)
+    git_current_branch = gitget(["branch", "--show-current"], cwd=repo)
+    git_remote_status = gitget(["status", "--short", "--b", "--porcelain"], cwd=repo)
+    try:
+        git_ghpages = gitget(["rev-parse", "--verify", "gh-pages"], cwd=repo)
+    except subprocess.CalledProcessError:
+        git_ghpages = None
+
+    if git_current_branch != "main":
+        raise RuntimeError(
+            f"current git branch is '{git_current_branch}', expected 'main'."
+        )
+
+    if not git_ghpages:
+        raise RuntimeError("Branch 'gh-pages' doesn't exists. Create it first.")
+
+    if git_status:
+        raise RuntimeError(f"Uncommited changes found: {git_status}.")
+
+    if re.search(rf"## {git_current_branch}.+\[ahead", git_remote_status):
+        raise RuntimeError("current git branch is ahead of its remote (needs push).")
+
+    if re.search(rf"## {git_current_branch}.+\[behind", git_remote_status):
+        raise RuntimeError("current git branch is behind of its remote (needs pull). ")
+
+    return (
+        f"chore(doc): sphinx build copied to gh-pages\n\n"
+        f"from commit {git_last_commit} on branch {git_current_branch}"
+    )
+
+
+@contextlib.contextmanager
+def publish_context(build_dir: Path, commit_msg: str):
+    """
+    Perform actions that will be published to the gh-page branch.
+
+    Args:
+        build_dir: filesystem path to a directory thatmay not exist yet.
+        commit_msg: message for the gh-page branch commit.
+    """
+    subprocess.check_call(
+        ["git", "worktree", "add", str(build_dir), "gh-pages"], cwd=THISDIR
+    )
+    try:
+        yield
+
+        subprocess.check_call(["git", "add", "--all"], cwd=build_dir)
+
+        changes = gitget(["status", "--porcelain"], cwd=build_dir)
+        if not changes:
+            LOGGER.warning("nothing to commit, skipping publishing ...")
+            return
+
+        LOGGER.info(f"changes found:\n{'=' * 8}")
+        LOGGER.info(changes)
+
+        LOGGER.info(f"git commit -m {commit_msg}")
+        subprocess.check_call(["git", "commit", "-m", commit_msg], cwd=build_dir)
+        LOGGER.info("git push origin gh-pages")
+        subprocess.check_call(["git", "push", "origin", "gh-pages"], cwd=build_dir)
+
+    finally:
+        # `git worktree remove` is supposed to delete it but fail, so we do it in python
+        shutil.rmtree(build_dir, ignore_errors=True)
+        subprocess.check_call(["git", "worktree", "prune"], cwd=THISDIR)
+
+
+def build(build_dir: Path, work_dir: Path, publish: bool):
+    """
+    Generate the final static html site.
+
+    Args:
+        build_dir: filesystem path to a non-existing directory. Used to store the final site.
+        work_dir: filesystem path to an existing directory.
+        publish: true to build for web publishing else implies local testing.
+    """
 
     def expand_siteurl(path: str) -> str:
         if publish:
             return f"{SITEURL}/{path}"
         return path
 
-    work_dir.mkdir(exist_ok=True)
+    def conformize_paths(p: str) -> str:
+        p = Path("img", p)
+        return p.as_posix()
 
-    if build_dir.exists():
-        shutil.rmtree(build_dir)
-    build_dir.mkdir(exist_ok=True)
+    # // comparison images generation
 
     comparisons_dir = build_dir / "img"
-    LOGGER.info(f"building comparisons to '{comparisons_dir}'")
+    LOGGER.info(f"building comparisons images to '{comparisons_dir}'")
     comparisons, renderers = build_comparisons(
         work_dir=work_dir,
         dst_dir=comparisons_dir,
     )
     comparisons = {comparison.source: comparison for comparison in comparisons}
 
+    # // HTML generation
+
     jinja_env = get_jinja_env(build_dir)
     comparison_template = jinja_env.get_template("comparison.html")
 
-    def conformize_paths(p: str) -> str:
-        p = Path("img", p)
-        return p.as_posix()
+    # build comparison.html
 
     global_ctx = {
         "SITENAME": SITENAME,
@@ -274,11 +368,43 @@ def main(argv: list[str] | None = None):
         os.symlink(CSS_PATH, build_dir / CSS_PATH.name)
     for src_path, dst_path in STATIC_RESOURCES.items():
         src_path = Path(THISDIR, src_path)
-        dst_path = Path(BUILDIR, dst_path)
+        dst_path = Path(build_dir, dst_path)
         LOGGER.debug(f"shutil.copy({src_path}, {dst_path})")
         shutil.copy(src_path, dst_path)
 
-    LOGGER.info("site build finished")
+
+def main(argv: list[str] | None = None):
+    cli = get_cli(argv)
+    work_dir: Path = cli.work_dir
+    build_dir: Path = cli.target_dir
+    publish: bool = cli.publish
+
+    work_dir.mkdir(exist_ok=True)
+
+    LOGGER.debug(f"build_dir={build_dir}")
+    LOGGER.debug(f"work_dir={work_dir}")
+
+    if build_dir.exists():
+        shutil.rmtree(build_dir)
+
+    if publish:
+        LOGGER.warning("about to publish website; make sure this is intentional")
+        try:
+            commit_msg = check_git_repo_state(THISDIR)
+        except Exception as error:
+            print(f"GIT ERROR: {error}", file=sys.stderr)
+            sys.exit(1)
+
+        with publish_context(build_dir, commit_msg):
+            build(build_dir=build_dir, work_dir=work_dir, publish=True)
+        LOGGER.info("✅ site publish finished")
+        LOGGER.info(f"🌐 check '{SITEURL}' in few minutes")
+
+    else:
+        build_dir.mkdir(exist_ok=True)
+        build(build_dir=build_dir, work_dir=work_dir, publish=False)
+        LOGGER.info("✅ site build finished")
+        LOGGER.info(f"🌐 check 'file:///{build_dir.as_posix()}/index.html'")
 
 
 if __name__ == "__main__":
