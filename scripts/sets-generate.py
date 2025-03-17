@@ -35,7 +35,7 @@ assert OIIOTOOL_PATH.exists()
 ASSET_INGEST_PATH = THISDIR / "asset-in-ingest.py"
 _ASSET_INGEST = runpy.run_path(str(ASSET_INGEST_PATH), run_name="__passthrough__")
 # to upgrade at each code change that affect the data writen to the output image
-__version__ = f"4-{_ASSET_INGEST['__version__']}"
+__version__ = f"5-{_ASSET_INGEST['__version__']}"
 
 OVERWRITE_EXISTING = True
 
@@ -125,7 +125,7 @@ def generate_mosaic(
             "--ch",
             "R,G,B,A=1.0",
             # bottom-left text with 30px margin
-            "--text:x={TOP.x+30}:y={TOP.height+TOP.y-15}:shadow=4",
+            "--text:x={TOP.x+30}:y={TOP.height+TOP.y-15}:shadow=4:size=20",
             f"{src_asset.identifier}",
             # have the data-window cover the display-window
             "--croptofull",
