@@ -44,6 +44,7 @@ OVERWRITE_EXISTING = True
 class SetVariant(abc.ABC):
 
     identifier: str
+    description: str
     bg_color: tuple[float, float, float]
     asset_sorter: Callable[[ImageAsset], Any] | None = None
     asset_filter: Callable[[ImageAsset], bool] | None = None
@@ -64,11 +65,16 @@ def _sort_assets_color(asset: ImageAsset):
 SET_VARIANTS = [
     SetVariant(
         identifier="lxmpicturelab.al.sorted-color.bg-black",
+        description="A collection of heterogeneous images from various physical or virtual capture devices.",
         bg_color=(0, 0, 0),
         asset_sorter=_sort_assets_color,
     ),
     SetVariant(
         identifier="lxmpicturelab.al.sorted-color.bg-midgrey",
+        description=(
+            "A collection of heterogeneous images from various physical or virtual "
+            "capture devices; with a mid-grey background to affect picture perception."
+        ),
         bg_color=(0.18, 0.18, 0.18),
         asset_sorter=_sort_assets_color,
     ),
@@ -78,6 +84,7 @@ SET_VARIANTS = [
 def generate_mosaic(
     dst_asset: ImageAsset,
     src_assets: list[ImageAsset],
+    description: str,
     mosaic_columns: int = 5,
     tile_width: int = 1102,
     tile_height: int = 752,
@@ -157,8 +164,6 @@ def generate_mosaic(
     authors: list[str] = [
         f"{author} ({','.join(assets)})" for author, assets in authors.items()
     ]
-    context_by_file = {asset.identifier: asset.metadata.context for asset in src_assets}
-    contexts = str(json.dumps(context_by_file))
     metadata = AssetMetadata(
         source="https://github.com/MrLixm/picture-lab-lxm",
         authors=authors,
@@ -166,7 +171,7 @@ def generate_mosaic(
         capture_gamut="various",
         primary_color=AssetPrimaryColor.rainbow,
         type=AssetType.cgi,
-        context=contexts,
+        context=description,
     )
     LOGGER.debug(f"writing metadata to '{dst_asset.json_path}'")
     metadata.to_json_file(dst_asset.json_path, indent=4)
@@ -273,6 +278,7 @@ def main(
                 dst_asset=mosaic_asset,
                 src_assets=assets,
                 background_color=bg_color,
+                description=variant.description,
             )
             preview_path = mosaic_path.with_suffix(".preview.jpg")
             generate_preview(
