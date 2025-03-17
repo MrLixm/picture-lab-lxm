@@ -68,23 +68,31 @@ class OcioConfigRenderer:
             look=self.look,
         )
 
-    @classmethod
-    def from_json(cls, json_str: str) -> "OcioConfigRenderer":
-        structure = json.loads(json_str)
-        return cls(
-            name=structure["name"],
-            filename=structure["filename"],
-            description=structure["description"],
-            config_path=Path(structure["config_path"]),
-            srgb_lin=structure["srgb_lin"],
-            display=structure["display"],
-            view=structure["view"],
-            look=structure["look"],
-            src_colorspace=structure["src_colorspace"],
-            reference_url=structure["reference_url"],
-        )
-
-    def to_json(self, **json_kwargs) -> str:
+    def to_dict(self) -> dict:
         asdict = dataclasses.asdict(self)
         asdict["config_path"] = str(self.config_path)
+        return asdict
+
+    @classmethod
+    def from_dict(cls, as_dict: dict) -> "OcioConfigRenderer":
+        return cls(
+            name=as_dict["name"],
+            filename=as_dict["filename"],
+            description=as_dict["description"],
+            config_path=Path(as_dict["config_path"]),
+            srgb_lin=as_dict["srgb_lin"],
+            display=as_dict["display"],
+            view=as_dict["view"],
+            look=as_dict["look"],
+            src_colorspace=as_dict["src_colorspace"],
+            reference_url=as_dict["reference_url"],
+        )
+
+    @classmethod
+    def from_json(cls, json_str: str) -> "OcioConfigRenderer":
+        as_dict = json.loads(json_str)
+        return cls.from_dict(as_dict)
+
+    def to_json(self, **json_kwargs) -> str:
+        asdict = self.to_dict()
         return json.dumps(asdict, **json_kwargs)
