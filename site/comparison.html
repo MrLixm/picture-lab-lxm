@@ -1,20 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %}{{ SITENAME }} - {{ Comparison.source }}{% endblock %}
+{% block title %}{{ SITENAME }} - {{ Comparison.asset_id }}{% endblock %}
 
 {% block main %}
-  <h1>{{ Comparison.source }}</h1>
-  <p>{{ Comparison.metadata.context }}</p>
+  <h1>{{ Comparison.asset_id }}</h1>
+  <p>{{ Comparison.meta_context }}</p>
   <table>
     <tr>
       <th>authors</th>
-      <td>{{ ', '.join(Comparison.metadata.authors) }}</td>
+      <td>{{ Comparison.meta_authors }}</td>
     </tr>
     <tr>
       <th>capture gamut</th>
-      <td>{{ Comparison.metadata.capture_gamut }}</td>
+      <td>{{ Comparison.meta_gamut }}</td>
     </tr>
-    {%- for reference in Comparison.metadata.references %}
+    {%- for reference in Comparison.meta_references %}
       <tr>
         <th>reference</th>
         <td><a href="{{ reference }}">{{ reference }}</a></td>
@@ -30,12 +30,12 @@
       <div class="tab-content">
 
         <div class="tiles-formations">
-          {%- for renderer, render_path in generator.renders.items() %}
+          {%- for render in generator.renders %}
             <div class="tile-item">
-              <h3>{{ renderer.name }}</h3>
-              <a href="{{ render_path|escape }}">
-                {% set img_name = "image render with picture formation '" + renderer.name + "'" %}
-                <img src="{{ render_path|escape }}" alt="render using {{ img_name }}" title="{{ img_name }}">
+              <h3>{{ render.renderer_name }}</h3>
+              <a href="{{ render.path|escape }}">
+                {% set img_name = "image render with picture formation '" + render.renderer_name + "'" %}
+                <img src="{{ render.path|escape }}" alt="render using {{ img_name }}" title="{{ img_name }}">
               </a>
             </div>
           {%- endfor %}
@@ -47,14 +47,14 @@
       <div class="tab-content">
 
         <div class="tab-wrap">
-          {%- for renderer, render_path in generator.renders.items() %}
-            {% set tabid = "tab-rend-{}-{}".format(generator.name, renderer.filename) %}
+          {%- for render in generator.renders %}
+            {% set tabid = "tab-rend-{}-{}".format(generator.name, render.renderer_id) %}
             <input class="tab-input" id="{{ tabid|slugify }}" name="tab-rend-{{ generator.name }}" type="radio" {% if loop.index==1 %}checked{% endif %}>
-            <label class="tab-label" for="{{ tabid|slugify }}" title="{{ renderer.name }}">{{ renderer.filename }}</label>
+            <label class="tab-label" for="{{ tabid|slugify }}" title="{{ render.renderer_name }}">{{ render.renderer_id }}</label>
             <div class="tab-content">
-              <a href="{{ render_path|escape }}">
-                {% set img_name = "image render with picture formation '" + renderer.name + "'" %}
-                <img src="{{ render_path|escape }}" alt="render using {{ img_name }}" title="{{ img_name }}">
+              <a href="{{ render.path|escape }}">
+                {% set img_name = "image render with picture formation '" + render.renderer_name + "'" %}
+                <img src="{{ render.path|escape }}" alt="render using {{ img_name }}" title="{{ img_name }}">
               </a>
             </div>
           {%- endfor %}

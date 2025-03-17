@@ -17,8 +17,10 @@ from typing import Callable
 import jinja2
 
 import lxmpicturelab
-from lxmpicturelab.asset import AssetMetadata
 from lxmpicturelab.renderer import OcioConfigRenderer
+from lxmpicturelab.comparison import ComparisonSession
+from lxmpicturelab.comparison import ComparisonRender
+from lxmpicturelab.comparison import GeneratorCombined
 
 LOGGER = logging.getLogger(Path(__file__).stem)
 
@@ -27,6 +29,17 @@ BUILDIR = THISDIR / ".build"
 WORKDIR = THISDIR / ".workbench"
 
 IMAGEGEN_SCRIPT_PATH = THISDIR.parent / "scripts" / "comparisons-generate.py"
+
+ASSETS = {
+    "lxmpicturelab.al.sorted-color.bg-black": ["--generator-full", "2048"],
+    "CGts-W0L-sweep": ["--generator-full", "864"],
+    "CAlc-D8T-dragon": ["--generator-exposures", "0.45", "--generator-full", "864"],
+    "PAmsk-R65-christmas": ["--generator-exposures", "0.3", "--generator-full", "864"],
+    "PAfm-SWE-neongirl": ["--generator-exposures", "0.3", "--generator-full", "864"],
+    "PAac-B01-skins": ["--generator-exposures", "0.01", "--generator-full", "864"],
+    "PAjg-MZY-nightstreet": ["--generator-exposures", "0.3", "--generator-full", "864"],
+}
+
 
 CSS_PATH = THISDIR / "main.css"
 
@@ -49,88 +62,152 @@ META_IMAGE = "img/lxmpicturelab-cover.jpg"
 
 FOOTER = "Static website created by Liam Collod using Python"
 
-
-@dataclasses.dataclass
-class ComparisonGenerator:
-    name: str
-    renders: dict[OcioConfigRenderer, str]
-    combined: str
+# we mirror the API in lxmpicturelab to prevent break
+# in Jinja templates when the API changes. It also mean
+# we pass simpler object to the Jinja template and this is the only
+# place to read if you want to know what to access in your template.
 
 
 @dataclasses.dataclass
-class Comparison:
-    source: str
-    generators: list[ComparisonGenerator]
-    metadata: AssetMetadata
+class CtxRender:
+    renderer_name: str
+    renderer_id: str
+    path: str
 
     @classmethod
-    def from_json(cls, json_str: str, renderers: list[OcioConfigRenderer]):
-        as_dict = json.loads(json_str)
-        renderers_by_name = {renderer.name: renderer for renderer in renderers}
+    def from_comparison(cls, comparison: ComparisonRender) -> "CtxRender":
+        return cls(
+            renderer_name=comparison.renderer.name,
+            renderer_id=comparison.renderer.filename,
+            path=str(comparison.dst_path),
+        )
 
-        generators = []
-        for generator_name, generator_config in as_dict["generators"].items():
-            generator = ComparisonGenerator(
+
+@dataclasses.dataclass
+class CtxGenerator:
+    name: str
+    renders: list[CtxRender]
+    combined: CtxRender | None
+
+
+@dataclasses.dataclass
+class CtxComparison:
+    asset_id: str
+    generators: list[CtxGenerator]
+    meta_context: str
+    meta_gamut: str
+    meta_authors: str
+    meta_references: list[str]
+
+    @property
+    def page_slug(self) -> str:
+        return self.asset_id
+
+    @classmethod
+    def from_session(cls, session: ComparisonSession) -> "CtxComparison":
+        asset_id = session.asset.identifier
+        meta_context = session.asset.metadata.context
+        meta_gamut = session.asset.metadata.capture_gamut
+        meta_authors = "; ".join(session.asset.metadata.authors)
+        meta_references = session.asset.metadata.references
+        render_by_generators: dict[str, list[ComparisonRender]] = {}
+        combined_by_generators: dict[str, CtxRender] = {}
+        for render in session.renders:
+            generator_name = render.generator.shortname
+            if generator_name == GeneratorCombined.shortname:
+                combined_by_generators[generator_name] = CtxRender.from_comparison(
+                    render
+                )
+            else:
+                render_by_generators.setdefault(generator_name, []).append(render)
+
+        cgs = []
+        for generator_name, renders in render_by_generators.items():
+            cg = CtxGenerator(
                 name=generator_name,
-                renders={
-                    renderers_by_name[renderer_name]: path
-                    for renderer_name, path in generator_config["renders"].items()
-                },
-                combined=generator_config["combined"],
+                renders=[CtxRender.from_comparison(render) for render in renders],
+                combined=combined_by_generators.get(generator_name),
             )
-            generators.append(generator)
+            cgs.append(cg)
 
         return cls(
-            source=as_dict["name"],
-            generators=generators,
-            metadata=AssetMetadata.from_dict(as_dict["metadata"]),
+            asset_id=asset_id,
+            generators=cgs,
+            meta_context=meta_context,
+            meta_gamut=meta_gamut,
+            meta_authors=meta_authors,
+            meta_references=meta_references,
         )
 
     def edit_paths(self, callback: Callable[[str], str]):
         for generator in self.generators:
-            generator.renders = {
-                name: callback(path) for name, path in generator.renders.items()
-            }
-            generator.combined = callback(generator.combined)
+            for render in generator.renders:
+                render.path = callback(render.path)
 
 
 def build_comparisons(
+    assets: dict[str, list[str]],
     work_dir: Path,
     dst_dir: Path,
-) -> tuple[list[Comparison], list[OcioConfigRenderer]]:
+    overwrite_existing: bool = False,
+) -> tuple[list[CtxComparison], list[OcioConfigRenderer]]:
     """
     Generate the comparison images and their metadata.
     """
     comparisons_dir = work_dir / "comparisons"
     renderer_dir = work_dir / "renderers"
-    if not comparisons_dir.exists() or not renderer_dir.exists():
-        sys.argv = [
-            sys.argv[0],
-            "--results-dir",
-            str(comparisons_dir),
-            "--renderer-dir",
-            str(renderer_dir),
-        ]
-        runpy.run_path(str(IMAGEGEN_SCRIPT_PATH), run_name="__main__")
 
+    # build renderers only first
+    sys.argv = [
+        sys.argv[0],
+        "RENDERERONLY",
+        "--renderer-dir",
+        str(renderer_dir),
+        "--build-renderer-only",
+    ]
+    runpy.run_path(str(IMAGEGEN_SCRIPT_PATH), run_name="__main__")
     renderers = []
     for renderer_metadadata_path in renderer_dir.glob("*.json"):
         renderer = OcioConfigRenderer.from_json(renderer_metadadata_path.read_text())
         renderers.append(renderer)
 
-    comparisons = []
-    for comparison_metadadata_path in comparisons_dir.glob("*.json"):
-        comparison = Comparison.from_json(
-            json_str=comparison_metadadata_path.read_text(),
-            renderers=renderers,
-        )
-        if comparison_metadadata_path.name.startswith("lxm"):
-            comparisons.insert(0, comparison)
+    # now build all assets comparisons
+    sessions: list[ComparisonSession] = []
+
+    for asset_id, asset_args in assets.items():
+        asset_dst_dir = comparisons_dir / asset_id
+
+        if asset_dst_dir.exists() and not overwrite_existing:
+            LOGGER.info(f"💨 skipping building for '{asset_id}': found existing")
         else:
-            comparisons.append(comparison)
+            LOGGER.info(f"🔨 building comparisons for '{asset_id}'")
+            sys.argv = [
+                sys.argv[0],
+                asset_id,
+                "--target-dir",
+                str(asset_dst_dir),
+                "--renderer-dir",
+                str(renderer_dir),
+            ] + asset_args
+            runpy.run_path(str(IMAGEGEN_SCRIPT_PATH), run_name="__main__")
+
+        session_metadadata_path = next(asset_dst_dir.glob("*.json"))
+        session_metadadata = session_metadadata_path.read_text(encoding="utf-8")
+        session = ComparisonSession.from_json(json_str=session_metadadata)
+        if session.asset.identifier.startswith("lxm"):
+            sessions.insert(0, session)
+        else:
+            sessions.append(session)
 
     LOGGER.debug(f"copytree('{comparisons_dir}', '{dst_dir}')")
     shutil.copytree(comparisons_dir, dst_dir, ignore=shutil.ignore_patterns("*.json"))
+
+    def swap_path(p: str) -> str:
+        p = Path(p).relative_to(comparisons_dir)
+        return str(dst_dir / p)
+
+    comparisons = [CtxComparison.from_session(session) for session in sessions]
+    [comparison.edit_paths(swap_path) for comparison in comparisons]
 
     return comparisons, renderers
 
@@ -283,11 +360,12 @@ def publish_context(build_dir: Path, commit_msg: tuple[str, str]):
         subprocess.check_call(["git", "worktree", "prune"], cwd=THISDIR)
 
 
-def build(build_dir: Path, work_dir: Path, publish: bool):
+def build(assets: dict[str, list[str]], build_dir: Path, work_dir: Path, publish: bool):
     """
     Generate the final static html site.
 
     Args:
+        assets: collection of asset to build the website against
         build_dir: filesystem path to a non-existing directory. Used to store the final site.
         work_dir: filesystem path to an existing directory.
         publish: true to build for web publishing else implies local testing.
@@ -299,18 +377,19 @@ def build(build_dir: Path, work_dir: Path, publish: bool):
         return path
 
     def conformize_paths(p: str) -> str:
-        p = Path("img", p)
+        p = Path(p)
+        p = p.relative_to(build_dir)
         return p.as_posix()
 
     # // comparison images generation
 
     comparisons_dir = build_dir / "img"
-    LOGGER.info(f"building comparisons images to '{comparisons_dir}'")
+    LOGGER.info(f"🔨 building comparisons images to '{comparisons_dir}'")
     comparisons, renderers = build_comparisons(
+        assets=assets,
         work_dir=work_dir,
         dst_dir=comparisons_dir,
     )
-    comparisons = {comparison.source: comparison for comparison in comparisons}
 
     # // HTML generation
 
@@ -323,22 +402,22 @@ def build(build_dir: Path, work_dir: Path, publish: bool):
         "SITENAME": SITENAME,
         "SITEICON": expand_siteurl(SITEICON),
         "STYLESHEETS": [CSS_PATH.name],
-        "COMPARISONS": list(comparisons.keys()),
+        "COMPARISONS": comparisons,
         "FOOTER": FOOTER,
         "BUILD_DATE": datetime.datetime.today().isoformat(timespec="minutes"),
         "META_DESCRIPTION": META_DESCRIPTION,
         "META_IMAGE": expand_siteurl(META_IMAGE),
     }
 
-    for filename, comparison in comparisons.items():
+    for comparison in comparisons:
         comparison.edit_paths(callback=conformize_paths)
         page_ctx = {
             "Comparison": comparison,
-            "NAV_ACTIVE": filename,
+            "NAV_ACTIVE": comparison.page_slug,
         }
         page_ctx.update(global_ctx)
         html = comparison_template.render(**page_ctx)
-        html_path = build_dir / f"{filename}.html"
+        html_path = build_dir / f"{comparison.page_slug}.html"
         LOGGER.info(f"writing html to '{html_path}'")
         html_path.write_text(html, encoding="utf-8")
 
@@ -405,13 +484,13 @@ def main(argv: list[str] | None = None):
             sys.exit(1)
 
         with publish_context(build_dir, commit_msgs):
-            build(build_dir=build_dir, work_dir=work_dir, publish=True)
+            build(assets=ASSETS, build_dir=build_dir, work_dir=work_dir, publish=True)
         LOGGER.info("✅ site publish finished")
         LOGGER.info(f"🌐 check '{SITEURL}' in few minutes")
 
     else:
         build_dir.mkdir(exist_ok=True)
-        build(build_dir=build_dir, work_dir=work_dir, publish=False)
+        build(assets=ASSETS, build_dir=build_dir, work_dir=work_dir, publish=False)
         LOGGER.info("✅ site build finished")
         LOGGER.info(f"🌐 check 'file:///{build_dir.as_posix()}/index.html'")
 

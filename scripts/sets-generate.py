@@ -15,6 +15,7 @@ from typing import Any
 from typing import Callable
 
 import lxmpicturelab
+from lxmpicturelab.browse import ASSET_DIR
 from lxmpicturelab.browse import SETS_DIR
 from lxmpicturelab.browse import get_all_assets
 from lxmpicturelab.asset import AssetMetadata
@@ -47,7 +48,7 @@ class SetVariant(abc.ABC):
     asset_sorter: Callable[[ImageAsset], Any] | None = None
     asset_filter: Callable[[ImageAsset], bool] | None = None
 
-    def get_assets(self, root_dir: Path = None) -> list[ImageAsset]:
+    def get_assets(self, root_dir: Path) -> list[ImageAsset]:
         assets = get_all_assets(root_dir)
         if self.asset_filter:
             assets = filter(self.asset_filter, assets)
@@ -250,7 +251,7 @@ def main(
 
         prefix = f"[{index + 1:0>2}/{len(variants):0>2}]"
 
-        assets = variant.get_assets()
+        assets = variant.get_assets(ASSET_DIR)
         bg_color = variant.bg_color
         variant_name = variant.identifier
         variant_dir = dst_dir / variant_name

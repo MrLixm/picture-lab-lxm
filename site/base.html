@@ -27,10 +27,10 @@
     </nav>
   </div>
   <nav class="comparisons">
-    {% for COMPARISON in COMPARISONS %}
-      <a href="{{ COMPARISON }}.html">
-        <div class="nav-item {% if NAV_ACTIVE is defined and NAV_ACTIVE == COMPARISON %}active{% endif %}">
-          <span>{{ COMPARISON }}</span>
+    {% for Comparison in COMPARISONS %}
+      <a href="{{ Comparison.page_slug }}.html">
+        <div class="nav-item {% if NAV_ACTIVE is defined and NAV_ACTIVE == Comparison.page_slug %}active{% endif %}">
+          <span>{{ Comparison.asset_id }}</span>
         </div>
       </a>
     {% endfor %}

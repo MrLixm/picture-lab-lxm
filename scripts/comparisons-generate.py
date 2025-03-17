@@ -1,6 +1,5 @@
 import abc
 import argparse
-import ast
 import dataclasses
 import json
 import logging
@@ -14,208 +13,24 @@ import PyOpenColorIO as ocio
 
 import lxmpicturelab
 from lxmpicturelab.browse import WORKBENCH_DIR
-from lxmpicturelab.browse import get_asset
-from lxmpicturelab.browse import get_set
+from lxmpicturelab.browse import find_asset
+from lxmpicturelab.comparison import ComparisonSession
 from lxmpicturelab.download import download_file
 from lxmpicturelab.download import download_file_advanced
 from lxmpicturelab.download import extract_zip
 from lxmpicturelab.renderer import OcioConfigRenderer
-from lxmpicturelab.oiiotoolio import oiiotool_export
-from lxmpicturelab.oiiotoolio import oiiotool_generate_expo_bands
-from lxmpicturelab.oiiotoolio import oiiotool_auto_mosaic
-from lxmpicturelab.asset import AssetMetadata
+from lxmpicturelab.oiiotoolio import oiiotool_export_auto_mosaic
+from lxmpicturelab.comparison import ComparisonRender
+from lxmpicturelab.comparison import BaseGenerator
+from lxmpicturelab.comparison import GeneratorFull
+from lxmpicturelab.comparison import GeneratorExposureBands
 
 LOGGER = logging.getLogger(Path(__file__).stem)
 
-OIIOTOOL = Path(shutil.which("oiiotool"))
-assert OIIOTOOL.exists()
 
 WORKBENCH_DIR.mkdir(exist_ok=True)
 WORK_DIR = WORKBENCH_DIR / "comparisons-generate"
 WORK_DIR.mkdir(exist_ok=True)
-
-
-class BaseGenerator(abc.ABC):
-    """
-    A method of generating an image with oiiotool.
-    """
-
-    @classmethod
-    @abc.abstractmethod
-    def shortname(cls) -> str:
-        pass
-
-    @abc.abstractmethod
-    def run(
-        self,
-        src_path: Path,
-        renderer: OcioConfigRenderer,
-        target_dir: Path,
-    ) -> Path:
-        pass
-
-
-@dataclasses.dataclass
-class GeneratorExposureBands(BaseGenerator):
-    # 0-1 range, percentage of image width
-    band_offset: float = 0.0
-
-    @classmethod
-    def shortname(cls):
-        return "exposures"
-
-    def _run(
-        self,
-        src_path: Path,
-        dst_path: Path,
-        ocio_command: list[str],
-        text_left: str,
-        text_right: str,
-    ):
-        command = [str(OIIOTOOL)]
-        command += oiiotool_generate_expo_bands(
-            src_path=src_path,
-            band_number=7,
-            band_exposure_offset=2,
-            band_width=0.2,
-            band_x_offset=self.band_offset,
-            band_extra_args=ocio_command,
-        )
-        command += [
-            "--resize:filter=box",
-            "0x864",
-            "--cut",
-            "0,0,{TOP.width},{TOP.height+100}",
-            "--text:x=40:y={TOP.height-45}:shadow=0:size=34:color=1,1,1,1:yalign=center",
-            text_left,
-            "--text:x={TOP.width-40}:y={TOP.height-45}:shadow=0:size=24:color=1,1,1,1:yalign=center:xalign=right",
-            text_right,
-        ]
-        command += oiiotool_export(
-            target_path=dst_path,
-            # assume dst_path is .jpg
-            bitdepth="uint8",
-            compression="jpeg:98",
-        )
-        LOGGER.debug(f"subprocess.run({' '.join(command)})")
-        subprocess.run(command)
-
-    def run(
-        self,
-        src_path: Path,
-        renderer: OcioConfigRenderer,
-        target_dir: Path,
-    ) -> Path:
-        look_str = f", look='{renderer.look}'" if renderer.look else ""
-        ocio_command = renderer.to_oiiotool_command()
-        dst_name = f"{src_path.stem}.exposures.{renderer.filename}.jpg"
-        dst_path = target_dir / dst_name
-        text_left = f"{src_path.stem} - {renderer.name}"
-        text_right = f"(display='{renderer.display}', view='{renderer.view}'{look_str})"
-        self._run(
-            src_path=src_path,
-            dst_path=dst_path,
-            ocio_command=ocio_command,
-            text_left=text_left,
-            text_right=text_right,
-        )
-        return dst_path
-
-
-@dataclasses.dataclass
-class GeneratorFull(BaseGenerator):
-    """
-    Render the full size of the image with a legend in a bottom footer.
-    """
-
-    max_height: int
-
-    @classmethod
-    def shortname(cls):
-        return "full"
-
-    def _run(
-        self,
-        src_path: Path,
-        dst_path: Path,
-        ocio_command: list[str],
-        text_left: tuple[str, str],
-        text_right: str,
-    ):
-        command = [
-            str(OIIOTOOL),
-            "-i",
-            str(src_path),
-        ]
-        command += ocio_command
-        command += ["--ch", "R,G,B"]
-        command += [
-            "--resize:filter=box",
-            f"0x{self.max_height}",
-            "--cut",
-            "0,0,{TOP.width},{TOP.height+100}",
-            "--text:x=40:y={TOP.height-47}:shadow=0:size=34:color=1,1,1,1:yalign=bottom",
-            text_left[0],
-            "--text:x=40:y={TOP.height-42}:shadow=0:size=24:color=1,1,1,1:yalign=top",
-            text_left[1],
-            "--text:x={TOP.width-40}:y={TOP.height-45}:shadow=0:size=34:color=1,1,1,1:yalign=center:xalign=right",
-            text_right,
-        ]
-        command += oiiotool_export(
-            target_path=dst_path,
-            # assume dst_path is .jpg
-            bitdepth="uint8",
-            compression="jpeg:98",
-        )
-        LOGGER.debug(f"subprocess.run({' '.join(command)})")
-        subprocess.run(command)
-
-    def run(
-        self,
-        src_path: Path,
-        renderer: OcioConfigRenderer,
-        target_dir: Path,
-    ) -> Path:
-        look_str = f", look='{renderer.look}'" if renderer.look else ""
-        ocio_command = renderer.to_oiiotool_command()
-
-        dst_name = f"{src_path.stem}.full.{renderer.filename}.jpg"
-        dst_path = target_dir / dst_name
-        text_left = (
-            f"{renderer.name}",
-            f"(display='{renderer.display}', view='{renderer.view}'{look_str})",
-        )
-        text_right = f"{src_path.stem}"
-        self._run(
-            src_path=src_path,
-            dst_path=dst_path,
-            ocio_command=ocio_command,
-            text_left=text_left,
-            text_right=text_right,
-        )
-        return dst_path
-
-
-def generate_combine(image_paths: list[Path], dst_path: Path):
-    command = [("-i", str(path)) for path in image_paths]
-    command = [arg for args in command for arg in args]
-    command += oiiotool_auto_mosaic(len(image_paths))
-    command += oiiotool_export(
-        target_path=dst_path,
-        bitdepth="uint8",
-        compression="jpeg:98",
-    )
-    command.insert(0, str(OIIOTOOL))
-    LOGGER.debug(f"subprocess.run({' '.join(command)})")
-    subprocess.run(command)
-
-
-@dataclasses.dataclass
-class SourceAsset:
-    path: Path
-    filename: str
-    generators: list[BaseGenerator]
-    metadata: AssetMetadata
 
 
 def _build_AgX_renderer(work_dir: Path) -> OcioConfigRenderer:
@@ -525,121 +340,58 @@ def build_renderers(renderer_work_dir: Path) -> list[OcioConfigRenderer]:
     return renderers
 
 
-def oiiotool_get_metadata(image_path: Path, metadata: str) -> str:
-    command = [str(OIIOTOOL), str(image_path), "--echo", f"\"{{TOP.'{metadata}'}}\""]
-    LOGGER.debug(f"subprocess.run({command})")
-    result = subprocess.run(command, capture_output=True, text=True)
-    if result.returncode != 0:
-        LOGGER.error(result.stderr)
-        LOGGER.error(result.stdout)
-        raise RuntimeError("Failed to execute oiiotool")
-    return result.stdout.strip()
-
-
-def build_source_assets() -> list[SourceAsset]:
-    srcassets = []
-
-    srcasset_path = get_set("al.sorted-color.bg-black")
-    # read authors metadata from file
-    author_metadata = oiiotool_get_metadata(srcasset_path, "sheet/authors")
-    author_metadata = ast.literal_eval(author_metadata)
-    author_metadata = json.loads(author_metadata)
-    assets_by_author = {}
-    for asset_name, authors in author_metadata.items():
-        for author in authors:
-            assets_by_author.setdefault(author, set()).add(asset_name)
-    authors = [
-        f"{author} ({','.join(assets)})" for author, assets in assets_by_author.items()
-    ]
-    srcasset = SourceAsset(
-        path=srcasset_path,
-        filename="lxmpicturelab-set.al",
-        generators=[GeneratorFull(2048)],
-        metadata=AssetMetadata(
-            source=srcasset_path.name,
-            authors=authors,
-            references=["https://github.com/MrLixm/picture-lab-lxm"],
-            capture_gamut="various",
-            primary_color=lxmpicturelab.imgasset.AssetPrimaryColor.rainbow,
-            type=lxmpicturelab.imgasset.AssetType.cgi,
-            context="An heterogeneous collection of various images.",
-        ),
-    )
-    srcassets.append(srcasset)
-
-    asset = get_asset("CGts-W0L-sweep")
-    srcasset = SourceAsset(
-        path=asset.image_path,
-        filename="CGts-W0L-sweep",
-        generators=[GeneratorFull(864)],
-        metadata=asset.metadata,
-    )
-    srcassets.append(srcasset)
-
-    asset = get_asset("CAlc-D8T-dragon")
-    srcasset = SourceAsset(
-        path=asset.image_path,
-        filename="CAlc-D8T-dragon",
-        generators=[GeneratorExposureBands(0.45), GeneratorFull(864)],
-        metadata=asset.metadata,
-    )
-    srcassets.append(srcasset)
-
-    asset = get_asset("PAmsk-R65-christmas")
-    srcasset = SourceAsset(
-        path=asset.image_path,
-        filename="PAmsk-R65-christmas",
-        generators=[GeneratorExposureBands(0.3), GeneratorFull(864)],
-        metadata=asset.metadata,
-    )
-    srcassets.append(srcasset)
-
-    asset = get_asset("PAfm-SWE-neongirl")
-    srcasset = SourceAsset(
-        path=asset.image_path,
-        filename="PAfm-SWE-neongirl",
-        generators=[GeneratorExposureBands(0.3), GeneratorFull(864)],
-        metadata=asset.metadata,
-    )
-    srcassets.append(srcasset)
-
-    asset = get_asset("PAac-B01-skins")
-    srcasset = SourceAsset(
-        path=asset.image_path,
-        filename="PAac-B01-skins",
-        generators=[GeneratorExposureBands(0.01), GeneratorFull(864)],
-        metadata=asset.metadata,
-    )
-    srcassets.append(srcasset)
-
-    asset = get_asset("PAjg-MZY-nightstreet")
-    srcasset = SourceAsset(
-        path=asset.image_path,
-        filename="PAjg-MZY-nightstreet",
-        generators=[GeneratorExposureBands(0.3), GeneratorFull(864)],
-        metadata=asset.metadata,
-    )
-    srcassets.append(srcasset)
-
-    return srcassets
-
-
 def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
     argv = argv or sys.argv[1:]
     parser = argparse.ArgumentParser(
         description="Generates image to compare image formation algorithm.",
     )
     parser.add_argument(
-        "--results-dir",
+        "asset_id",
+        type=str,
+        help="Identifier of the asset to generate comparison for.",
+    )
+    parser.add_argument(
+        "--build-renderer-only",
+        action="store_true",
+        help="Don't perform any asset processing and just build the renderers.",
+    )
+    parser.add_argument(
+        "--generator-exposures",
+        type=float,
+        default=None,
+        help=(
+            "If specified, generate bands of gradually increasing exposure. "
+            "Value is the percentage of image to offset on the x axis in 0-1 range."
+        ),
+    )
+    parser.add_argument(
+        "--generator-full",
+        type=int,
+        default=None,
+        help=(
+            "If specified, render the whole area of the image and resize "
+            "its height to the given size (in pixels)."
+        ),
+    )
+    parser.add_argument(
+        "--combined-renderers",
+        action="store_true",
+        help=(
+            "If specified, create an additional image which combine all the image "
+            "generated for each renderer."
+        ),
+    )
+    parser.add_argument(
+        "--target-dir",
         type=Path,
-        default=WORK_DIR / "results",
-        help="filesystem path to write the result images to.",
+        default=None,
+        help="filesystem path to a directory that may not exist.",
     )
     parser.add_argument(
         "--renderer-dir",
         type=Path,
         default=WORK_DIR / "renderers",
-        help="filesystem path to write renderers resource data to.",
+        help="filesystem path to a directory that may not exist.",
     )
     parsed = parser.parse_args(argv)
     return parsed
@@ -647,73 +399,92 @@ def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None):
     cli = get_cli(argv)
+    stime = time.time()
 
-    srcassets = build_source_assets()
+    asset_id: str = cli.asset_id
+    renderer_work_dir: Path = cli.renderer_dir
+    target_dir: Path | None = cli.target_dir
+    generator_exposure: float | None = cli.generator_exposures
+    generator_full: int | None = cli.generator_full
+    combined_renderers: bool = cli.combined_renderers
+    build_renderer_only: bool = cli.build_renderer_only
 
-    renderer_work_dir = cli.renderer_dir
+    LOGGER.debug(f"{asset_id=}")
+    LOGGER.debug(f"{target_dir=}")
+    LOGGER.debug(f"{renderer_work_dir=}")
+    LOGGER.debug(f"{combined_renderers=}")
+
     renderer_work_dir.mkdir(exist_ok=True)
     LOGGER.info(f"building renderers to '{renderer_work_dir}'")
     renderers = build_renderers(renderer_work_dir)
-
     for renderer in renderers:
         as_json = renderer.to_json(indent=4, sort_keys=True)
         renderer_path = renderer_work_dir / f"{renderer.filename}.json"
         LOGGER.info(f"writing '{renderer_path}'")
         renderer_path.write_text(as_json)
 
-    results_dir = cli.results_dir
-    results_dir.mkdir(exist_ok=True)
-    LOGGER.info(f"results will be found at '{results_dir}'")
+    if build_renderer_only:
+        LOGGER.info("requested to only build renderer; exiting early ...")
+        LOGGER.info(f"✅ finished in {time.time() - stime:.1f}s")
+        return
 
-    stime = time.time()
+    asset = find_asset(asset_id)
+    if not asset:
+        LOGGER.error(f"No asset with identifier '{asset_id}' found.")
+        sys.exit(1)
 
-    for asset in srcassets:
-        asset_results_dir = results_dir / asset.filename
-        if asset_results_dir.exists():
-            shutil.rmtree(asset_results_dir)
-        asset_results_dir.mkdir()
+    target_dir = target_dir or WORKBENCH_DIR / "comparisons" / asset.identifier
+    if target_dir.exists():
+        LOGGER.debug(f"shutil.rmtree({target_dir})")
+        shutil.rmtree(target_dir)
+    target_dir.mkdir(exist_ok=True, parents=True)
 
-        metadata = {
-            "name": asset.filename,
-            "generators": {},
-            "metadata": asset.metadata.to_dict(),
-        }
-        metadata_path = results_dir / f"{asset.filename}.json"
+    generators: list[BaseGenerator] = []
+    if generator_exposure is not None:
+        generators.append(GeneratorExposureBands(generator_exposure))
+    if generator_full is not None:
+        generators.append(GeneratorFull(generator_full))
 
-        for generator in asset.generators:
-            generator_results: dict[str, Path] = {}
-            for renderer in renderers:
-                LOGGER.info(
-                    f"💫 running asset '{asset.path.stem}' with renderer "
-                    f"'{renderer.name}'; generator '{generator.shortname()}'"
-                )
-                output_path = generator.run(
-                    src_path=asset.path,
-                    renderer=renderer,
-                    target_dir=asset_results_dir,
-                )
-                generator_results[renderer.name] = output_path
+    session = ComparisonSession(asset=asset)
 
-            metadata["generators"][generator.shortname()] = {}
-            metadata["generators"][generator.shortname()]["renders"] = {
-                renderer_name: str(path.relative_to(metadata_path.parent))
-                for renderer_name, path in generator_results.items()
-            }
+    for generator in generators:
+        generator_results: dict[str, Path] = {}
+        generator_name = generator.shortname
+        comparison_src_path = asset.image_path
 
-            combined_name = (
-                f"{asset.path.stem}.{generator.shortname()}.__combined__.jpg"
+        for renderer in renderers:
+            generation_dst_name = (
+                f"{asset.identifier}.{generator_name}.{renderer.filename}.jpg"
             )
-            combined_path = asset_results_dir / combined_name
+            comparison_dst_path = target_dir / generation_dst_name
+            comparison = ComparisonRender(
+                generator=generator,
+                renderer=renderer,
+                src_paths=[comparison_src_path],
+                dst_path=comparison_dst_path,
+            )
+            LOGGER.info(f"💫 generating '{comparison_dst_path}'")
+            comparison.run()
+            session.add_render(comparison)
+
+        # this is an extra comparison but without renderer
+        if combined_renderers:
+            combined_name = f"{asset.identifier}.{generator_name}.__combined__.jpg"
+            combined_path = target_dir / combined_name
+            comparison = ComparisonRender(
+                generator=generator,
+                renderer=None,
+                src_paths=list(generator_results.values()),
+                dst_path=combined_path,
+            )
             LOGGER.info(f"💫 generating combined image to '{combined_path}'")
-            generate_combine(list(generator_results.values()), combined_path)
+            comparison.run()
+            session.add_render(comparison)
 
-            metadata["generators"][generator.shortname()]["combined"] = str(
-                combined_path.relative_to(asset_results_dir)
-            )
-
-        LOGGER.info(f"writing metadata to '{metadata_path}'")
-        with metadata_path.open("w") as metadata_file:
-            json.dump(metadata, metadata_file, indent=4)
+    metadata: str = session.to_json(indent=4)
+    metadata_path = target_dir / f"{asset.identifier}.metadata.json"
+    LOGGER.info(f"writing metadata to '{metadata_path}'")
+    metadata_path.write_text(metadata, encoding="utf-8")
 
     LOGGER.info(f"✅ finished in {time.time() - stime:.1f}s")
 

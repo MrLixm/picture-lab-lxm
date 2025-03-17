@@ -17,7 +17,7 @@ WORKBENCH_DIR = REPO_ROOT / ".workbench"
 SETS_DIR = REPO_ROOT / "sets"
 
 
-def get_all_assets(root_dir: Path = None) -> list[ImageAsset]:
+def get_all_assets(root_dir: Path) -> list[ImageAsset]:
     """
     Retrieve all the existing ImageryAssets stored in the given directory.
     """
@@ -25,9 +25,9 @@ def get_all_assets(root_dir: Path = None) -> list[ImageAsset]:
     return [ImageAsset(path) for path in root_dir.rglob("*.json")]
 
 
-def get_asset(identifier: str, root_dir: Path = None) -> ImageAsset | None:
+def get_asset(identifier: str, root_dir: Path) -> ImageAsset | None:
     """
-    Get the asset matching the given identifier.
+    Get the asset matching the given identifier from the given directory.
     """
     assets = get_all_assets(root_dir)
     for asset in assets:
@@ -36,23 +36,12 @@ def get_asset(identifier: str, root_dir: Path = None) -> ImageAsset | None:
     return None
 
 
-def get_all_sets(root_dir: Path = None) -> dict[str, Path]:
+def find_asset(identifier: str) -> ImageAsset | None:
     """
-    Retrieve all the existing sets images file stored in the given directory.
-
-    Returns:
-        mapping of "set name": "set absolute path"
+    Find the given asset based on known assets locations.
     """
-    root_dir = root_dir or SETS_DIR
-    return {path.parent.name: path for path in root_dir.rglob("*.exr")}
-
-
-def get_set(identifier: str, root_dir: Path = None) -> Path | None:
-    """
-    Get the set image matching the given identifier.
-    """
-    imgsets = get_all_sets(root_dir)
-    for imgset_id, imgset_path in imgsets.items():
-        if imgset_id == identifier:
-            return imgset_path
-    return None
+    asset = get_asset(identifier, ASSET_DIR)
+    if asset:
+        return asset
+    set_asset = get_asset(identifier, SETS_DIR)
+    return set_asset
