@@ -17,7 +17,7 @@ from typing import Callable
 import jinja2
 
 import lxmpicturelab
-from lxmpicturelab.imgasset import ImageryAssetMetadata
+from lxmpicturelab.asset import AssetMetadata
 from lxmpicturelab.renderer import OcioConfigRenderer
 
 LOGGER = logging.getLogger(Path(__file__).stem)
@@ -61,7 +61,7 @@ class ComparisonGenerator:
 class Comparison:
     source: str
     generators: list[ComparisonGenerator]
-    metadata: ImageryAssetMetadata
+    metadata: AssetMetadata
 
     @classmethod
     def from_json(cls, json_str: str, renderers: list[OcioConfigRenderer]):
@@ -83,7 +83,7 @@ class Comparison:
         return cls(
             source=as_dict["name"],
             generators=generators,
-            metadata=ImageryAssetMetadata.from_dict(as_dict["metadata"]),
+            metadata=AssetMetadata.from_dict(as_dict["metadata"]),
         )
 
     def edit_paths(self, callback: Callable[[str], str]):

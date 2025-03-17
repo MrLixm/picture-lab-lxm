@@ -17,7 +17,7 @@ from lxmpicturelab.browse import ASSET_IN_DIR
 from lxmpicturelab.browse import WORKBENCH_DIR
 from lxmpicturelab.utils import timeit
 from lxmpicturelab.download import download_file
-from lxmpicturelab.browse import ImageryAsset
+from lxmpicturelab.browse import ImageAsset
 
 # to upgrade at each code change that affect the data writen to the output image
 __version__ = f"2-{lxmpicturelab.__version__}"
@@ -66,7 +66,7 @@ ASSETS_IN: dict[Path, str | None] = {
 
 
 def optimize_asset(
-    source_asset: ImageryAsset,
+    source_asset: ImageAsset,
     target_path: Path,
     ocio_config_path: Path,
     source_ocio_colorspace: str | None,
@@ -221,7 +221,7 @@ def ingest_assets(
     for index, (src_asset_path, colorspace) in enumerate(assets_config.items()):
         prefix = f"[{index+1:0>2}/{len(assets_config):0>2}]"
 
-        src_asset = ImageryAsset(src_asset_path)
+        src_asset = ImageAsset(src_asset_path)
         dst_asset_dir = dst_dir / src_asset.identifier
         dst_asset = src_asset.with_root_path(dst_asset_dir)
 

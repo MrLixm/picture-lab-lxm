@@ -15,9 +15,9 @@ from typing import Any
 from typing import Callable
 
 import lxmpicturelab
-from lxmpicturelab.browse import ImageryAsset
+from lxmpicturelab.browse import ImageAsset
 from lxmpicturelab.browse import SETS_DIR
-from lxmpicturelab.browse import get_imagery_assets
+from lxmpicturelab.browse import get_all_assets
 from lxmpicturelab.oiiotoolio import oiiotool_export
 from lxmpicturelab.utils import timeit
 
@@ -41,11 +41,11 @@ class SetVariant(abc.ABC):
 
     identifier: str
     bg_color: tuple[float, float, float]
-    asset_sorter: Callable[[ImageryAsset], Any] | None = None
-    asset_filter: Callable[[ImageryAsset], bool] | None = None
+    asset_sorter: Callable[[ImageAsset], Any] | None = None
+    asset_filter: Callable[[ImageAsset], bool] | None = None
 
-    def get_assets(self, root_dir: Path = None) -> list[ImageryAsset]:
-        assets = get_imagery_assets(root_dir)
+    def get_assets(self, root_dir: Path = None) -> list[ImageAsset]:
+        assets = get_all_assets(root_dir)
         if self.asset_filter:
             assets = filter(self.asset_filter, assets)
         if self.asset_sorter:
@@ -53,7 +53,7 @@ class SetVariant(abc.ABC):
         return assets
 
 
-def _sort_assets_color(asset: ImageryAsset):
+def _sort_assets_color(asset: ImageAsset):
     return asset.metadata.type.value, asset.metadata.primary_color, asset.identifier
 
 
@@ -72,7 +72,7 @@ SET_VARIANTS = [
 
 
 def generate_mosaic(
-    assets: list[ImageryAsset],
+    assets: list[ImageAsset],
     target_path: Path,
     mosaic_columns: int = 5,
     tile_width: int = 1102,

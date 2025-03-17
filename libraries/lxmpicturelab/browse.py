@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-from .imgasset import ImageryAsset
+from .asset import ImageAsset
 
 
 LOGGER = logging.getLogger(__name__)
@@ -17,26 +17,26 @@ WORKBENCH_DIR = REPO_ROOT / ".workbench"
 SETS_DIR = REPO_ROOT / "sets"
 
 
-def get_imagery_assets(root_dir: Path = None) -> list[ImageryAsset]:
+def get_all_assets(root_dir: Path = None) -> list[ImageAsset]:
     """
     Retrieve all the existing ImageryAssets stored in the given directory.
     """
     root_dir = root_dir or ASSET_DIR
-    return [ImageryAsset(path) for path in root_dir.rglob("*.json")]
+    return [ImageAsset(path) for path in root_dir.rglob("*.json")]
 
 
-def get_imagery_asset(identifier: str, root_dir: Path = None) -> ImageryAsset | None:
+def get_asset(identifier: str, root_dir: Path = None) -> ImageAsset | None:
     """
     Get the asset matching the given identifier.
     """
-    assets = get_imagery_assets(root_dir)
+    assets = get_all_assets(root_dir)
     for asset in assets:
         if asset.identifier == identifier:
             return asset
     return None
 
 
-def get_imagery_sets(root_dir: Path = None) -> dict[str, Path]:
+def get_all_sets(root_dir: Path = None) -> dict[str, Path]:
     """
     Retrieve all the existing sets images file stored in the given directory.
 
@@ -47,11 +47,11 @@ def get_imagery_sets(root_dir: Path = None) -> dict[str, Path]:
     return {path.parent.name: path for path in root_dir.rglob("*.exr")}
 
 
-def get_imagery_set(identifier: str, root_dir: Path = None) -> Path | None:
+def get_set(identifier: str, root_dir: Path = None) -> Path | None:
     """
     Get the set image matching the given identifier.
     """
-    imgsets = get_imagery_sets(root_dir)
+    imgsets = get_all_sets(root_dir)
     for imgset_id, imgset_path in imgsets.items():
         if imgset_id == identifier:
             return imgset_path

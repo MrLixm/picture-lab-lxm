@@ -14,8 +14,8 @@ import PyOpenColorIO as ocio
 
 import lxmpicturelab
 from lxmpicturelab.browse import WORKBENCH_DIR
-from lxmpicturelab.browse import get_imagery_asset
-from lxmpicturelab.browse import get_imagery_set
+from lxmpicturelab.browse import get_asset
+from lxmpicturelab.browse import get_set
 from lxmpicturelab.download import download_file
 from lxmpicturelab.download import download_file_advanced
 from lxmpicturelab.download import extract_zip
@@ -23,7 +23,7 @@ from lxmpicturelab.renderer import OcioConfigRenderer
 from lxmpicturelab.oiiotoolio import oiiotool_export
 from lxmpicturelab.oiiotoolio import oiiotool_generate_expo_bands
 from lxmpicturelab.oiiotoolio import oiiotool_auto_mosaic
-from lxmpicturelab.imgasset import ImageryAssetMetadata
+from lxmpicturelab.asset import AssetMetadata
 
 LOGGER = logging.getLogger(Path(__file__).stem)
 
@@ -215,7 +215,7 @@ class SourceAsset:
     path: Path
     filename: str
     generators: list[BaseGenerator]
-    metadata: ImageryAssetMetadata
+    metadata: AssetMetadata
 
 
 def _build_AgX_renderer(work_dir: Path) -> OcioConfigRenderer:
@@ -539,7 +539,7 @@ def oiiotool_get_metadata(image_path: Path, metadata: str) -> str:
 def build_source_assets() -> list[SourceAsset]:
     srcassets = []
 
-    srcasset_path = get_imagery_set("al.sorted-color.bg-black")
+    srcasset_path = get_set("al.sorted-color.bg-black")
     # read authors metadata from file
     author_metadata = oiiotool_get_metadata(srcasset_path, "sheet/authors")
     author_metadata = ast.literal_eval(author_metadata)
@@ -555,19 +555,19 @@ def build_source_assets() -> list[SourceAsset]:
         path=srcasset_path,
         filename="lxmpicturelab-set.al",
         generators=[GeneratorFull(2048)],
-        metadata=ImageryAssetMetadata(
+        metadata=AssetMetadata(
             source=srcasset_path.name,
             authors=authors,
             references=["https://github.com/MrLixm/picture-lab-lxm"],
             capture_gamut="various",
             primary_color=lxmpicturelab.imgasset.AssetPrimaryColor.rainbow,
-            type=lxmpicturelab.imgasset.ImageryAssetType.cgi,
+            type=lxmpicturelab.imgasset.AssetType.cgi,
             context="An heterogeneous collection of various images.",
         ),
     )
     srcassets.append(srcasset)
 
-    asset = get_imagery_asset("CGts-W0L-sweep")
+    asset = get_asset("CGts-W0L-sweep")
     srcasset = SourceAsset(
         path=asset.image_path,
         filename="CGts-W0L-sweep",
@@ -576,7 +576,7 @@ def build_source_assets() -> list[SourceAsset]:
     )
     srcassets.append(srcasset)
 
-    asset = get_imagery_asset("CAlc-D8T-dragon")
+    asset = get_asset("CAlc-D8T-dragon")
     srcasset = SourceAsset(
         path=asset.image_path,
         filename="CAlc-D8T-dragon",
@@ -585,7 +585,7 @@ def build_source_assets() -> list[SourceAsset]:
     )
     srcassets.append(srcasset)
 
-    asset = get_imagery_asset("PAmsk-R65-christmas")
+    asset = get_asset("PAmsk-R65-christmas")
     srcasset = SourceAsset(
         path=asset.image_path,
         filename="PAmsk-R65-christmas",
@@ -594,7 +594,7 @@ def build_source_assets() -> list[SourceAsset]:
     )
     srcassets.append(srcasset)
 
-    asset = get_imagery_asset("PAfm-SWE-neongirl")
+    asset = get_asset("PAfm-SWE-neongirl")
     srcasset = SourceAsset(
         path=asset.image_path,
         filename="PAfm-SWE-neongirl",
@@ -603,7 +603,7 @@ def build_source_assets() -> list[SourceAsset]:
     )
     srcassets.append(srcasset)
 
-    asset = get_imagery_asset("PAac-B01-skins")
+    asset = get_asset("PAac-B01-skins")
     srcasset = SourceAsset(
         path=asset.image_path,
         filename="PAac-B01-skins",
@@ -612,7 +612,7 @@ def build_source_assets() -> list[SourceAsset]:
     )
     srcassets.append(srcasset)
 
-    asset = get_imagery_asset("PAjg-MZY-nightstreet")
+    asset = get_asset("PAjg-MZY-nightstreet")
     srcasset = SourceAsset(
         path=asset.image_path,
         filename="PAjg-MZY-nightstreet",
