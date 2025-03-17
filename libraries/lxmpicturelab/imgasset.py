@@ -176,7 +176,7 @@ class ImageryAssetMetadata:
         """
         Unserialize from a json file.
         """
-        with file_path.open("r") as file:
+        with file_path.open("r", encoding="utf-8") as file:
             content = json.load(file)
         return cls.from_dict(serialized_dict=content)
 
