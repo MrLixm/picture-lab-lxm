@@ -17,7 +17,7 @@
     {%- for reference in Comparison.meta_references %}
       <tr>
         <th>reference</th>
-        <td><a href="{{ reference }}">{{ reference }}</a></td>
+        <td>{{ reference|urlize }}</td>
       </tr>
     {%- endfor %}
   </table>

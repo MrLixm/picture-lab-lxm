@@ -17,17 +17,13 @@
       to a readable visual representation. The concept can be explored further
       with:</p>
     <ul>
-      <li><a href="https://github.com/sobotka/scise/wiki/Picture-Formation">https://github.com/sobotka/scise/wiki/Picture-Formation</a>
-      </li>
-      <li><a href="https://hg2dc.com/2025/03/13/question-34/">https://hg2dc.com/2025/03/13/question-34/</a>
-      </li>
-      <li>
-        <a href="https://github.com/jedypod/open-display-transform/wiki/doc-introduction">https://github.com/jedypod/open-display-transform/wiki/doc-introduction</a>
-      </li>
+      <li>{{ "https://github.com/sobotka/scise/wiki/Picture-Formation"|urlize }}</li>
+      <li>{{ "https://hg2dc.com/2025/03/13/question-34/"|urlize }}</li>
+      <li>{{ "https://github.com/jedypod/open-display-transform/wiki/doc-introduction"|urlize }}</li>
     </ul>
     <p class="adm-note">The code source for this website and the image
       generation can be retrieved
-      at <a href="https://github.com/MrLixm/picture-lab-lxm">https://github.com/MrLixm/picture-lab-lxm</a>.
+      at {{ "https://github.com/MrLixm/picture-lab-lxm"|urlize }}.
     </p>
     <h2>Caveats</h2>
     <p>The workflow and the image presented have the following trade-offs:</p>
@@ -80,7 +76,7 @@
         <div class="renderer-item">
           <h3>{{ Renderer.name }}</h3>
           <div class="renderer-item-content">
-            <p>{{ Renderer.description|e }}</p>
+            <p>{{ Renderer.description|e|urlize }}</p>
             <p>Source:
               <a href="{{ Renderer.reference_url }}">{{ Renderer.reference_url }}</a>
             </p>
