@@ -7,6 +7,7 @@ dependencies = [
     "numpy==1.26.*",
     "opencolorio>=2.4.1",
     "openimageio>=3.0.4.0",
+    "rawpy>=0.24.0",
 ]
 
 [tool.uv]

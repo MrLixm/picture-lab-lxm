@@ -258,6 +258,7 @@ dependencies = [
     { name = "numpy" },
     { name = "opencolorio" },
     { name = "openimageio" },
+    { name = "rawpy" },
 ]
 
 [package.dev-dependencies]
@@ -271,6 +272,7 @@ requires-dist = [
     { name = "numpy", specifier = "==1.26.*" },
     { name = "opencolorio", specifier = ">=2.4.1" },
     { name = "openimageio", specifier = ">=3.0.4.0" },
+    { name = "rawpy", specifier = ">=0.24.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -286,6 +288,36 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/13/fc/128cc9cb8f03208bdbf93d3aa862e16d376844a14f9a0ce5cf4507372de4/platformdirs-4.3.6.tar.gz", hash = "sha256:357fb2acbc885b0419afd3ce3ed34564c13c9b95c89360cd9563f73aa5e2b907", size = 21302 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/3c/a6/bc1012356d8ece4d66dd75c4b9fc6c1f6650ddd5991e421177d9f8f671be/platformdirs-4.3.6-py3-none-any.whl", hash = "sha256:73e575e1408ab8103900836b97580d5307456908a03e92031bab39e4554cc3fb", size = 18439 },
+]
+
+[[package]]
+name = "rawpy"
+version = "0.24.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2b/bc/3712c908548be578e69eada6d4fdee0f18e8d81f8f485e6975418c29260b/rawpy-0.24.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:a36b91c76b36c8728c1e30cc1ffadfb37c2612fba30914c6e8a1ab74813eb9c8", size = 1112433 },
+    { url = "https://files.pythonhosted.org/packages/a4/ba/b31e41d88c9b5cfbbd5fed5d66f11099e03b32d00e41fd10a1f76f801ee3/rawpy-0.24.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:c9f2e471412d649fcab7b2ae0ce70c4eb3546145038727ac4e0107937ce7d5b2", size = 1009148 },
+    { url = "https://files.pythonhosted.org/packages/63/3a/0d9e8b9ee0c73cc5ecd8b6440630ea4570c5130043b723fc6f436f86e78e/rawpy-0.24.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ee8856d471676210e1db790d50c9b9853a578e3cf43c9988f28f799a172d0675", size = 1929197 },
+    { url = "https://files.pythonhosted.org/packages/bd/c8/1eb0fea11fe5cd84c78a9fffbdcad101f974734fbd23b0200ad9ef5ea23e/rawpy-0.24.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:64c79d4a1e7e994eb73eb7af2f986f3d871931bb32c2faac9344e61f723b2aea", size = 1949408 },
+    { url = "https://files.pythonhosted.org/packages/40/69/0f02343b0b9f0d7dda3150eed922eefc976254eda6f15f30e887418795b8/rawpy-0.24.0-cp310-cp310-win_amd64.whl", hash = "sha256:8ae80421393efd1c5db2b4e1d3db4f8b21bf112429014f4266a8e52dca50cad5", size = 855347 },
+    { url = "https://files.pythonhosted.org/packages/9e/a7/6dfc6b8389f147b46a77895b931410341be454dc0ab65bcdf3ff203e9a01/rawpy-0.24.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:4c684fa8766055ec5e0af1e5cc83cf1959f72b730eaed9baa4b1e57bc50f202f", size = 1107598 },
+    { url = "https://files.pythonhosted.org/packages/b4/b0/07e1dc01b8ef7b324b1587dff62cec7bd3ea28a11d63980f50deabc050ab/rawpy-0.24.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:d5f2fcebe8b32dc45b0e88619f9200d103d2b791c06549388b94e6ab70b098b9", size = 1006090 },
+    { url = "https://files.pythonhosted.org/packages/a6/a9/6ca82effeb0e7f4cc345e6ecb498077d4a84c6a88118e1be7e40e112bf8a/rawpy-0.24.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:0744aa22d24fcae895eab98361f2ff3f1f494c43dc4ce22dec0b8b83ea2ed5dc", size = 1928308 },
+    { url = "https://files.pythonhosted.org/packages/31/42/bb9087a99449e7d85ac350be155ee4a4994395cab2c2531d276c63b13e57/rawpy-0.24.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0464164361c97bdd4dc10da17a11e9fa47a9e379c36ea4a1b68053c7ebe7b38f", size = 1947794 },
+    { url = "https://files.pythonhosted.org/packages/05/25/7f094638c1c3f2844ea6e0ad6291857f10d8f446ccf8e1e86ce2b3738b6c/rawpy-0.24.0-cp311-cp311-win_amd64.whl", hash = "sha256:756c587ad93e008c27b538e42a8b8729c12e724dde48867029cab5715b3fba3b", size = 855471 },
+    { url = "https://files.pythonhosted.org/packages/27/1c/59024e87c20b325e10b43e3b709929681a0ed23bda3885c7825927244fcc/rawpy-0.24.0-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:ed639b0dc91c3e85d6c39303a1523b7e1edc4f4b0381c376ed0ff99febb306e4", size = 1118739 },
+    { url = "https://files.pythonhosted.org/packages/87/75/610a34caf048aa87248f8393e70073610146f379fdda8194a988ba286d5b/rawpy-0.24.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:1097b10eed4027e5b50006548190602e1adba9c824526b45f7a37781cfa01818", size = 1015048 },
+    { url = "https://files.pythonhosted.org/packages/9c/c4/576853c0eea14d62a2776f683dae23c994572dfc2dcb47fd1a1473b7b18a/rawpy-0.24.0-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:17a970fd8cdece57929d6e99ce64503f21b51c00ab132bad53065bd523154892", size = 1921378 },
+    { url = "https://files.pythonhosted.org/packages/fe/35/5d6765359ce6e06fe0aee5a3e4e731cfe08c056df093d97c292bdc02132a/rawpy-0.24.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a12fc4e6c5879b88c6937abb9f3f6670dd34d126b4a770ad4566e9f747e306fb", size = 1942131 },
+    { url = "https://files.pythonhosted.org/packages/ba/20/9aa265d8ba735bb8735c1382fcf1e553bd230061280663aebc72995438cd/rawpy-0.24.0-cp312-cp312-win_amd64.whl", hash = "sha256:9277f6839424ed88fe11a87f3e934987ff42846dcb73a9b8cb8e9f1e934ec6db", size = 851899 },
+    { url = "https://files.pythonhosted.org/packages/fd/51/e6e59a74fb968e93afe969eb46f766379fb59dfffcbca6f68e0288495312/rawpy-0.24.0-cp313-cp313-macosx_10_9_x86_64.whl", hash = "sha256:8689b12779f9ac7b59a744dc12390214b971a70cc121b25c9207f7367889e21d", size = 1118371 },
+    { url = "https://files.pythonhosted.org/packages/56/36/0f4d5b41ae10f9399d5f166fe82b748fd7873d0dda5131ac8eb91723042a/rawpy-0.24.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:b26cae58c2effbec506eeaf36e0ec0fd7bc0f40bebb2754686897ea6389a9f47", size = 1014606 },
+    { url = "https://files.pythonhosted.org/packages/32/6f/6ee2a24c354f6ebcb24ec65e9b4dd952ea0e84178a172186d8e7f5444913/rawpy-0.24.0-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c7cd218d0c5f7ff00dacfdea36756a5f1d76f3d36815e168a18a86059ff45b94", size = 1920051 },
+    { url = "https://files.pythonhosted.org/packages/1b/05/c406fcac78b22eb3eb8134db400493f2293c917bb09df50acae762e40748/rawpy-0.24.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ee0ce86b2d49f6936943cf633dff6320e83a500dd8c69652ab6f0bcf6b3b45c3", size = 1940898 },
+    { url = "https://files.pythonhosted.org/packages/1c/1b/24809fe4787a6b6b17eb0f49569f1c9092fe8315105b2d5c19b2c5e5bc3f/rawpy-0.24.0-cp313-cp313-win_amd64.whl", hash = "sha256:691d6dc1dac2da3b9f7991b5eec6ff3e520c30e7820e33cb35828c35ff78eea4", size = 851158 },
 ]
 
 [[package]]
