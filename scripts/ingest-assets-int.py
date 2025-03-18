@@ -39,6 +39,7 @@ ASSETS_IN: dict[Path, list[str]] = {
     ASSET_IN_DIR / "PWdc-85R-braidmaker.json": [],
     ASSET_IN_DIR / "PPry-00M-mountain.json": [],
     ASSET_IN_DIR / "PWdac-11H-ngohaiha.json": [],
+    ASSET_IN_DIR / "Pbri-H34-sunflower.json": [],
     ASSET_IN_DIR
     / "Pgra-O1K-snowfire.json": [
         # asset is Filmlight E-Gamut encoded which is not in the ACES config
