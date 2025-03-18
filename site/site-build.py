@@ -8,6 +8,7 @@ import runpy
 import shutil
 import sys
 import time
+from multiprocessing import Pool
 from typing import Any
 
 import unicodedata
@@ -32,6 +33,8 @@ WORKDIR = THISDIR / ".workbench"
 
 RENDERER_SCRIPT_PATH = SCRIPTS_DIR / "renderer-build.py"
 IMAGEGEN_SCRIPT_PATH = SCRIPTS_DIR / "comparisons-generate.py"
+__gen_ctx = runpy.run_path(str(IMAGEGEN_SCRIPT_PATH), run_name="__ignore__")
+IMAGEGEN_SCRIPT: Callable[[list[str]], None] = __gen_ctx["main"]
 
 ASSETS = {
     "lxmpicturelab.al.sorted-color.bg-black": ["--generator-full", "2048"],
@@ -231,6 +234,11 @@ def build_renderers(
     return renderers
 
 
+def _build_comparison(asset_id: str, argv: list[str]):
+    LOGGER.info(f"🔨 building comparisons for '{asset_id}'")
+    IMAGEGEN_SCRIPT(argv)
+
+
 def build_comparisons(
     assets: dict[str, list[str]],
     comparisons_dir: Path,
@@ -243,13 +251,16 @@ def build_comparisons(
     """
     sessions: list[ComparisonSession] = []
 
+    comparison_ctx: list[tuple[str, list[str]]] = []
+    comparison_dirs: list[Path] = []
+
     for asset_id, asset_args in assets.items():
         asset_dst_dir = comparisons_dir / asset_id
-
+        comparison_dirs.append(asset_dst_dir)
         if asset_dst_dir.exists() and not overwrite_existing:
             LOGGER.info(f"⏩ skipping building for '{asset_id}': found existing")
         else:
-            LOGGER.info(f"🔨 building comparisons for '{asset_id}'")
+
             command = [
                 asset_id,
                 "--target-dir",
@@ -257,9 +268,14 @@ def build_comparisons(
                 "--renderer-dir",
                 str(renderers_dir),
             ] + asset_args
-            with patch_sysargv([str(IMAGEGEN_SCRIPT_PATH)] + command):
-                runpy.run_path(str(IMAGEGEN_SCRIPT_PATH), run_name="__main__")
+            comparison_ctx.append((asset_id, command))
 
+    LOGGER.debug(f"🚦▶️ about to run {len(comparison_ctx)} comparisons in parallel ...")
+    with Pool(processes=4) as pool:
+        pool.starmap(_build_comparison, comparison_ctx)
+    LOGGER.debug(f"🚦✅ completed parallel run")
+
+    for asset_dst_dir in comparison_dirs:
         session_metadadata_path = next(asset_dst_dir.glob("*.json"))
         session_metadadata = session_metadadata_path.read_text(encoding="utf-8")
         session = ComparisonSession.from_json(json_str=session_metadadata)
