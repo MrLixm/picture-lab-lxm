@@ -7,19 +7,20 @@ import re
 import runpy
 import shutil
 import sys
+from typing import Any
+
 import unicodedata
 from pathlib import Path
 from typing import Callable
 
 import jinja2
 
-import lxmpicturelab
+import lxmpicturelab.renderer
 from lxmpicturelab.browse import SCRIPTS_DIR
 from lxmpicturelab.comparison import ComparisonRender
 from lxmpicturelab.comparison import ComparisonSession
 from lxmpicturelab.comparison import GeneratorCombined
 from lxmpicturelab.renderer import OcioConfigRenderer
-from lxmpicturelab.renderer import RENDERER_BUILDERS_BY_ID
 
 LOGGER = logging.getLogger(Path(__file__).stem)
 
@@ -43,6 +44,19 @@ ASSETS = {
     "PAac-B01-skins": ["--generator-exposures", "0.01", "--generator-full", "864"],
     "PAjg-MZY-nightstreet": ["--generator-exposures", "0.3", "--generator-full", "864"],
 }
+
+# orders define visual order in which comparison are presented on the site
+RENDERERS = [
+    lxmpicturelab.renderer.NativeBuilder,
+    lxmpicturelab.renderer.TCAMBuilder,
+    lxmpicturelab.renderer.ARRIBuilder,
+    lxmpicturelab.renderer.AgXBuilder,
+    lxmpicturelab.renderer.AgXBlenderBuilder,
+    lxmpicturelab.renderer.AgXcBuilder,
+    lxmpicturelab.renderer.ACES13gmBuilder,
+    lxmpicturelab.renderer.ACES2gmBuilder,
+    lxmpicturelab.renderer.ACES2Builder,
+]
 
 CSS_PATH = THISDIR / "main.css"
 
@@ -177,6 +191,10 @@ class CtxComparison:
         for generator in self.generators:
             for render in generator.renders:
                 render.path = callback(render.path)
+
+    def sort_renders(self, callback: Callable[[CtxRender], Any]):
+        for generator in self.generators:
+            generator.renders = sorted(generator.renders, key=callback)
 
 
 def build_renderers(
@@ -317,6 +335,15 @@ def build(
         p = p.relative_to(build_dir)
         return p.as_posix()
 
+    def sort_renders(render: CtxRender):
+        try:
+            return renderer_ids.index(render.renderer_id)
+        except ValueError:
+            LOGGER.warning(
+                f"could not sort CtxRender {render.renderer_id}; not in {renderer_ids}"
+            )
+            return 0
+
     # // comparison images generation
 
     img_dir = build_dir / "img"
@@ -356,6 +383,7 @@ def build(
 
     for comparison in comparisons:
         comparison.edit_paths(callback=conformize_paths)
+        comparison.sort_renders(callback=sort_renders)
         page_ctx = {
             "Comparison": comparison,
             "NAV_ACTIVE": comparison.page_slug,
@@ -444,13 +472,11 @@ def main(argv: list[str] | None = None):
 
     work_dir.mkdir(exist_ok=True)
 
-    renderer_ids = list(RENDERER_BUILDERS_BY_ID.keys())
-
     build_dir.mkdir(exist_ok=True)
     LOGGER.info(f"🔨 building site to '{build_dir}'")
     build(
         assets=ASSETS,
-        renderer_ids=renderer_ids,
+        renderer_ids=[r.identifier for r in RENDERERS],
         build_dir=build_dir,
         work_dir=work_dir,
         publish=publish,
