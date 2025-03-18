@@ -29,6 +29,23 @@
       generation can be retrieved
       at <a href="https://github.com/MrLixm/picture-lab-lxm">https://github.com/MrLixm/picture-lab-lxm</a>.
     </p>
+    <h2>Caveats</h2>
+    <p>The workflow and the image presented have the following trade-offs:</p>
+    <ul>
+      <li>sRGB colorspace encoding is not consistent: piecewise function versus
+        power function.
+      </li>
+      <li>Some assets were already designed by their author to work with a
+        specific picture-formation; their look are bias against it.
+      </li>
+      <li>Some picture-formation were not designed to be applied through OCIO
+        and might be more accurate if used in their proper context.
+      </li>
+      <li>Quickly comparing images next to each other will more easily reveal
+        differences that might not be noticeable otherwise. It's best to let
+        your eye adapt to the picture before jumping to a conclusion.
+      </li>
+    </ul>
     <h2>Software</h2>
     <p>This project is made possible thanks to the following (non-exhaustive)
       free software:</p>
