@@ -1,4 +1,5 @@
 import contextlib
+import sys
 import time
 from typing import Callable
 
@@ -26,3 +27,17 @@ def timeit(message: str, stream: Callable[[str], None], decimals: int = 2):
         end = time.time()
         duration = "{:.{}f}".format(end - start, decimals)
         stream(f"{message}{duration}s")
+
+
+@contextlib.contextmanager
+def patch_sysargv(new_argv: list[str] | None = None):
+    """
+    Create a context which allow to edit sys.argv while making sure its restored on exit.
+    """
+    backup = sys.argv.copy()
+    try:
+        if new_argv is not None:
+            sys.argv = new_argv
+        yield
+    finally:
+        sys.argv = backup
