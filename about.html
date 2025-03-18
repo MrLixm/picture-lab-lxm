@@ -19,7 +19,10 @@
     <nav>
       <a href="about.html">
         <div class="nav-item active">
-          <span>about</span>
+          <span id="nav-about">about<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+     fill="currentColor">
+    <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 15H13V17H11V15ZM13 13.3551V14H11V12.5C11 11.9477 11.4477 11.5 12 11.5C12.8284 11.5 13.5 10.8284 13.5 10C13.5 9.17157 12.8284 8.5 12 8.5C11.2723 8.5 10.6656 9.01823 10.5288 9.70577L8.56731 9.31346C8.88637 7.70919 10.302 6.5 12 6.5C13.933 6.5 15.5 8.067 15.5 10C15.5 11.5855 14.4457 12.9248 13 13.3551Z"></path>
+</svg></span>
         </div>
       </a>
     </nav>
@@ -175,7 +178,7 @@
         <div class="renderer-item">
           <h3>Native (no image formation)</h3>
           <div class="renderer-item-content">
-            <p>No picture formation is applied, anything outside the target volume is clipped.</p>
+            <p>No picture formation is applied, anything outside the destination volume is clipped.</p>
             <table>
               <tr>
                 <th>source</th>
@@ -203,7 +206,7 @@
         <div class="renderer-item">
           <h3>TCAMv3</h3>
           <div class="renderer-item-content">
-            <p>Filmlight&#39;s algorithm which is best working in the context of their grading tools.</p>
+            <p>Filmlight&#39;s color pipeline. Initially designed for their Baselight grading tool but for which they still provide an OCIO configuration.</p>
             <table>
               <tr>
                 <th>source</th>
@@ -235,7 +238,7 @@
         <div class="renderer-item">
           <h3>ARRI Reveal</h3>
           <div class="renderer-item-content">
-            <p>The ARRI &#34;color-science&#34; pipeline, based on their provided display LUTs.</p>
+            <p>The ARRI &#34;color-science&#34; pipeline, based on their provided display LUTs. Injected in the studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio config.</p>
             <table>
               <tr>
                 <th>source</th>
@@ -347,7 +350,7 @@
         <div class="renderer-item">
           <h3>AgXc v1.0</h3>
           <div class="renderer-item-content">
-            <p>Another custom variant of AgX, closer to Blender variant. Not yet released.</p>
+            <p>Another custom variant of AgX, closer to Blender variant. Still in development.</p>
             <table>
               <tr>
                 <th>source</th>
@@ -511,7 +514,7 @@
         <div class="renderer-item">
           <h3>2499DRT</h3>
           <div class="renderer-item-content">
-            <p>A .dctl algorithm by Juan Pablo Zambrano.</p>
+            <p>A .dctl algorithm by Juan Pablo Zambrano; targeting colorists.</p>
             <table>
               <tr>
                 <th>source</th>
@@ -543,7 +546,7 @@
         <div class="renderer-item">
           <h3>Kodak2383</h3>
           <div class="renderer-item-content">
-            <p>The iconic Kodak2383 print film simulation LUT, authored by Blackmagic as an ACES LMT.</p>
+            <p>The iconic Kodak2383 print film simulation LUT, authored by Blackmagic as an ACES LMT. Injected in the studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio config.</p>
             <table>
               <tr>
                 <th>source</th>
@@ -562,7 +565,7 @@
             <table>
               <tr>
                 <th>display</th>
-                <td>sRGB - 2.2</td>
+                <td>sRGB - Display</td>
               </tr>
               <tr>
                 <th>view</th>
@@ -586,6 +589,6 @@
 </main>
 </body>
 <footer>
-  <p>Static website created by Liam Collod using Python - Last built on 2025-03-18T21:50</p>
+  <p>Static website created by Liam Collod using Python - Last built on 2025-03-19T00:03</p>
 </footer>
 </html>

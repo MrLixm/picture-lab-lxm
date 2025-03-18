@@ -102,6 +102,17 @@ header a:hover {
     text-decoration: unset;
     white-space: nowrap;
 }
+header nav span#nav-about {
+    display: flex;
+    align-items: center;
+    font-style: italic;
+}
+header nav span#nav-about svg {
+    display: inline-block;
+    margin-left: 5px;
+    width: 18px;
+    height: 18px;
+}
 header nav div.nav-item {
     /*font-family: 'Martian Mono', sans-serif;*/
     /*font-weight: 200;*/
