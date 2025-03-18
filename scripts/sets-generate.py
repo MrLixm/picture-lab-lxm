@@ -17,7 +17,7 @@ from typing import Callable
 import lxmpicturelab
 from lxmpicturelab.browse import ASSET_DIR
 from lxmpicturelab.browse import SETS_DIR
-from lxmpicturelab.browse import get_all_assets
+from lxmpicturelab.browse import get_asset
 from lxmpicturelab.asset import AssetMetadata
 from lxmpicturelab.asset import ImageAsset
 from lxmpicturelab.asset import AssetPrimaryColor
@@ -35,7 +35,7 @@ assert OIIOTOOL_PATH.exists()
 ASSET_INGEST_PATH = THISDIR / "asset-in-ingest.py"
 _ASSET_INGEST = runpy.run_path(str(ASSET_INGEST_PATH), run_name="__passthrough__")
 # to upgrade at each code change that affect the data writen to the output image
-__version__ = f"5-{_ASSET_INGEST['__version__']}"
+__version__ = f"6-{_ASSET_INGEST['__version__']}"
 
 OVERWRITE_EXISTING = True
 
@@ -46,13 +46,11 @@ class SetVariant(abc.ABC):
     identifier: str
     description: str
     bg_color: tuple[float, float, float]
+    asset_ids: list[str]
     asset_sorter: Callable[[ImageAsset], Any] | None = None
-    asset_filter: Callable[[ImageAsset], bool] | None = None
 
     def get_assets(self, root_dir: Path) -> list[ImageAsset]:
-        assets = get_all_assets(root_dir)
-        if self.asset_filter:
-            assets = filter(self.asset_filter, assets)
+        assets = [get_asset(assetid, root_dir) for assetid in self.asset_ids]
         if self.asset_sorter:
             assets = sorted(assets, key=self.asset_sorter)
         return assets
@@ -62,11 +60,40 @@ def _sort_assets_color(asset: ImageAsset):
     return asset.metadata.type.value, asset.metadata.primary_color, asset.identifier
 
 
+ALL_ASSETS = [
+    "CAaf-Z37-legomovie",
+    "CAlc-D8T-dragon",
+    "CAtm-FGH-specbox",
+    "Cblr-GFD-spring",
+    "CGts-W0L-sweep",
+    "PAac-B01-skins",
+    "PAds-4HS-testbench",
+    "PAfl-H6O-night",
+    "PAfl-IP1-candle",
+    "PAfl-UY7-garden",
+    "PAfm-SWE-neongirl",
+    "PAjg-MZY-nightstreet",
+    "PAkp-4DO-bluehand",
+    "PAmsk-8BB-bluebar",
+    "PAmsk-R65-christmas",
+    "PAtm-2QQ-space",
+    "PAtm-B2W-fire",
+    "PPry-00M-mountain",
+    "PWarr-VWE-helenjohn",
+    "PWdac-11H-ngohaiha",
+    "PWdc-85R-braidmaker",
+    "PWsjw-7QC-watchmaker",
+    "PWsjw-90G-icecave",
+    "PWsjw-FCC-closeman",
+    "PWsjw-LE4-alpinist",
+]
+
 SET_VARIANTS = [
     SetVariant(
         identifier="lxmpicturelab.al.sorted-color.bg-black",
         description="A collection of heterogeneous images from various physical or virtual capture devices.",
         bg_color=(0, 0, 0),
+        asset_ids=ALL_ASSETS,
         asset_sorter=_sort_assets_color,
     ),
     SetVariant(
@@ -76,6 +103,7 @@ SET_VARIANTS = [
             "capture devices; with a mid-grey background to affect picture perception."
         ),
         bg_color=(0.18, 0.18, 0.18),
+        asset_ids=ALL_ASSETS,
         asset_sorter=_sort_assets_color,
     ),
 ]
@@ -95,14 +123,15 @@ def generate_mosaic(
     """
 
     Args:
-        background_color:
         dst_asset: the asset configuration of the mosaic to create
         src_assets: list of image asset to build the mosaic with
+        description:
         mosaic_columns: max number of columns
         tile_height: width each image (tile) must be fitted in
         tile_width: height each image (tile) must be fitted in
         mosaic_gap_size: internal gap in pixels between each tile of the mosaic
         margins: space in pixels between the border of the image and the tiles
+        background_color:
     """
     header_height = 150
     header_title = f"{dst_asset.image_path.stem} v{__version__}"
