@@ -32,16 +32,20 @@ WORK_DIR.mkdir(exist_ok=True)
 def build_renderers(
     dst_dir: Path,
     renderer_ids: list[str],
+    overwrite: bool = False,
 ) -> list[OcioConfigRenderer]:
     """
     Args:
         dst_dir: filesystem path to a directory that may exist
         renderer_ids: list of renderer identifier to build and return
+        overwrite: still build the render even if it exists.
     """
     renderers: list[OcioConfigRenderer] = []
     for renderer_id in renderer_ids:
         renderer_dir = dst_dir / renderer_id
         command = [renderer_id, str(renderer_dir)]
+        if overwrite:
+            command.append("--force-overwrite")
         with patch_sysargv([str(RENDERER_SCRIPT)] + command):
             runpy.run_path(str(RENDERER_SCRIPT), run_name="__main__")
 
@@ -109,6 +113,11 @@ def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
         default=WORKBENCH_DIR / "renderers",
         help="filesystem path to a directory that may not exist.",
     )
+    parser.add_argument(
+        "--overwrite-renderers",
+        action="store_true",
+        help=("If specified, still build the render even if they exists."),
+    )
     parsed = parser.parse_args(argv)
     return parsed
 
@@ -124,6 +133,7 @@ def main(argv: list[str] | None = None):
     generator_full: int | None = cli.generator_full
     combined_renderers: bool = cli.combined_renderers
     renderer_ids: list[str] = cli.renderers
+    overwrite_renderers: bool = cli.overwrite_renderers
 
     LOGGER.debug(f"{asset_id=}")
     LOGGER.debug(f"{target_dir=}")
@@ -132,7 +142,11 @@ def main(argv: list[str] | None = None):
 
     renderer_work_dir.mkdir(exist_ok=True)
     LOGGER.info(f"🛠️ building {len(renderer_ids)} renderers to '{renderer_work_dir}'")
-    renderers = build_renderers(renderer_work_dir, renderer_ids)
+    renderers = build_renderers(
+        dst_dir=renderer_work_dir,
+        renderer_ids=renderer_ids,
+        overwrite=overwrite_renderers,
+    )
 
     asset = find_asset(asset_id)
     if not asset:
