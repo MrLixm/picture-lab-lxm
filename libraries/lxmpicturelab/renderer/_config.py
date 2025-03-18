@@ -50,7 +50,8 @@ class OcioConfigRenderer:
 
     src_colorspace: str = ACES20651_COLORSPACE
 
-    reference_url: str = ""
+    source_url: str = ""
+    references: list[str] = dataclasses.field(default_factory=list)
 
     def to_oiiotool_command(self) -> list[str]:
         if self.src_colorspace == ACES20651_COLORSPACE:
@@ -85,7 +86,8 @@ class OcioConfigRenderer:
             view=as_dict["view"],
             look=as_dict["look"],
             src_colorspace=as_dict["src_colorspace"],
-            reference_url=as_dict["reference_url"],
+            source_url=as_dict["source_url"],
+            references=as_dict["references"],
         )
 
     @classmethod

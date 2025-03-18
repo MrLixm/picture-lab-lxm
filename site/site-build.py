@@ -101,16 +101,18 @@ class CtxRenderer:
     config_display: str
     config_view: str
     config_look: str
+    references: list[str]
 
     @classmethod
     def from_renderer(cls, renderer: OcioConfigRenderer) -> "CtxRenderer":
         name = renderer.name
         identifier = renderer.filename
         description = renderer.description
-        reference_url = renderer.reference_url
+        reference_url = renderer.source_url
         config_display = renderer.display
         config_view = renderer.view
         config_look = renderer.look
+        references = renderer.references
         return cls(
             name=name,
             identifier=identifier,
@@ -119,6 +121,7 @@ class CtxRenderer:
             config_display=config_display,
             config_view=config_view,
             config_look=config_look,
+            references=references,
         )
 
 

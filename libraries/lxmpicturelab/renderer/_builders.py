@@ -26,7 +26,7 @@ class BaseRendererBuilder:
     """
 
     identifier: str = NotImplemented
-    reference_url: str = NotImplemented
+    source_url: str = NotImplemented
 
     def __init__(self, path: Path):
         self.path: Path = path
@@ -46,7 +46,7 @@ class BaseRendererBuilder:
 
 class AgXBuilder(BaseRendererBuilder):
     identifier: str = "AgX"
-    reference_url: str = "https://github.com/sobotka/AgX/archive/refs/heads/main.zip"
+    source_url: str = "https://github.com/sobotka/AgX/archive/refs/heads/main.zip"
 
     def get_ocio_config_path(self) -> Path:
         return self.path / "AgX-main" / "config.ocio"
@@ -60,21 +60,23 @@ class AgXBuilder(BaseRendererBuilder):
             srgb_lin="Linear BT.709",
             display="sRGB",
             view="Appearance Punchy",
-            reference_url=self.reference_url,
+            source_url=self.source_url,
+            references=[
+                "https://github.com/sobotka/AgX",
+                "https://blenderartists.org/t/feedback-development-filmic-baby-step-to-a-v2/1361663",
+            ],
         )
 
     def build(self):
         repo_path = self.path / "AgX.zip"
-        download_file(self.reference_url, repo_path)
+        download_file(self.source_url, repo_path)
         extract_zip(repo_path, remove_zip=True)
         assert self.get_ocio_config_path().exists()
 
 
 class AgXBlenderBuilder(BaseRendererBuilder):
     identifier: str = "AgX.blender"
-    reference_url: str = (
-        "https://projects.blender.org/blender/blender/archive/v4.2.7.zip"
-    )
+    source_url: str = "https://projects.blender.org/blender/blender/archive/v4.2.7.zip"
 
     def get_ocio_config_path(self) -> Path:
         return self.path / "ocio" / "config.ocio"
@@ -89,13 +91,18 @@ class AgXBlenderBuilder(BaseRendererBuilder):
             display="sRGB",
             view="AgX",
             look="AgX - Punchy",
-            reference_url=self.reference_url,
+            source_url=self.source_url,
+            references=[
+                "https://projects.blender.org/blender/blender/pulls/106355",
+                "https://github.com/EaryChow/AgX",
+                "https://blenderartists.org/t/feedback-development-filmic-baby-step-to-a-v2/1361663",
+            ],
         )
 
     def build(self):
         src_dir = self.path / "blender" / "release" / "datafiles" / "colormanagement"
         repo_path = self.path / "blender.zip"
-        download_file(self.reference_url, repo_path)
+        download_file(self.source_url, repo_path)
         extract_zip(repo_path, remove_zip=True)
         config_path = self.get_ocio_config_path()
         shutil.copytree(src_dir, config_path.parent)
@@ -105,7 +112,7 @@ class AgXBlenderBuilder(BaseRendererBuilder):
 
 class AgXcBuilder(BaseRendererBuilder):
     identifier: str = "AgXc"
-    reference_url: str = (
+    source_url: str = (
         "https://github.com/MrLixm/AgXc/archive/refs/heads/refacto/ocio-overhaul.zip"
     )
 
@@ -127,19 +134,23 @@ class AgXcBuilder(BaseRendererBuilder):
             srgb_lin="sRGB-linear",
             display="sRGB-2.2",
             view="AgXc.base Punchy",
-            reference_url=self.reference_url,
+            source_url=self.source_url,
+            references=[
+                "https://github.com/MrLixm/AgXc",
+                "https://github.com/MrLixm/AgXc/pull/35",
+            ],
         )
 
     def build(self):
         repo_path = self.path / "AgXc.zip"
-        download_file(self.reference_url, repo_path)
+        download_file(self.source_url, repo_path)
         extract_zip(repo_path, remove_zip=True)
         assert self.get_ocio_config_path().exists()
 
 
 class TCAMBuilder(BaseRendererBuilder):
     identifier: str = "TCAMv3"
-    reference_url: str = "https://www.filmlight.ltd.uk/resources/download.php"
+    source_url: str = "https://www.filmlight.ltd.uk/resources/download.php"
 
     def get_ocio_config_path(self) -> Path:
         return self.path / "TCS_TCAMv3" / "TCS_TCAMv3.ocio"
@@ -153,13 +164,16 @@ class TCAMBuilder(BaseRendererBuilder):
             srgb_lin="CGI: Linear : Rec.709",
             display="sRGB Display: 2.2 Gamma : Rec.709 Truelight CAM v3",
             view="sRGB Display: 2.2 Gamma : Rec.709",
-            reference_url=self.reference_url,
+            source_url=self.source_url,
+            references=[
+                "https://www.filmlight.ltd.uk/support/customer-login/colourspaces/colourspaces.php",
+            ],
         )
 
     def build(self):
         repo_path = self.path / "TCAM.zip"
         download_file_advanced(
-            self.reference_url,
+            self.source_url,
             repo_path,
             params={
                 "access": "public",
@@ -179,7 +193,7 @@ class TCAMBuilder(BaseRendererBuilder):
 
 class ARRIBuilder(BaseRendererBuilder):
     identifier: str = "ARRIreveal"
-    reference_url: str = (
+    source_url: str = (
         "https://www.arri.com/resource/blob/280728/7933fd1ce4de9165b906936661ab54eb/arri-logc4-lut-package-data.zip"
     )
     aces_url = "https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio"
@@ -196,7 +210,11 @@ class ARRIBuilder(BaseRendererBuilder):
             srgb_lin="Linear Rec.709 (sRGB)",
             display="sRGB - 2.2",
             view="ARRI Reveal",
-            reference_url=self.reference_url,
+            source_url=self.source_url,
+            references=[
+                "https://www.arri.com/en/learn-help/learn-help-camera-system/tools/lut-generator",
+                "https://www.arri.com/en/learn-help/learn-help-camera-system/image-science/reveal-color-science",
+            ],
         )
 
     def build(self):
@@ -207,7 +225,7 @@ class ARRIBuilder(BaseRendererBuilder):
         """
         aces_config_path = self.path / self.aces_url.split("/")[-1]
         repo_path = self.path / "arri.zip"
-        download_file(self.reference_url, repo_path)
+        download_file(self.source_url, repo_path)
         extract_zip(repo_path, remove_zip=True)
         download_file(self.aces_url, aces_config_path)
 
@@ -258,12 +276,12 @@ class ARRIBuilder(BaseRendererBuilder):
 
 class ACES13gmBuilder(BaseRendererBuilder):
     identifier: str = "ACESv1.3-gm"
-    reference_url: str = (
+    source_url: str = (
         "https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v2.1.0-v2.2.0/studio-config-v2.1.0_aces-v1.3_ocio-v2.1.ocio"
     )
 
     def get_ocio_config_path(self) -> Path:
-        return self.path / self.reference_url.split("/")[-1]
+        return self.path / self.source_url.split("/")[-1]
 
     def get_renderer(self):
         return OcioConfigRenderer(
@@ -275,23 +293,24 @@ class ACES13gmBuilder(BaseRendererBuilder):
             display="sRGB - Display",
             view="ACES 1.0 - SDR Video",
             look="ACES 1.3 Reference Gamut Compression",
-            reference_url=self.reference_url,
+            source_url=self.source_url,
+            references=["https://community.acescentral.com/"],
         )
 
     def build(self):
         config_path = self.get_ocio_config_path()
-        download_file(self.reference_url, config_path)
+        download_file(self.source_url, config_path)
         assert config_path.exists()
 
 
 class ACES2gmBuilder(BaseRendererBuilder):
     identifier: str = "ACESv2.0-gm"
-    reference_url: str = (
+    source_url: str = (
         "https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio"
     )
 
     def get_ocio_config_path(self) -> Path:
-        return self.path / self.reference_url.split("/")[-1]
+        return self.path / self.source_url.split("/")[-1]
 
     def get_renderer(self):
         return OcioConfigRenderer(
@@ -303,12 +322,13 @@ class ACES2gmBuilder(BaseRendererBuilder):
             display="sRGB - Display",
             view="ACES 2.0 - SDR 100 nits (Rec.709)",
             look="ACES 1.3 Reference Gamut Compression",
-            reference_url=self.reference_url,
+            source_url=self.source_url,
+            references=["https://community.acescentral.com/"],
         )
 
     def build(self):
         config_path = self.get_ocio_config_path()
-        download_file(self.reference_url, config_path)
+        download_file(self.source_url, config_path)
         assert config_path.exists()
 
 
@@ -326,6 +346,7 @@ class ACES2Builder(ACES2gmBuilder):
             display="sRGB - Display",
             view="ACES 2.0 - SDR 100 nits (Rec.709)",
             look="",
+            references=["https://community.acescentral.com/"],
         )
 
 
@@ -343,12 +364,13 @@ class NativeBuilder(ACES2gmBuilder):
             display="sRGB - Display",
             view="Un-tone-mapped",
             look="",
+            references=[],
         )
 
 
 class OpenDRTBuilder(BaseRendererBuilder):
     identifier: str = "OpenDRT"
-    reference_url: str = (
+    source_url: str = (
         "https://github.com/Joegenco/PixelManager/archive/c8716a42c7e03c6573915ad24f19eccfc39f687c.zip"
     )
 
@@ -359,21 +381,22 @@ class OpenDRTBuilder(BaseRendererBuilder):
         return OcioConfigRenderer(
             name=f"OpenDRT",
             filename=self.identifier,
-            description="An open source display rendering transform authored by Jed Smith (https://github.com/jedypod/open-display-transform).",
+            description="An open source display rendering transform authored by Jed Smith.",
             config_path=self.get_ocio_config_path(),
             srgb_lin="Linear Rec.709",
             display="sRGB",
             view="OpenDRT",
             look="",
-            reference_url=self.reference_url,
+            source_url=self.source_url,
+            references=["https://github.com/jedypod/open-display-transform"],
         )
 
     def build(self):
         repo_dir = self.path / "tmp"
         repo_dir.mkdir(exist_ok=True)
         repo_path = repo_dir / "PixelManager.zip"
-        git_ref = self.reference_url.split("/")[-1].split(".zip")[0]
-        download_file(self.reference_url, repo_path)
+        git_ref = self.source_url.split("/")[-1].split(".zip")[0]
+        download_file(self.source_url, repo_path)
         extract_zip(repo_path, remove_zip=True)
         os.rename(repo_dir / f"PixelManager-{git_ref}", self.path / "ocio")
         assert self.get_ocio_config_path().exists()
@@ -381,7 +404,7 @@ class OpenDRTBuilder(BaseRendererBuilder):
 
 class DRT2499Builder(OpenDRTBuilder):
     identifier: str = "2499DRT"
-    reference_url: str = (
+    source_url: str = (
         "https://github.com/Joegenco/PixelManager/archive/c8716a42c7e03c6573915ad24f19eccfc39f687c.zip"
     )
 
@@ -389,19 +412,20 @@ class DRT2499Builder(OpenDRTBuilder):
         return OcioConfigRenderer(
             name=f"2499DRT",
             filename=self.identifier,
-            description="A .dctl algorithm by Juan Pablo Zambrano (https://github.com/JuanPabloZambrano/DCTL/tree/main/2499_DRT).",
+            description="A .dctl algorithm by Juan Pablo Zambrano.",
             config_path=self.get_ocio_config_path(),
             srgb_lin="Linear Rec.709",
             display="sRGB",
             view="JP2499DRT",
             look="",
-            reference_url=self.reference_url,
+            source_url=self.source_url,
+            references=["https://github.com/JuanPabloZambrano/DCTL/tree/main/2499_DRT"],
         )
 
 
 class Kodak2383Builder(BaseRendererBuilder):
     identifier: str = "Kodak2383"
-    reference_url: str = (
+    source_url: str = (
         "https://www.dropbox.com/s/qn62wg07f21jydp/LMT%20Kodak%202383%20Print%20Emulation.xml?dl=0"
     )
     aces_url = "https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio"
@@ -418,7 +442,11 @@ class Kodak2383Builder(BaseRendererBuilder):
             srgb_lin="Linear Rec.709 (sRGB)",
             display="sRGB - 2.2",
             view="Kodak2383",
-            reference_url=self.reference_url,
+            source_url=self.source_url,
+            references=[
+                "https://community.acescentral.com/t/lmts-part-1-what-are-they-and-what-can-they-do-for-me/790/10?u=mrlixm",
+                "https://www.kodak.com/en/motion/product/post/print-films/vision-color-2383-3383/",
+            ],
         )
 
     def build(self):

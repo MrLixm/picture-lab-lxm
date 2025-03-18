@@ -77,9 +77,18 @@
           <h3>{{ Renderer.name }}</h3>
           <div class="renderer-item-content">
             <p>{{ Renderer.description|e|urlize }}</p>
-            <p>Source:
-              <a href="{{ Renderer.reference_url }}">{{ Renderer.reference_url }}</a>
-            </p>
+            <table>
+              <tr>
+                <th>source</th>
+                <td>{{ Renderer.reference_url|urlize }}</td>
+              </tr>
+              {%- for ref in Renderer.references %}
+              <tr>
+                <th>reference</th>
+                <td>{{ ref|urlize }}</td>
+              </tr>
+              {%- endfor %}
+            </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
               <tr>
