@@ -75,6 +75,36 @@ FOOTER = "Static website created by Liam Collod using Python"
 
 
 @dataclasses.dataclass
+class CtxRenderer:
+    name: str
+    identifier: str
+    description: str
+    reference_url: str
+    config_display: str
+    config_view: str
+    config_look: str
+
+    @classmethod
+    def from_renderer(cls, renderer: OcioConfigRenderer) -> "CtxRenderer":
+        name = renderer.name
+        identifier = renderer.filename
+        description = renderer.description
+        reference_url = renderer.reference_url
+        config_display = renderer.display
+        config_view = renderer.view
+        config_look = renderer.look
+        return cls(
+            name=name,
+            identifier=identifier,
+            description=description,
+            reference_url=reference_url,
+            config_display=config_display,
+            config_view=config_view,
+            config_look=config_look,
+        )
+
+
+@dataclasses.dataclass
 class CtxRender:
     renderer_name: str
     renderer_id: str
@@ -154,13 +184,13 @@ class CtxComparison:
 def build_renderers(
     dst_dir: Path,
     renderer_ids: list[str],
-) -> list[OcioConfigRenderer]:
+) -> list[CtxRenderer]:
     """
     Args:
         dst_dir: filesystem path to a directory that may exist
         renderer_ids: list of renderer identifier to build and return
     """
-    renderers: list[OcioConfigRenderer] = []
+    renderers: list[CtxRenderer] = []
     for renderer_id in renderer_ids:
         renderer_dir = dst_dir / renderer_id
         sys.argv = [
@@ -173,7 +203,8 @@ def build_renderers(
         renderer_file = next(renderer_dir.glob("*.json"))
         renderer_txt = renderer_file.read_text("utf-8")
         renderer = OcioConfigRenderer.from_json(renderer_txt)
-        renderers.append(renderer)
+        ctxrenderer = CtxRenderer.from_renderer(renderer)
+        renderers.append(ctxrenderer)
 
     return renderers
 
@@ -194,7 +225,7 @@ def build_comparisons(
         asset_dst_dir = comparisons_dir / asset_id
 
         if asset_dst_dir.exists() and not overwrite_existing:
-            LOGGER.info(f"💨 skipping building for '{asset_id}': found existing")
+            LOGGER.info(f"⏩ skipping building for '{asset_id}': found existing")
         else:
             LOGGER.info(f"🔨 building comparisons for '{asset_id}'")
             sys.argv = [
