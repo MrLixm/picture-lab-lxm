@@ -26,6 +26,7 @@ table, th, td {
     text-align: left;
     padding: 5px;
     border-collapse: collapse;
+    margin-bottom: 15px;
 }
 th {
     background-color: rgb(var(--bgcolor_l1));
@@ -187,7 +188,7 @@ Reference: https://codepen.io/alvarotrigo/pen/bGoPzmw
 }
 .tab-label {
     width: auto;
-    padding: 10px 15px;
+    padding: 10px 10px;
     cursor: pointer;
     transition: background 0.1s, color 0.1s;
 }

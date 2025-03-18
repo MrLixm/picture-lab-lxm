@@ -116,17 +116,13 @@
       to a readable visual representation. The concept can be explored further
       with:</p>
     <ul>
-      <li><a href="https://github.com/sobotka/scise/wiki/Picture-Formation">https://github.com/sobotka/scise/wiki/Picture-Formation</a>
-      </li>
-      <li><a href="https://hg2dc.com/2025/03/13/question-34/">https://hg2dc.com/2025/03/13/question-34/</a>
-      </li>
-      <li>
-        <a href="https://github.com/jedypod/open-display-transform/wiki/doc-introduction">https://github.com/jedypod/open-display-transform/wiki/doc-introduction</a>
-      </li>
+      <li><a href="https://github.com/sobotka/scise/wiki/Picture-Formation" rel="noopener">https://github.com/sobotka/scise/wiki/Picture-Formation</a></li>
+      <li><a href="https://hg2dc.com/2025/03/13/question-34/" rel="noopener">https://hg2dc.com/2025/03/13/question-34/</a></li>
+      <li><a href="https://github.com/jedypod/open-display-transform/wiki/doc-introduction" rel="noopener">https://github.com/jedypod/open-display-transform/wiki/doc-introduction</a></li>
     </ul>
     <p class="adm-note">The code source for this website and the image
       generation can be retrieved
-      at <a href="https://github.com/MrLixm/picture-lab-lxm">https://github.com/MrLixm/picture-lab-lxm</a>.
+      at <a href="https://github.com/MrLixm/picture-lab-lxm" rel="noopener">https://github.com/MrLixm/picture-lab-lxm</a>.
     </p>
     <h2>Caveats</h2>
     <p>The workflow and the image presented have the following trade-offs:</p>
@@ -180,9 +176,12 @@
           <h3>Native (no image formation)</h3>
           <div class="renderer-item-content">
             <p>No picture formation is applied, anything outside the target volume is clipped.</p>
-            <p>Source:
-              <a href="https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio">https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio</a>
-            </p>
+            <table>
+              <tr>
+                <th>source</th>
+                <td><a href="https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio" rel="noopener">https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio</a></td>
+              </tr>
+            </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
               <tr>
@@ -205,9 +204,16 @@
           <h3>TCAMv3</h3>
           <div class="renderer-item-content">
             <p>Filmlight&#39;s algorithm which is best working in the context of their grading tools.</p>
-            <p>Source:
-              <a href="https://www.filmlight.ltd.uk/resources/download.php">https://www.filmlight.ltd.uk/resources/download.php</a>
-            </p>
+            <table>
+              <tr>
+                <th>source</th>
+                <td><a href="https://www.filmlight.ltd.uk/resources/download.php" rel="noopener">https://www.filmlight.ltd.uk/resources/download.php</a></td>
+              </tr>
+              <tr>
+                <th>reference</th>
+                <td><a href="https://www.filmlight.ltd.uk/support/customer-login/colourspaces/colourspaces.php" rel="noopener">https://www.filmlight.ltd.uk/support/customer-login/colourspaces/colourspaces.php</a></td>
+              </tr>
+            </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
               <tr>
@@ -230,9 +236,20 @@
           <h3>ARRI Reveal</h3>
           <div class="renderer-item-content">
             <p>The ARRI &#34;color-science&#34; pipeline, based on their provided display LUTs.</p>
-            <p>Source:
-              <a href="https://www.arri.com/resource/blob/280728/7933fd1ce4de9165b906936661ab54eb/arri-logc4-lut-package-data.zip">https://www.arri.com/resource/blob/280728/7933fd1ce4de9165b906936661ab54eb/arri-logc4-lut-package-data.zip</a>
-            </p>
+            <table>
+              <tr>
+                <th>source</th>
+                <td><a href="https://www.arri.com/resource/blob/280728/7933fd1ce4de9165b906936661ab54eb/arri-logc4-lut-package-data.zip" rel="noopener">https://www.arri.com/resource/blob/280728/7933fd1ce4de9165b906936661ab54eb/arri-logc4-lut-package-data.zip</a></td>
+              </tr>
+              <tr>
+                <th>reference</th>
+                <td><a href="https://www.arri.com/en/learn-help/learn-help-camera-system/tools/lut-generator" rel="noopener">https://www.arri.com/en/learn-help/learn-help-camera-system/tools/lut-generator</a></td>
+              </tr>
+              <tr>
+                <th>reference</th>
+                <td><a href="https://www.arri.com/en/learn-help/learn-help-camera-system/image-science/reveal-color-science" rel="noopener">https://www.arri.com/en/learn-help/learn-help-camera-system/image-science/reveal-color-science</a></td>
+              </tr>
+            </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
               <tr>
@@ -255,9 +272,20 @@
           <h3>AgX</h3>
           <div class="renderer-item-content">
             <p>The original AgX algorithm by Troy Sobotka.</p>
-            <p>Source:
-              <a href="https://github.com/sobotka/AgX/archive/refs/heads/main.zip">https://github.com/sobotka/AgX/archive/refs/heads/main.zip</a>
-            </p>
+            <table>
+              <tr>
+                <th>source</th>
+                <td><a href="https://github.com/sobotka/AgX/archive/refs/heads/main.zip" rel="noopener">https://github.com/sobotka/AgX/archive/refs/heads/main.zip</a></td>
+              </tr>
+              <tr>
+                <th>reference</th>
+                <td><a href="https://github.com/sobotka/AgX" rel="noopener">https://github.com/sobotka/AgX</a></td>
+              </tr>
+              <tr>
+                <th>reference</th>
+                <td><a href="https://blenderartists.org/t/feedback-development-filmic-baby-step-to-a-v2/1361663" rel="noopener">https://blenderartists.org/t/feedback-development-filmic-baby-step-to-a-v2/1361663</a></td>
+              </tr>
+            </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
               <tr>
@@ -280,9 +308,24 @@
           <h3>AgX Blender-4.2.7</h3>
           <div class="renderer-item-content">
             <p>The improved AgX algorithm implemented in Blender.</p>
-            <p>Source:
-              <a href="https://projects.blender.org/blender/blender/archive/v4.2.7.zip">https://projects.blender.org/blender/blender/archive/v4.2.7.zip</a>
-            </p>
+            <table>
+              <tr>
+                <th>source</th>
+                <td><a href="https://projects.blender.org/blender/blender/archive/v4.2.7.zip" rel="noopener">https://projects.blender.org/blender/blender/archive/v4.2.7.zip</a></td>
+              </tr>
+              <tr>
+                <th>reference</th>
+                <td><a href="https://projects.blender.org/blender/blender/pulls/106355" rel="noopener">https://projects.blender.org/blender/blender/pulls/106355</a></td>
+              </tr>
+              <tr>
+                <th>reference</th>
+                <td><a href="https://github.com/EaryChow/AgX" rel="noopener">https://github.com/EaryChow/AgX</a></td>
+              </tr>
+              <tr>
+                <th>reference</th>
+                <td><a href="https://blenderartists.org/t/feedback-development-filmic-baby-step-to-a-v2/1361663" rel="noopener">https://blenderartists.org/t/feedback-development-filmic-baby-step-to-a-v2/1361663</a></td>
+              </tr>
+            </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
               <tr>
@@ -305,9 +348,20 @@
           <h3>AgXc v1.0</h3>
           <div class="renderer-item-content">
             <p>Another custom variant of AgX, closer to Blender variant. Not yet released.</p>
-            <p>Source:
-              <a href="https://github.com/MrLixm/AgXc/archive/refs/heads/refacto/ocio-overhaul.zip">https://github.com/MrLixm/AgXc/archive/refs/heads/refacto/ocio-overhaul.zip</a>
-            </p>
+            <table>
+              <tr>
+                <th>source</th>
+                <td><a href="https://github.com/MrLixm/AgXc/archive/refs/heads/refacto/ocio-overhaul.zip" rel="noopener">https://github.com/MrLixm/AgXc/archive/refs/heads/refacto/ocio-overhaul.zip</a></td>
+              </tr>
+              <tr>
+                <th>reference</th>
+                <td><a href="https://github.com/MrLixm/AgXc" rel="noopener">https://github.com/MrLixm/AgXc</a></td>
+              </tr>
+              <tr>
+                <th>reference</th>
+                <td><a href="https://github.com/MrLixm/AgXc/pull/35" rel="noopener">https://github.com/MrLixm/AgXc/pull/35</a></td>
+              </tr>
+            </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
               <tr>
@@ -330,9 +384,16 @@
           <h3>ACES v1.3 + Gamut Mapping</h3>
           <div class="renderer-item-content">
             <p>The Academy Color Encoding System on major version 1, with their &#34;Gamut Compression&#34; look.</p>
-            <p>Source:
-              <a href="https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v2.1.0-v2.2.0/studio-config-v2.1.0_aces-v1.3_ocio-v2.1.ocio">https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v2.1.0-v2.2.0/studio-config-v2.1.0_aces-v1.3_ocio-v2.1.ocio</a>
-            </p>
+            <table>
+              <tr>
+                <th>source</th>
+                <td><a href="https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v2.1.0-v2.2.0/studio-config-v2.1.0_aces-v1.3_ocio-v2.1.ocio" rel="noopener">https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v2.1.0-v2.2.0/studio-config-v2.1.0_aces-v1.3_ocio-v2.1.ocio</a></td>
+              </tr>
+              <tr>
+                <th>reference</th>
+                <td><a href="https://community.acescentral.com/" rel="noopener">https://community.acescentral.com/</a></td>
+              </tr>
+            </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
               <tr>
@@ -355,9 +416,16 @@
           <h3>ACES v2.0 + Gamut Mapping</h3>
           <div class="renderer-item-content">
             <p>The Academy Color Encoding System on major version 2, with their &#34;Gamut Compression&#34; look.</p>
-            <p>Source:
-              <a href="https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio">https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio</a>
-            </p>
+            <table>
+              <tr>
+                <th>source</th>
+                <td><a href="https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio" rel="noopener">https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio</a></td>
+              </tr>
+              <tr>
+                <th>reference</th>
+                <td><a href="https://community.acescentral.com/" rel="noopener">https://community.acescentral.com/</a></td>
+              </tr>
+            </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
               <tr>
@@ -380,9 +448,16 @@
           <h3>ACES v2.0 </h3>
           <div class="renderer-item-content">
             <p>The Academy Color Encoding System on major version 2.</p>
-            <p>Source:
-              <a href="https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio">https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio</a>
-            </p>
+            <table>
+              <tr>
+                <th>source</th>
+                <td><a href="https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio" rel="noopener">https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio</a></td>
+              </tr>
+              <tr>
+                <th>reference</th>
+                <td><a href="https://community.acescentral.com/" rel="noopener">https://community.acescentral.com/</a></td>
+              </tr>
+            </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
               <tr>
@@ -392,6 +467,106 @@
               <tr>
                 <th>view</th>
                 <td>ACES 2.0 - SDR 100 nits (Rec.709)</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      
+        <div class="renderer-item">
+          <h3>OpenDRT</h3>
+          <div class="renderer-item-content">
+            <p>An open source display rendering transform authored by Jed Smith.</p>
+            <table>
+              <tr>
+                <th>source</th>
+                <td><a href="https://github.com/Joegenco/PixelManager/archive/c8716a42c7e03c6573915ad24f19eccfc39f687c.zip" rel="noopener">https://github.com/Joegenco/PixelManager/archive/c8716a42c7e03c6573915ad24f19eccfc39f687c.zip</a></td>
+              </tr>
+              <tr>
+                <th>reference</th>
+                <td><a href="https://github.com/jedypod/open-display-transform" rel="noopener">https://github.com/jedypod/open-display-transform</a></td>
+              </tr>
+            </table>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>sRGB</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>OpenDRT</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      
+        <div class="renderer-item">
+          <h3>2499DRT</h3>
+          <div class="renderer-item-content">
+            <p>A .dctl algorithm by Juan Pablo Zambrano.</p>
+            <table>
+              <tr>
+                <th>source</th>
+                <td><a href="https://github.com/Joegenco/PixelManager/archive/c8716a42c7e03c6573915ad24f19eccfc39f687c.zip" rel="noopener">https://github.com/Joegenco/PixelManager/archive/c8716a42c7e03c6573915ad24f19eccfc39f687c.zip</a></td>
+              </tr>
+              <tr>
+                <th>reference</th>
+                <td><a href="https://github.com/JuanPabloZambrano/DCTL/tree/main/2499_DRT" rel="noopener">https://github.com/JuanPabloZambrano/DCTL/tree/main/2499_DRT</a></td>
+              </tr>
+            </table>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>sRGB</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>JP2499DRT</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      
+        <div class="renderer-item">
+          <h3>Kodak2383</h3>
+          <div class="renderer-item-content">
+            <p>The iconic Kodak2383 print film simulation LUT, authored by Blackmagic as an ACES LMT.</p>
+            <table>
+              <tr>
+                <th>source</th>
+                <td><a href="https://www.dropbox.com/s/qn62wg07f21jydp/LMT%20Kodak%202383%20Print%20Emulation.xml?dl=0" rel="noopener">https://www.dropbox.com/s/qn62wg07f21jydp/LMT%20Kodak%202383%20Print%20Emulation.xml?dl=0</a></td>
+              </tr>
+              <tr>
+                <th>reference</th>
+                <td><a href="https://community.acescentral.com/t/lmts-part-1-what-are-they-and-what-can-they-do-for-me/790/10?u=mrlixm" rel="noopener">https://community.acescentral.com/t/lmts-part-1-what-are-they-and-what-can-they-do-for-me/790/10?u=mrlixm</a></td>
+              </tr>
+              <tr>
+                <th>reference</th>
+                <td><a href="https://www.kodak.com/en/motion/product/post/print-films/vision-color-2383-3383/" rel="noopener">https://www.kodak.com/en/motion/product/post/print-films/vision-color-2383-3383/</a></td>
+              </tr>
+            </table>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>sRGB - 2.2</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>Kodak2383</td>
               </tr>
               <tr>
                 <th>look</th>
@@ -411,6 +586,6 @@
 </main>
 </body>
 <footer>
-  <p>Static website created by Liam Collod using Python - Last built on 2025-03-18T18:12</p>
+  <p>Static website created by Liam Collod using Python - Last built on 2025-03-18T21:50</p>
 </footer>
 </html>
