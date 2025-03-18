@@ -101,6 +101,12 @@ def publish_context(
 
         yield
 
+        gitc(["worktree", "prune"], cwd=THISDIR)
+        worktrees = gitget(["worktree", "list"], cwd=THISDIR)
+        LOGGER.debug(f"git worktree list\n{worktrees}")
+        if build_dir.as_posix() not in worktrees:
+            raise RuntimeError(f"worktree '{build_dir}' was deleted at some point.")
+
         gitc(["add", "--all"], cwd=build_dir)
 
         changes = gitget(["status", "--porcelain"], cwd=build_dir)
