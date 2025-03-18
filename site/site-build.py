@@ -2,7 +2,6 @@ import argparse
 import contextlib
 import dataclasses
 import datetime
-import json
 import logging
 import os
 import re
@@ -17,10 +16,12 @@ from typing import Callable
 import jinja2
 
 import lxmpicturelab
+from lxmpicturelab.browse import SCRIPTS_DIR
 from lxmpicturelab.renderer import OcioConfigRenderer
 from lxmpicturelab.comparison import ComparisonSession
 from lxmpicturelab.comparison import ComparisonRender
 from lxmpicturelab.comparison import GeneratorCombined
+from lxmpicturelab.renderer import RENDERER_BUILDERS_BY_ID
 
 LOGGER = logging.getLogger(Path(__file__).stem)
 
@@ -28,7 +29,8 @@ THISDIR = Path(__file__).parent
 BUILDIR = THISDIR / ".build"
 WORKDIR = THISDIR / ".workbench"
 
-IMAGEGEN_SCRIPT_PATH = THISDIR.parent / "scripts" / "comparisons-generate.py"
+RENDERER_SCRIPT_PATH = SCRIPTS_DIR / "renderer-build.py"
+IMAGEGEN_SCRIPT_PATH = SCRIPTS_DIR / "comparisons-generate.py"
 
 ASSETS = {
     "lxmpicturelab.al.sorted-color.bg-black": ["--generator-full", "2048"],
@@ -149,33 +151,43 @@ class CtxComparison:
                 render.path = callback(render.path)
 
 
+def build_renderers(
+    dst_dir: Path,
+    renderer_ids: list[str],
+) -> list[OcioConfigRenderer]:
+    """
+    Args:
+        dst_dir: filesystem path to a directory that may exist
+        renderer_ids: list of renderer identifier to build and return
+    """
+    renderers: list[OcioConfigRenderer] = []
+    for renderer_id in renderer_ids:
+        renderer_dir = dst_dir / renderer_id
+        sys.argv = [
+            sys.argv[0],
+            renderer_id,
+            str(renderer_dir),
+        ]
+        runpy.run_path(str(RENDERER_SCRIPT_PATH), run_name="__main__")
+
+        renderer_file = next(renderer_dir.glob("*.json"))
+        renderer_txt = renderer_file.read_text("utf-8")
+        renderer = OcioConfigRenderer.from_json(renderer_txt)
+        renderers.append(renderer)
+
+    return renderers
+
+
 def build_comparisons(
     assets: dict[str, list[str]],
-    work_dir: Path,
+    comparisons_dir: Path,
+    renderers_dir: Path,
     dst_dir: Path,
     overwrite_existing: bool = False,
-) -> tuple[list[CtxComparison], list[OcioConfigRenderer]]:
+) -> list[CtxComparison]:
     """
     Generate the comparison images and their metadata.
     """
-    comparisons_dir = work_dir / "comparisons"
-    renderer_dir = work_dir / "renderers"
-
-    # build renderers only first
-    sys.argv = [
-        sys.argv[0],
-        "RENDERERONLY",
-        "--renderer-dir",
-        str(renderer_dir),
-        "--build-renderer-only",
-    ]
-    runpy.run_path(str(IMAGEGEN_SCRIPT_PATH), run_name="__main__")
-    renderers = []
-    for renderer_metadadata_path in renderer_dir.glob("*.json"):
-        renderer = OcioConfigRenderer.from_json(renderer_metadadata_path.read_text())
-        renderers.append(renderer)
-
-    # now build all assets comparisons
     sessions: list[ComparisonSession] = []
 
     for asset_id, asset_args in assets.items():
@@ -191,7 +203,7 @@ def build_comparisons(
                 "--target-dir",
                 str(asset_dst_dir),
                 "--renderer-dir",
-                str(renderer_dir),
+                str(renderers_dir),
             ] + asset_args
             runpy.run_path(str(IMAGEGEN_SCRIPT_PATH), run_name="__main__")
 
@@ -213,7 +225,7 @@ def build_comparisons(
     comparisons = [CtxComparison.from_session(session) for session in sessions]
     [comparison.edit_paths(swap_path) for comparison in comparisons]
 
-    return comparisons, renderers
+    return comparisons
 
 
 def gitget(command: list[str], cwd: Path) -> str:
@@ -364,12 +376,19 @@ def publish_context(build_dir: Path, commit_msg: tuple[str, str]):
         subprocess.check_call(["git", "worktree", "prune"], cwd=THISDIR)
 
 
-def build(assets: dict[str, list[str]], build_dir: Path, work_dir: Path, publish: bool):
+def build(
+    assets: dict[str, list[str]],
+    renderer_ids: list[str],
+    build_dir: Path,
+    work_dir: Path,
+    publish: bool,
+):
     """
     Generate the final static html site.
 
     Args:
         assets: collection of asset to build the website against
+        renderer_ids: list of renderer identifier to build and use for the comparison
         build_dir: filesystem path to a non-existing directory. Used to store the final site.
         work_dir: filesystem path to an existing directory.
         publish: true to build for web publishing else implies local testing.
@@ -387,12 +406,21 @@ def build(assets: dict[str, list[str]], build_dir: Path, work_dir: Path, publish
 
     # // comparison images generation
 
-    comparisons_dir = build_dir / "img"
+    img_dir = build_dir / "img"
+
+    renderers_dir = work_dir / "renderers"
+    renderers_dir.mkdir(exist_ok=True)
+    LOGGER.info(f"🔨 building renderers to '{renderers_dir}'")
+    renderers = build_renderers(dst_dir=renderers_dir, renderer_ids=renderer_ids)
+
+    comparisons_dir = work_dir / "comparisons"
+    comparisons_dir.mkdir(exist_ok=True)
     LOGGER.info(f"🔨 building comparisons images to '{comparisons_dir}'")
-    comparisons, renderers = build_comparisons(
+    comparisons = build_comparisons(
         assets=assets,
-        work_dir=work_dir,
-        dst_dir=comparisons_dir,
+        comparisons_dir=comparisons_dir,
+        renderers_dir=renderers_dir,
+        dst_dir=img_dir,
     )
 
     # // HTML generation
@@ -479,6 +507,8 @@ def main(argv: list[str] | None = None):
 
     work_dir.mkdir(exist_ok=True)
 
+    renderer_ids = list(RENDERER_BUILDERS_BY_ID.keys())
+
     if publish:
         LOGGER.warning("about to publish website; make sure this is intentional")
         try:
@@ -488,13 +518,25 @@ def main(argv: list[str] | None = None):
             sys.exit(1)
 
         with publish_context(build_dir, commit_msgs):
-            build(assets=ASSETS, build_dir=build_dir, work_dir=work_dir, publish=True)
+            build(
+                assets=ASSETS,
+                renderer_ids=renderer_ids,
+                build_dir=build_dir,
+                work_dir=work_dir,
+                publish=True,
+            )
         LOGGER.info("✅ site publish finished")
         LOGGER.info(f"🌐 check '{SITEURL}' in few minutes")
 
     else:
         build_dir.mkdir(exist_ok=True)
-        build(assets=ASSETS, build_dir=build_dir, work_dir=work_dir, publish=False)
+        build(
+            assets=ASSETS,
+            renderer_ids=renderer_ids,
+            build_dir=build_dir,
+            work_dir=work_dir,
+            publish=False,
+        )
         LOGGER.info("✅ site build finished")
         LOGGER.info(f"🌐 check 'file:///{build_dir.as_posix()}/index.html'")
 
