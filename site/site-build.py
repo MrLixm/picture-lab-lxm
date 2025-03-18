@@ -73,6 +73,7 @@ STATIC_RESOURCES = {
     "MartianMono.variable.ttf": "MartianMono.variable.ttf",
     "img/lxmpicturelab-cover.jpg": "img/lxmpicturelab-cover.jpg",
     "img/lxmpicturelab-icon.svg": "img/lxmpicturelab-icon.svg",
+    "img/icon-help.svg": "img/icon-help.svg",
     "img/icon-grid.svg": "img/icon-grid.svg",
     "img/icon-swap-box.svg": "img/icon-swap-box.svg",
     ".nojekyll": ".nojekyll",
