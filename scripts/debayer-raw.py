@@ -12,6 +12,7 @@ import rawpy._rawpy as rawpy
 import OpenImageIO as oiio
 
 from lxmpicturelab import configure_logging
+from lxmpicturelab import METADATA_PREFIX
 
 LOGGER = logging.getLogger(__name__)
 
@@ -67,6 +68,12 @@ def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
             "Required if rawpy cannot read the given raw file format."
         ),
     )
+    parser.add_argument(
+        "--exposure",
+        type=float,
+        default=2.6,
+        help="Amount of exposure in stops, to increase the debayered image by.",
+    )
     parsed = parser.parse_args(argv)
     return parsed
 
@@ -75,6 +82,7 @@ def main():
     cli = get_cli()
     src_path: Path = cli.src_path
     dng_converter: Path | None = cli.adobe_dng_converter
+    u_exposure: float = cli.exposure
 
     dst_path: Path = src_path.with_suffix(".exr")
     dng_path: Path | None = None
@@ -119,7 +127,7 @@ def main():
         dng_path.unlink()
 
     LOGGER.info(f"💫 processing raw ...")
-    exposure = 2**2.6
+    exposure = 2**u_exposure
     buf = oiio.ImageBuf(rgb)
     buf = oiio.ImageBufAlgo.mul(buf, exposure)
 
@@ -145,6 +153,7 @@ def main():
             extra_attrib.name, extra_attrib.type, extra_attrib.value
         )
     buf.specmod().attribute("compression", dst_compression)
+    buf.specmod().attribute(f"{METADATA_PREFIX}/debayer-exposure", u_exposure)
 
     if buf.has_error:
         print(
