@@ -26,7 +26,7 @@ These are the tasks this repository defines:
 
 All those tasks match an executable python script:
 
-1. [asset-in-ingest.py](scripts/asset-in-ingest.py)
+1. [asset-generate.py](scripts/asset-generate.py)
 2. [sets-generate.py](scripts/sets-generate.py)
 3. [renderer-build.py](scripts/renderer-build.py)
 4. [comparisons-generate.py](scripts/comparisons-generate.py)
@@ -52,13 +52,22 @@ To run a script you can use the following template:
 uv run script/path/scriptname.py
 ```
 
-### asset-in-ingest.py
+### asset-generate.py
 
-⚠️ This script requires you for now to manually download each image source
-from its url listed the json metadata file.
+Ingest a pre-asset as "asset" by optimizing and conforming it.
+
+Use `uv run asset-generate.py --help` to display its documentation.
+
+> ⚠️ This script requires you for now to manually download each image source
+> from its url listed the json metadata file.
 
 You can then check the README in [assets/](assets) to better understand the
 asset workflow.
+
+### ingest-assets-int.py
+
+Batch run [asset-generate.py](scripts/asset-generate.py) on all the known
+assets of this repository.
 
 ### sets-generate.py
 
