@@ -72,13 +72,18 @@ def check_git_repo_state(repo: Path) -> tuple[str, str]:
 
 
 @contextlib.contextmanager
-def publish_context(build_dir: Path, commit_msg: tuple[str, str]):
+def publish_context(
+    build_dir: Path,
+    commit_msg: tuple[str, str],
+    dry_run: bool = False,
+):
     """
     Perform actions that will be published to the gh-page branch.
 
     Args:
         build_dir: filesystem path to a directory thatmay not exist yet.
         commit_msg: message for the gh-page branch commit.
+        dry_run: If True do not affect the repository permanently.
     """
     LOGGER.debug(f"git worktree add {build_dir} gh-pages")
     subprocess.check_call(
@@ -101,12 +106,17 @@ def publish_context(build_dir: Path, commit_msg: tuple[str, str]):
 
         LOGGER.info(f"git changes found:\n{changes}")
 
-        LOGGER.info(f"git commit -m '{commit_msg[0]}' -m '{commit_msg[1]}'")
-        subprocess.check_call(
-            ["git", "commit", "-m", commit_msg[0], "-m", commit_msg[1]], cwd=build_dir
-        )
-        LOGGER.info("git push origin gh-pages")
-        subprocess.check_call(["git", "push", "origin", "gh-pages"], cwd=build_dir)
+        if dry_run:
+            LOGGER.warning("dry run specified; returning ...")
+            return
+        else:
+            LOGGER.info(f"git commit -m '{commit_msg[0]}' -m '{commit_msg[1]}'")
+            subprocess.check_call(
+                ["git", "commit", "-m", commit_msg[0], "-m", commit_msg[1]],
+                cwd=build_dir,
+            )
+            LOGGER.info("git push origin gh-pages")
+            subprocess.check_call(["git", "push", "origin", "gh-pages"], cwd=build_dir)
 
     finally:
         # `git worktree remove` is supposed to delete it but fail, so we do it in python
@@ -132,6 +142,11 @@ def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
         default=WORK_DIR,
         help="filesystem path to a directory that may exist. use to write intermediates resource data to.",
     )
+    parser.add_argument(
+        "--dev-mode",
+        action="store_true",
+        help="If specified, do not push the branch, and git check do not raises. Useful for debugging.",
+    )
     parsed = parser.parse_args(argv)
     return parsed
 
@@ -142,16 +157,21 @@ def main():
 
     u_preserve_work_dir: bool = cli.preserve_work_dir
     u_work_dir: Path = cli.work_dir
+    u_dev_mode: bool = cli.dev_mode
 
     LOGGER.debug(f"{u_preserve_work_dir=}")
     LOGGER.debug(f"{u_work_dir=}")
+    LOGGER.debug(f"{u_dev_mode=}")
 
     LOGGER.warning("📤 about to publish website; make sure this is intentional")
     try:
         commit_msgs = check_git_repo_state(THISDIR)
     except Exception as error:
         print(f"GIT ERROR: {error}", file=sys.stderr)
-        sys.exit(1)
+        if u_dev_mode:
+            commit_msgs = ("! delete me (dev mode enabled)", "")
+        else:
+            sys.exit(1)
 
     # make sure to regenerates all the comparisons/renderers from scratch
     if u_work_dir.exists() and not u_preserve_work_dir:
@@ -165,7 +185,7 @@ def main():
         "--work-dir",
         str(u_work_dir),
     ]
-    with publish_context(BUILD_DIR, commit_msgs):
+    with publish_context(BUILD_DIR, commit_msgs, dry_run=u_dev_mode):
         runpy.run_path(str(BUILD_SCRIPT), run_name="__main__")
 
     LOGGER.info("✅ site publish finished")
