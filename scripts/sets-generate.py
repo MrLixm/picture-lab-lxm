@@ -32,7 +32,7 @@ LOGGER = logging.getLogger(Path(__file__).stem)
 OIIOTOOL_PATH = Path(shutil.which("oiiotool"))
 assert OIIOTOOL_PATH.exists()
 
-ASSET_INGEST_PATH = THISDIR / "asset-in-ingest.py"
+ASSET_INGEST_PATH = THISDIR / "asset-generate.py"
 _ASSET_INGEST = runpy.run_path(str(ASSET_INGEST_PATH), run_name="__passthrough__")
 # to upgrade at each code change that affect the data writen to the output image
 __version__ = f"6-{_ASSET_INGEST['__version__']}"
