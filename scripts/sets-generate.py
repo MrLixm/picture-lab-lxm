@@ -35,7 +35,7 @@ assert OIIOTOOL_PATH.exists()
 ASSET_INGEST_PATH = THISDIR / "asset-generate.py"
 _ASSET_INGEST = runpy.run_path(str(ASSET_INGEST_PATH), run_name="__passthrough__")
 # to upgrade at each code change that affect the data writen to the output image
-__version__ = f"6-{_ASSET_INGEST['__version__']}"
+__version__ = f"7-{_ASSET_INGEST['__version__']}"
 
 OVERWRITE_EXISTING = True
 
@@ -69,7 +69,8 @@ ALL_ASSETS = [
     "PAac-B01-skins",
     "PAds-4HS-testbench",
     "PAfl-H6O-night",
-    "PAfl-IP1-candle",
+    # "PAfl-IP1-candle",
+    "Pbri-H34-sunflower",
     "PAfl-UY7-garden",
     "PAfm-SWE-neongirl",
     "PAjg-MZY-nightstreet",
@@ -77,6 +78,7 @@ ALL_ASSETS = [
     "PAmsk-8BB-bluebar",
     "PAmsk-R65-christmas",
     "PAtm-2QQ-space",
+    "Pgra-O1K-snowfire",
     "PPry-00M-mountain",
     "PWarr-VWE-helenjohn",
     "PWdac-11H-ngohaiha",
