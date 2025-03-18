@@ -31,6 +31,7 @@ def optimize_asset(
     ocio_config_path: Path,
     source_ocio_colorspace: str | None,
     dst_ocio_colorspace: str = "ACES2065-1",
+    color_matrix: list[float] = None,
     max_width: int = 2204,
     max_height: int = 1504,
 ):
@@ -52,6 +53,7 @@ def optimize_asset(
         ocio_config_path: filesystem path to an existing .ocio config
         source_ocio_colorspace: colorspace name in given ocio config
         dst_ocio_colorspace: colorspace name in given ocio config
+        color_matrix: optional 3x3 matrix to perform color-conversion
         max_width: in pixels
         max_height: in pixels
     """
@@ -76,6 +78,14 @@ def optimize_asset(
         "--ch",
         "R,G,B",
     ]
+
+    if color_matrix:
+        _color_matrix = ",".join(map(str, color_matrix))
+        LOGGER.debug(f"[optimize] using color-matrix '{_color_matrix}'")
+        command += [
+            "--ccmatrix:transpose=1",
+            _color_matrix,
+        ]
 
     # color conversion with OCIO
     if source_ocio_colorspace:
@@ -183,6 +193,14 @@ def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--color-matrix",
+        type=str,
+        default=None,
+        help=(
+            "Peform manual color-conversion to ACES2065-1 by using a 3x3 color matrix."
+        ),
+    )
+    parser.add_argument(
         "--overwrite-existing",
         action="store_true",
         help="If specified, existing assets will be overwritten.",
@@ -197,6 +215,17 @@ def main(argv: list[str] | None = None):
     u_src_path: Path = cli.src_path
     u_colorspace: str | None = cli.colorspace
     u_overwrite_existing: bool = cli.overwrite_existing
+    u_color_matrix: str | None = cli.color_matrix
+
+    color_matrix = None
+    if u_color_matrix:
+        color_matrix = [float(i) for i in u_color_matrix.split(",")]
+        if not len(color_matrix) == 3 * 3:
+            print(
+                f"Invalid color matrix: expected 3x3, got {color_matrix}",
+                file=sys.stderr,
+            )
+            sys.exit(1)
 
     src_asset = ImageAsset(u_src_path)
     dst_dir = ASSET_DIR / src_asset.identifier
@@ -222,6 +251,7 @@ def main(argv: list[str] | None = None):
         target_path=dst_path,
         ocio_config_path=ocio_config_path,
         source_ocio_colorspace=u_colorspace,
+        color_matrix=color_matrix,
     )
     LOGGER.debug(f"copy({src_asset.json_path}, {dst_asset.json_path})")
     shutil.copy(src_asset.json_path, dst_asset.json_path)
