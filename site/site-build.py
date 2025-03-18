@@ -43,6 +43,7 @@ ASSETS = {
     "PAtm-2QQ-space": ["--generator-exposures", "0.3", "--generator-full", "864"],
     "PWarr-VWE-helenjohn": ["--generator-exposures", "0.1", "--generator-full", "864"],
     "PAac-B01-skins": ["--generator-exposures", "0.01", "--generator-full", "864"],
+    "Pbri-H34-sunflower": ["--generator-exposures", "0.15", "--generator-full", "864"],
     "PAjg-MZY-nightstreet": ["--generator-exposures", "0.3", "--generator-full", "864"],
 }
 
