@@ -60,6 +60,12 @@ def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
         help="Filesystem path to an existing camera raw file.",
     )
     parser.add_argument(
+        "--dst-path",
+        type=Path,
+        default=None,
+        help="Filesystem path to a file to write the debayered image to.",
+    )
+    parser.add_argument(
         "--adobe-dng-converter",
         type=Path,
         default=os.getenv("ADOBE_DNG_CONVERTER"),
@@ -83,8 +89,9 @@ def main():
     src_path: Path = cli.src_path
     dng_converter: Path | None = cli.adobe_dng_converter
     u_exposure: float = cli.exposure
+    u_dst_path: Path | None = cli.dst_path
 
-    dst_path: Path = src_path.with_suffix(".exr")
+    dst_path: Path = u_dst_path or src_path.with_suffix(".exr")
     dng_path: Path | None = None
     dst_bitdepth = "half"
     dst_compression = "zips"
