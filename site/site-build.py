@@ -483,10 +483,7 @@ def main(argv: list[str] | None = None):
         publish=publish,
     )
     LOGGER.info("✅ site build finished")
-    if publish:
-        LOGGER.info(f"🌐 check '{SITEURL}' in few minutes")
-    else:
-        LOGGER.info(f"🌐 check 'file:///{build_dir.as_posix()}/index.html'")
+    LOGGER.info(f"🌐 check 'file:///{build_dir.as_posix()}/index.html'")
 
 
 if __name__ == "__main__":

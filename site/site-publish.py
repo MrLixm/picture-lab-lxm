@@ -193,9 +193,11 @@ def main():
     ]
     with publish_context(BUILD_DIR, commit_msgs, dry_run=u_dev_mode):
         with patch_sysargv([str(BUILD_SCRIPT)] + command):
-            runpy.run_path(str(BUILD_SCRIPT), run_name="__main__")
+            build_ctx = runpy.run_path(str(BUILD_SCRIPT), run_name="__main__")
 
+    site_url = build_ctx["SITEURL"]
     LOGGER.info("✅ site publish finished")
+    LOGGER.info(f"🌐 check '{site_url}' in few minutes")
 
 
 if __name__ == "__main__":
