@@ -240,8 +240,9 @@ def main(argv: list[str] | None = None):
     LOGGER.info(f"🔨 {prefix} building ocio config to '{WORK_DIR}'")
     ocio_config_path = build_ocio_config(dst_dir=WORK_DIR)
 
-    LOGGER.debug(f"rmtree({dst_dir})")
-    shutil.rmtree(dst_dir)
+    if dst_dir.exists():
+        LOGGER.debug(f"rmtree({dst_dir})")
+        shutil.rmtree(dst_dir)
     dst_dir.mkdir(exist_ok=True)
 
     dst_path = dst_asset.json_path.with_suffix(".exr")
