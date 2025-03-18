@@ -129,7 +129,7 @@ class AgXcBuilder(BaseRendererBuilder):
         return OcioConfigRenderer(
             name=f"AgXc v1.0",
             filename=self.identifier,
-            description="Another custom variant of AgX, closer to Blender variant. Not yet released.",
+            description="Another custom variant of AgX, closer to Blender variant. Still in development.",
             config_path=self.get_ocio_config_path(),
             srgb_lin="sRGB-linear",
             display="sRGB-2.2",
@@ -159,7 +159,7 @@ class TCAMBuilder(BaseRendererBuilder):
         return OcioConfigRenderer(
             name=f"TCAMv3",
             filename=f"TCAMv3",
-            description="Filmlight's algorithm which is best working in the context of their grading tools.",
+            description="Filmlight's color pipeline. Initially designed for their Baselight grading tool but for which they still provide an OCIO configuration.",
             config_path=self.get_ocio_config_path(),
             srgb_lin="CGI: Linear : Rec.709",
             display="sRGB Display: 2.2 Gamma : Rec.709 Truelight CAM v3",
@@ -202,10 +202,11 @@ class ARRIBuilder(BaseRendererBuilder):
         return self.path / self.aces_url.split("/")[-1]
 
     def get_renderer(self):
+        config_name = self.aces_url.split("/")[-1]
         return OcioConfigRenderer(
             name=f"ARRI Reveal",
             filename=self.identifier,
-            description='The ARRI "color-science" pipeline, based on their provided display LUTs.',
+            description=f'The ARRI "color-science" pipeline, based on their provided display LUTs. Injected in the {config_name} config.',
             config_path=self.get_ocio_config_path(),
             srgb_lin="Linear Rec.709 (sRGB)",
             display="sRGB - 2.2",
@@ -359,7 +360,7 @@ class NativeBuilder(ACES2gmBuilder):
             renderer,
             name=f"Native (no image formation)",
             filename="native",
-            description="No picture formation is applied, anything outside the target volume is clipped.",
+            description="No picture formation is applied, anything outside the destination volume is clipped.",
             srgb_lin="Linear Rec.709 (sRGB)",
             display="sRGB - Display",
             view="Un-tone-mapped",
@@ -412,7 +413,7 @@ class DRT2499Builder(OpenDRTBuilder):
         return OcioConfigRenderer(
             name=f"2499DRT",
             filename=self.identifier,
-            description="A .dctl algorithm by Juan Pablo Zambrano.",
+            description="A .dctl algorithm by Juan Pablo Zambrano; targeting colorists.",
             config_path=self.get_ocio_config_path(),
             srgb_lin="Linear Rec.709",
             display="sRGB",
@@ -434,13 +435,14 @@ class Kodak2383Builder(BaseRendererBuilder):
         return self.path / self.aces_url.split("/")[-1]
 
     def get_renderer(self):
+        config_name = self.aces_url.split("/")[-1]
         return OcioConfigRenderer(
             name=f"Kodak2383",
             filename=self.identifier,
-            description="The iconic Kodak2383 print film simulation LUT, authored by Blackmagic as an ACES LMT.",
+            description=f"The iconic Kodak2383 print film simulation LUT, authored by Blackmagic as an ACES LMT. Injected in the {config_name} config.",
             config_path=self.get_ocio_config_path(),
             srgb_lin="Linear Rec.709 (sRGB)",
-            display="sRGB - 2.2",
+            display="sRGB - Display",
             view="Kodak2383",
             source_url=self.source_url,
             references=[
@@ -481,7 +483,7 @@ class Kodak2383Builder(BaseRendererBuilder):
             fromReference=transforms,
         )
         config.addColorSpace(arri_colorspace)
-        config.addDisplayView("sRGB - 2.2", "Kodak2383", new_colorspace_name)
+        config.addDisplayView("sRGB - Display", "Kodak2383", new_colorspace_name)
         config.setSearchPath(".")
         config.validate()
         LOGGER.debug(f"writing patched ACES config with {self.identifier}")
