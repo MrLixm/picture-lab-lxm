@@ -118,7 +118,7 @@ class AgXcBuilder(BaseRendererBuilder):
     def get_renderer(self):
         return OcioConfigRenderer(
             name=f"AgXc v1.0",
-            filename=f"AgXc.1.0",
+            filename=self.identifier,
             description="Another custom variant of AgX, closer to Blender variant. Not yet released.",
             config_path=self.get_ocio_config_path(),
             srgb_lin="sRGB-linear",
