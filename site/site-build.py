@@ -44,7 +44,7 @@ ASSETS = {
     "PWarr-VWE-helenjohn": ["--generator-exposures", "0.1", "--generator-full", "864"],
     "PAac-B01-skins": ["--generator-exposures", "0.01", "--generator-full", "864"],
     "Pbri-H34-sunflower": ["--generator-exposures", "0.15", "--generator-full", "864"],
-    "PAjg-MZY-nightstreet": ["--generator-exposures", "0.3", "--generator-full", "864"],
+    "Pgra-O1K-snowfire": ["--generator-exposures", "0.3", "--generator-full", "864"],
 }
 
 # orders define visual order in which comparison are presented on the site
