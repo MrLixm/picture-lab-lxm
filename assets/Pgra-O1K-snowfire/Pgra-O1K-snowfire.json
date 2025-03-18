@@ -1,0 +1,19 @@
+{
+  "source": "SRIC_hdm-vmlab-hdr.01032.exr",
+  "authors": [
+    "Jan Fröhlich",
+    "Stefan Grandinetti",
+    "Bernd Eberhardt",
+    "Simon Walter",
+    "Andreas Schilling",
+    "Harald Brendel"
+  ],
+  "references": [
+    "https://github.com/gralk/images",
+    "https://www.hdm-stuttgart.de/vmlab/hdm-hdr-2014"
+  ],
+  "capture-gamut": "ALEXA-Wide-Gamut",
+  "primary-color": "orange",
+  "context": "The scene offers a flickering light source with fast moving flames in front of a dim surrounding at dawn. The warm light of the campfire illuminates the persons that are surrounded by snowy scenery. The fire provides a strong color contrast to the bluish ambient light at dawn.",
+  "type": "plate"
+}

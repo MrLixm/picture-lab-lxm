@@ -40,6 +40,15 @@ ASSETS_IN: dict[Path, list[str]] = {
     ASSET_IN_DIR / "PWdc-85R-braidmaker.json": [],
     ASSET_IN_DIR / "PPry-00M-mountain.json": [],
     ASSET_IN_DIR / "PWdac-11H-ngohaiha.json": [],
+    ASSET_IN_DIR
+    / "Pgra-O1K-snowfire.json": [
+        # asset is Filmlight E-Gamut encoded which is not in the ACES config
+        # convert first to CIE-XYZ with matrix (which is in the config).
+        "--colorspace",
+        "CIE XYZ-D65 - Display-referredf",
+        "--color-matrix",
+        "0.7053968501,0.1640413283,0.08101774865,0.2801307241,0.8202066415,-0.1003373656,-0.1037815116,-0.07290725703,1.265746519",
+    ],
 }
 
 for asset_path, extra_args in ASSETS_IN.items():
