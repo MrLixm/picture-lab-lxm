@@ -77,7 +77,6 @@ ALL_ASSETS = [
     "PAmsk-8BB-bluebar",
     "PAmsk-R65-christmas",
     "PAtm-2QQ-space",
-    "PAtm-B2W-fire",
     "PPry-00M-mountain",
     "PWarr-VWE-helenjohn",
     "PWdac-11H-ngohaiha",

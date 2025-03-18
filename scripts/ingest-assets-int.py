@@ -27,7 +27,6 @@ ASSETS_IN: dict[Path, list[str]] = {
     ASSET_IN_DIR / "PAmsk-8BB-bluebar.json": [],
     ASSET_IN_DIR / "PAmsk-R65-christmas.json": [],
     ASSET_IN_DIR / "PAtm-2QQ-space.json": [],
-    ASSET_IN_DIR / "PAtm-B2W-fire.json": [],
     ASSET_IN_DIR / "PWarr-VWE-helenjohn.json": ["--colorspace", "ARRI LogC4"],
     ASSET_IN_DIR / "PWsjw-7QC-watchmaker.json": [],
     ASSET_IN_DIR / "PWsjw-90G-icecave.json": [],
