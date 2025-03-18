@@ -64,6 +64,14 @@ def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
         help="Identifier of the asset to generate comparison for.",
     )
     parser.add_argument(
+        "--renderers",
+        type=str,
+        default=list(RENDERER_BUILDERS_BY_ID.keys()),
+        nargs="+",
+        choices=list(RENDERER_BUILDERS_BY_ID.keys()),
+        help="list of renderer identifier to process assets with.",
+    )
+    parser.add_argument(
         "--generator-exposures",
         type=float,
         default=None,
@@ -115,13 +123,13 @@ def main(argv: list[str] | None = None):
     generator_exposure: float | None = cli.generator_exposures
     generator_full: int | None = cli.generator_full
     combined_renderers: bool = cli.combined_renderers
+    renderer_ids: list[str] = cli.renderers
 
     LOGGER.debug(f"{asset_id=}")
     LOGGER.debug(f"{target_dir=}")
     LOGGER.debug(f"{renderer_work_dir=}")
     LOGGER.debug(f"{combined_renderers=}")
 
-    renderer_ids = list(RENDERER_BUILDERS_BY_ID.keys())
     renderer_work_dir.mkdir(exist_ok=True)
     LOGGER.info(f"🛠️ building {len(renderer_ids)} renderers to '{renderer_work_dir}'")
     renderers = build_renderers(renderer_work_dir, renderer_ids)
