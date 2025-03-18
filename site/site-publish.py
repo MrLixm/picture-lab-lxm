@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 
 import lxmpicturelab
+from lxmpicturelab import patch_sysargv
 from lxmpicturelab.browse import WORKBENCH_DIR
 
 LOGGER = logging.getLogger(Path(__file__).stem)
@@ -177,8 +178,7 @@ def main():
     if u_work_dir.exists() and not u_preserve_work_dir:
         shutil.rmtree(u_work_dir)
 
-    sys.argv = [
-        sys.argv[0],
+    command = [
         "--publish",
         "--target-dir",
         str(BUILD_DIR),
@@ -186,7 +186,8 @@ def main():
         str(u_work_dir),
     ]
     with publish_context(BUILD_DIR, commit_msgs, dry_run=u_dev_mode):
-        runpy.run_path(str(BUILD_SCRIPT), run_name="__main__")
+        with patch_sysargv(command):
+            runpy.run_path(str(BUILD_SCRIPT), run_name="__main__")
 
     LOGGER.info("✅ site publish finished")
 
