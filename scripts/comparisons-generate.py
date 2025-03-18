@@ -7,6 +7,7 @@ import time
 from pathlib import Path
 
 import lxmpicturelab
+from lxmpicturelab import patch_sysargv
 from lxmpicturelab.browse import WORKBENCH_DIR
 from lxmpicturelab.browse import find_asset
 from lxmpicturelab.comparison import BaseGenerator
@@ -40,12 +41,9 @@ def build_renderers(
     renderers: list[OcioConfigRenderer] = []
     for renderer_id in renderer_ids:
         renderer_dir = dst_dir / renderer_id
-        sys.argv = [
-            sys.argv[0],
-            renderer_id,
-            str(renderer_dir),
-        ]
-        runpy.run_path(str(RENDERER_SCRIPT), run_name="__main__")
+        command = [renderer_id, str(renderer_dir)]
+        with patch_sysargv([str(RENDERER_SCRIPT)] + command):
+            runpy.run_path(str(RENDERER_SCRIPT), run_name="__main__")
 
         renderer_file = next(renderer_dir.glob("*.json"))
         renderer_txt = renderer_file.read_text("utf-8")

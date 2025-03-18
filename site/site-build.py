@@ -16,6 +16,7 @@ from typing import Callable
 import jinja2
 
 import lxmpicturelab.renderer
+from lxmpicturelab import patch_sysargv
 from lxmpicturelab.browse import SCRIPTS_DIR
 from lxmpicturelab.comparison import ComparisonRender
 from lxmpicturelab.comparison import ComparisonSession
@@ -209,12 +210,9 @@ def build_renderers(
     renderers: list[CtxRenderer] = []
     for renderer_id in renderer_ids:
         renderer_dir = dst_dir / renderer_id
-        sys.argv = [
-            sys.argv[0],
-            renderer_id,
-            str(renderer_dir),
-        ]
-        runpy.run_path(str(RENDERER_SCRIPT_PATH), run_name="__main__")
+        command = [renderer_id, str(renderer_dir)]
+        with patch_sysargv([str(RENDERER_SCRIPT_PATH)] + command):
+            runpy.run_path(str(RENDERER_SCRIPT_PATH), run_name="__main__")
 
         renderer_file = next(renderer_dir.glob("*.json"))
         renderer_txt = renderer_file.read_text("utf-8")
@@ -244,15 +242,15 @@ def build_comparisons(
             LOGGER.info(f"⏩ skipping building for '{asset_id}': found existing")
         else:
             LOGGER.info(f"🔨 building comparisons for '{asset_id}'")
-            sys.argv = [
-                sys.argv[0],
+            command = [
                 asset_id,
                 "--target-dir",
                 str(asset_dst_dir),
                 "--renderer-dir",
                 str(renderers_dir),
             ] + asset_args
-            runpy.run_path(str(IMAGEGEN_SCRIPT_PATH), run_name="__main__")
+            with patch_sysargv([str(IMAGEGEN_SCRIPT_PATH)] + command):
+                runpy.run_path(str(IMAGEGEN_SCRIPT_PATH), run_name="__main__")
 
         session_metadadata_path = next(asset_dst_dir.glob("*.json"))
         session_metadadata = session_metadadata_path.read_text(encoding="utf-8")
