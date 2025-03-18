@@ -1,5 +1,4 @@
 import argparse
-import contextlib
 import dataclasses
 import datetime
 import logging
@@ -7,7 +6,6 @@ import os
 import re
 import runpy
 import shutil
-import subprocess
 import sys
 import unicodedata
 from pathlib import Path
@@ -17,10 +15,10 @@ import jinja2
 
 import lxmpicturelab
 from lxmpicturelab.browse import SCRIPTS_DIR
-from lxmpicturelab.renderer import OcioConfigRenderer
-from lxmpicturelab.comparison import ComparisonSession
 from lxmpicturelab.comparison import ComparisonRender
+from lxmpicturelab.comparison import ComparisonSession
 from lxmpicturelab.comparison import GeneratorCombined
+from lxmpicturelab.renderer import OcioConfigRenderer
 from lxmpicturelab.renderer import RENDERER_BUILDERS_BY_ID
 
 LOGGER = logging.getLogger(Path(__file__).stem)
@@ -46,7 +44,6 @@ ASSETS = {
     "PAjg-MZY-nightstreet": ["--generator-exposures", "0.3", "--generator-full", "864"],
 }
 
-
 CSS_PATH = THISDIR / "main.css"
 
 STATIC_RESOURCES = {
@@ -67,6 +64,7 @@ META_DESCRIPTION = "Comparison of different picture formation algorithms."
 META_IMAGE = "img/lxmpicturelab-cover.jpg"
 
 FOOTER = "Static website created by Liam Collod using Python"
+
 
 # we mirror the API in lxmpicturelab to prevent break
 # in Jinja templates when the API changes. It also mean
@@ -259,15 +257,6 @@ def build_comparisons(
     return comparisons
 
 
-def gitget(command: list[str], cwd: Path) -> str:
-    """
-    Call git and return its output.
-    """
-    out = subprocess.check_output(["git"] + command, cwd=cwd, text=True)
-    out = out.rstrip("\n").rstrip(" ")
-    return out
-
-
 def slugify(value, allow_unicode=False):
     """
     Convert to ASCII if 'allow_unicode' is False. Convert spaces or repeated
@@ -298,113 +287,6 @@ def get_jinja_env(doc_build_dir: Path) -> jinja2.Environment:
     )
     jinja_env.filters["slugify"] = slugify
     return jinja_env
-
-
-def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
-    argv = argv or sys.argv[1:]
-    parser = argparse.ArgumentParser(
-        description="Generates the repository static website.",
-    )
-    parser.add_argument(
-        "--publish",
-        action="store_true",
-        help="True to create the website published to the gh-page branch.",
-    )
-    parser.add_argument(
-        "--target-dir",
-        type=Path,
-        default=BUILDIR,
-        help="filesystem path to write the final html site to.",
-    )
-    parser.add_argument(
-        "--work-dir",
-        type=Path,
-        default=WORKDIR,
-        help="filesystem path to write intermediates resource data to.",
-    )
-    parsed = parser.parse_args(argv)
-    return parsed
-
-
-def check_git_repo_state(repo: Path) -> tuple[str, str]:
-    """
-    Check the git repository is in the expected state for publishing.
-
-    Returns:
-        the commit name for publishing
-    """
-    git_status = gitget(["status", "--porcelain"], cwd=repo)
-    git_last_commit = gitget(["rev-parse", "HEAD"], cwd=repo)
-    git_current_branch = gitget(["branch", "--show-current"], cwd=repo)
-    git_remote_status = gitget(["status", "--short", "--b", "--porcelain"], cwd=repo)
-    try:
-        git_ghpages = gitget(["rev-parse", "--verify", "gh-pages"], cwd=repo)
-    except subprocess.CalledProcessError:
-        git_ghpages = None
-
-    if git_current_branch != "main":
-        raise RuntimeError(
-            f"current git branch is '{git_current_branch}', expected 'main'."
-        )
-
-    if not git_ghpages:
-        raise RuntimeError("Branch 'gh-pages' doesn't exists. Create it first.")
-
-    if git_status:
-        raise RuntimeError(f"Uncommited changes found: {git_status}.")
-
-    if re.search(rf"## {git_current_branch}.+\[ahead", git_remote_status):
-        raise RuntimeError("current git branch is ahead of its remote (needs push).")
-
-    if re.search(rf"## {git_current_branch}.+\[behind", git_remote_status):
-        raise RuntimeError("current git branch is behind of its remote (needs pull). ")
-
-    return (
-        f"chore(doc): automatic build to gh-pages",
-        f"from commit {git_last_commit} on branch {git_current_branch}",
-    )
-
-
-@contextlib.contextmanager
-def publish_context(build_dir: Path, commit_msg: tuple[str, str]):
-    """
-    Perform actions that will be published to the gh-page branch.
-
-    Args:
-        build_dir: filesystem path to a directory thatmay not exist yet.
-        commit_msg: message for the gh-page branch commit.
-    """
-    subprocess.check_call(
-        ["git", "worktree", "add", str(build_dir), "gh-pages"], cwd=THISDIR
-    )
-    try:
-        # ensure to clean the gh-pages content at each build
-        subprocess.check_call(
-            ["git", "rm", "--quiet", "--ignore-unmatch", "-r", "*"], cwd=build_dir
-        )
-
-        yield
-
-        subprocess.check_call(["git", "add", "--all"], cwd=build_dir)
-
-        changes = gitget(["status", "--porcelain"], cwd=build_dir)
-        if not changes:
-            LOGGER.warning("nothing to commit, skipping publishing ...")
-            return
-
-        LOGGER.info(f"git changes found:\n{changes}")
-
-        LOGGER.info(f"git commit -m '{commit_msg[0]}' -m '{commit_msg[1]}'")
-        subprocess.check_call(
-            ["git", "commit", "-m", commit_msg[0], "-m", commit_msg[1]], cwd=build_dir
-        )
-        LOGGER.info("git push origin gh-pages")
-        subprocess.check_call(["git", "push", "origin", "gh-pages"], cwd=build_dir)
-
-    finally:
-        # `git worktree remove` is supposed to delete it but fail, so we do it in python
-        shutil.rmtree(build_dir, ignore_errors=True)
-        subprocess.check_call(["git", "worktree", "prune"], cwd=THISDIR)
 
 
 def build(
@@ -481,7 +363,7 @@ def build(
         page_ctx.update(global_ctx)
         html = comparison_template.render(**page_ctx)
         html_path = build_dir / f"{comparison.page_slug}.html"
-        LOGGER.info(f"writing html to '{html_path}'")
+        LOGGER.info(f"💾 writing html to '{html_path}'")
         html_path.write_text(html, encoding="utf-8")
 
     # build about.html
@@ -494,7 +376,7 @@ def build(
     about_template = jinja_env.get_template("about.html")
     html = about_template.render(**page_ctx)
     html_path = build_dir / f"about.html"
-    LOGGER.info(f"writing html to '{html_path}'")
+    LOGGER.info(f"💾 writing html to '{html_path}'")
     html_path.write_text(html, encoding="utf-8")
 
     # build index.html
@@ -506,7 +388,7 @@ def build(
     index_template = jinja_env.get_template("index.html")
     html = index_template.render(**page_ctx)
     html_path = build_dir / f"index.html"
-    LOGGER.info(f"writing html to '{html_path}'")
+    LOGGER.info(f"💾 writing html to '{html_path}'")
     html_path.write_text(html, encoding="utf-8")
 
     # copy static resources
@@ -522,6 +404,32 @@ def build(
         shutil.copy(src_path, dst_path)
 
 
+def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
+    argv = argv or sys.argv[1:]
+    parser = argparse.ArgumentParser(
+        description="Generates the repository static website.",
+    )
+    parser.add_argument(
+        "--publish",
+        action="store_true",
+        help="If specified configure the site build for web publishing instead of local.",
+    )
+    parser.add_argument(
+        "--target-dir",
+        type=Path,
+        default=BUILDIR,
+        help="filesystem path to write the final html site to.",
+    )
+    parser.add_argument(
+        "--work-dir",
+        type=Path,
+        default=WORKDIR,
+        help="filesystem path to write intermediates resource data to.",
+    )
+    parsed = parser.parse_args(argv)
+    return parsed
+
+
 def main(argv: list[str] | None = None):
     cli = get_cli(argv)
     work_dir: Path = cli.work_dir
@@ -533,42 +441,24 @@ def main(argv: list[str] | None = None):
 
     if build_dir.exists():
         shutil.rmtree(build_dir)
-    if publish and work_dir.exists():
-        shutil.rmtree(work_dir)
 
     work_dir.mkdir(exist_ok=True)
 
     renderer_ids = list(RENDERER_BUILDERS_BY_ID.keys())
 
+    build_dir.mkdir(exist_ok=True)
+    LOGGER.info(f"🔨 building site to '{build_dir}'")
+    build(
+        assets=ASSETS,
+        renderer_ids=renderer_ids,
+        build_dir=build_dir,
+        work_dir=work_dir,
+        publish=publish,
+    )
+    LOGGER.info("✅ site build finished")
     if publish:
-        LOGGER.warning("about to publish website; make sure this is intentional")
-        try:
-            commit_msgs = check_git_repo_state(THISDIR)
-        except Exception as error:
-            print(f"GIT ERROR: {error}", file=sys.stderr)
-            sys.exit(1)
-
-        with publish_context(build_dir, commit_msgs):
-            build(
-                assets=ASSETS,
-                renderer_ids=renderer_ids,
-                build_dir=build_dir,
-                work_dir=work_dir,
-                publish=True,
-            )
-        LOGGER.info("✅ site publish finished")
         LOGGER.info(f"🌐 check '{SITEURL}' in few minutes")
-
     else:
-        build_dir.mkdir(exist_ok=True)
-        build(
-            assets=ASSETS,
-            renderer_ids=renderer_ids,
-            build_dir=build_dir,
-            work_dir=work_dir,
-            publish=False,
-        )
-        LOGGER.info("✅ site build finished")
         LOGGER.info(f"🌐 check 'file:///{build_dir.as_posix()}/index.html'")
 
 
