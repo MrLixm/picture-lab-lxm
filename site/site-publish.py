@@ -1,3 +1,4 @@
+import argparse
 import contextlib
 import logging
 import re
@@ -115,7 +116,36 @@ def publish_context(build_dir: Path, commit_msg: tuple[str, str]):
         subprocess.check_call(["git", "worktree", "prune"], cwd=THISDIR)
 
 
+def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
+    argv = argv or sys.argv[1:]
+    parser = argparse.ArgumentParser(
+        description="Generates the repository static website and publish it to GitHub pages.",
+    )
+    parser.add_argument(
+        "--preserve-work-dir",
+        action="store_true",
+        help="If specified, do not delete the work directory which may avoid the long generation of comparisons/renders.",
+    )
+    parser.add_argument(
+        "--work-dir",
+        type=Path,
+        default=WORK_DIR,
+        help="filesystem path to a directory that may exist. use to write intermediates resource data to.",
+    )
+    parsed = parser.parse_args(argv)
+    return parsed
+
+
 def main():
+
+    cli = get_cli()
+
+    u_preserve_work_dir: bool = cli.preserve_work_dir
+    u_work_dir: Path = cli.work_dir
+
+    LOGGER.debug(f"{u_preserve_work_dir=}")
+    LOGGER.debug(f"{u_work_dir=}")
+
     LOGGER.warning("📤 about to publish website; make sure this is intentional")
     try:
         commit_msgs = check_git_repo_state(THISDIR)
@@ -124,8 +154,8 @@ def main():
         sys.exit(1)
 
     # make sure to regenerates all the comparisons/renderers from scratch
-    if WORK_DIR.exists():
-        shutil.rmtree(WORK_DIR)
+    if u_work_dir.exists() and not u_preserve_work_dir:
+        shutil.rmtree(u_work_dir)
 
     sys.argv = [
         sys.argv[0],
@@ -133,7 +163,7 @@ def main():
         "--target-dir",
         str(BUILD_DIR),
         "--work-dir",
-        str(WORK_DIR),
+        str(u_work_dir),
     ]
     with publish_context(BUILD_DIR, commit_msgs):
         runpy.run_path(str(BUILD_SCRIPT), run_name="__main__")
