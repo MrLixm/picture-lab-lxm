@@ -7,6 +7,7 @@ import re
 import runpy
 import shutil
 import sys
+import time
 from typing import Any
 
 import unicodedata
@@ -58,6 +59,9 @@ RENDERERS = [
     lxmpicturelab.renderer.ACES13gmBuilder,
     lxmpicturelab.renderer.ACES2gmBuilder,
     lxmpicturelab.renderer.ACES2Builder,
+    lxmpicturelab.renderer.OpenDRTBuilder,
+    lxmpicturelab.renderer.DRT2499Builder,
+    lxmpicturelab.renderer.Kodak2383Builder,
 ]
 
 CSS_PATH = THISDIR / "main.css"
@@ -464,6 +468,8 @@ def main(argv: list[str] | None = None):
     build_dir: Path = cli.target_dir
     publish: bool = cli.publish
 
+    stime = time.time()
+
     LOGGER.debug(f"{build_dir=}")
     LOGGER.debug(f"{work_dir=}")
     LOGGER.debug(f"{publish=}")
@@ -483,7 +489,7 @@ def main(argv: list[str] | None = None):
         work_dir=work_dir,
         publish=publish,
     )
-    LOGGER.info("✅ site build finished")
+    LOGGER.info(f"✅ site build finished in {(time.time() - stime)/60:.2f}min.")
     LOGGER.info(f"🌐 check 'file:///{build_dir.as_posix()}/index.html'")
 
 

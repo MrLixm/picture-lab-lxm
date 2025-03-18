@@ -1,6 +1,7 @@
 import abc
 import dataclasses
 import logging
+import os
 import shutil
 from pathlib import Path
 
@@ -12,6 +13,8 @@ from lxmpicturelab.download import extract_zip
 from ._config import OcioConfigRenderer
 
 LOGGER = logging.getLogger(__name__)
+
+THISDIR = Path(__file__).parent
 
 
 class BaseRendererBuilder:
@@ -343,6 +346,121 @@ class NativeBuilder(ACES2gmBuilder):
         )
 
 
+class OpenDRTBuilder(BaseRendererBuilder):
+    identifier: str = "OpenDRT"
+    reference_url: str = (
+        "https://github.com/Joegenco/PixelManager/archive/c8716a42c7e03c6573915ad24f19eccfc39f687c.zip"
+    )
+
+    def get_ocio_config_path(self) -> Path:
+        return self.path / "ocio" / "config.ocio"
+
+    def get_renderer(self):
+        return OcioConfigRenderer(
+            name=f"OpenDRT",
+            filename=self.identifier,
+            description="An open source display rendering transform authored by Jed Smith (https://github.com/jedypod/open-display-transform).",
+            config_path=self.get_ocio_config_path(),
+            srgb_lin="Linear Rec.709",
+            display="sRGB",
+            view="OpenDRT",
+            look="",
+            reference_url=self.reference_url,
+        )
+
+    def build(self):
+        repo_dir = self.path / "tmp"
+        repo_dir.mkdir(exist_ok=True)
+        repo_path = repo_dir / "PixelManager.zip"
+        git_ref = self.reference_url.split("/")[-1].split(".zip")[0]
+        download_file(self.reference_url, repo_path)
+        extract_zip(repo_path, remove_zip=True)
+        os.rename(repo_dir / f"PixelManager-{git_ref}", self.path / "ocio")
+        assert self.get_ocio_config_path().exists()
+
+
+class DRT2499Builder(OpenDRTBuilder):
+    identifier: str = "2499DRT"
+    reference_url: str = (
+        "https://github.com/Joegenco/PixelManager/archive/c8716a42c7e03c6573915ad24f19eccfc39f687c.zip"
+    )
+
+    def get_renderer(self):
+        return OcioConfigRenderer(
+            name=f"2499DRT",
+            filename=self.identifier,
+            description="A .dctl algorithm by Juan Pablo Zambrano (https://github.com/JuanPabloZambrano/DCTL/tree/main/2499_DRT).",
+            config_path=self.get_ocio_config_path(),
+            srgb_lin="Linear Rec.709",
+            display="sRGB",
+            view="JP2499DRT",
+            look="",
+            reference_url=self.reference_url,
+        )
+
+
+class Kodak2383Builder(BaseRendererBuilder):
+    identifier: str = "Kodak2383"
+    reference_url: str = (
+        "https://www.dropbox.com/s/qn62wg07f21jydp/LMT%20Kodak%202383%20Print%20Emulation.xml?dl=0"
+    )
+    aces_url = "https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio"
+
+    def get_ocio_config_path(self) -> Path:
+        return self.path / self.aces_url.split("/")[-1]
+
+    def get_renderer(self):
+        return OcioConfigRenderer(
+            name=f"Kodak2383",
+            filename=self.identifier,
+            description="The iconic Kodak2383 print film simulation LUT, authored by Blackmagic as an ACES LMT.",
+            config_path=self.get_ocio_config_path(),
+            srgb_lin="Linear Rec.709 (sRGB)",
+            display="sRGB - 2.2",
+            view="Kodak2383",
+            reference_url=self.reference_url,
+        )
+
+    def build(self):
+        src_lut_path = THISDIR / "LMT-Kodak-2383-Print-Emulation.clf"
+        dst_lut_path = self.path / "LMT-Kodak-2383-Print-Emulation.clf"
+        shutil.copy(src_lut_path, dst_lut_path)
+
+        aces_config_path = self.path / self.aces_url.split("/")[-1]
+        download_file(self.aces_url, aces_config_path)
+
+        # noinspection PyArgumentList
+        config: ocio.Config = ocio.Config.CreateFromFile(str(aces_config_path))
+        transforms = ocio.GroupTransform()
+        transforms.appendTransform(
+            ocio.FileTransform(
+                # lut should be stored next to ocio config
+                src=dst_lut_path.name,
+                direction=ocio.TRANSFORM_DIR_FORWARD,
+            )
+        )
+        # the LUT output BT.1886 so convert to 2.2 to stay uniform with other renderers.
+        transforms.appendTransform(
+            ocio.ColorSpaceTransform(
+                src="ACES2065-1",
+                dst="sRGB - Display",
+            )
+        )
+        new_colorspace_name = "Kodak2383 AP0"
+        arri_colorspace = ocio.ColorSpace(
+            referenceSpace=ocio.REFERENCE_SPACE_SCENE,
+            name=new_colorspace_name,
+            fromReference=transforms,
+        )
+        config.addColorSpace(arri_colorspace)
+        config.addDisplayView("sRGB - 2.2", "Kodak2383", new_colorspace_name)
+        config.setSearchPath(".")
+        config.validate()
+        LOGGER.debug(f"writing patched ACES config with {self.identifier}")
+        config.serialize(str(aces_config_path))
+        assert self.get_ocio_config_path().exists()
+
+
 RENDERER_BUILDERS = [
     AgXBuilder,
     AgXBlenderBuilder,
@@ -353,6 +471,9 @@ RENDERER_BUILDERS = [
     ACES2gmBuilder,
     ACES2Builder,
     NativeBuilder,
+    OpenDRTBuilder,
+    DRT2499Builder,
+    Kodak2383Builder,
 ]
 
 RENDERER_BUILDERS_BY_ID = {b.identifier: b for b in RENDERER_BUILDERS}
