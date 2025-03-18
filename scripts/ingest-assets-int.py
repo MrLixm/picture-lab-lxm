@@ -14,36 +14,36 @@ OVERWRITE: bool = False
 
 # - file without colorspace are assumed to be already ACES2065-1
 # - colorspace value must be a name found in the ACES studio-config v2.0.0
-ASSETS_IN: dict[Path, str | None] = {
-    ASSET_IN_DIR / "CAaf-Z37-legomovie.json": None,
-    ASSET_IN_DIR / "CAlc-D8T-dragon.json": None,
-    ASSET_IN_DIR / "CAtm-FGH-specbox.json": None,
-    ASSET_IN_DIR / "CGts-W0L-sweep.json": "Linear Rec.709 (sRGB)",
-    ASSET_IN_DIR / "PAds-4HS-testbench.json": None,
-    ASSET_IN_DIR / "PAfl-H6O-night.json": None,
-    ASSET_IN_DIR / "PAfl-IP1-candle.json": None,
-    ASSET_IN_DIR / "PAfl-UY7-garden.json": None,
-    ASSET_IN_DIR / "PAfm-SWE-neongirl.json": None,
-    ASSET_IN_DIR / "PAmsk-8BB-bluebar.json": None,
-    ASSET_IN_DIR / "PAmsk-R65-christmas.json": None,
-    ASSET_IN_DIR / "PAtm-2QQ-space.json": None,
-    ASSET_IN_DIR / "PAtm-B2W-fire.json": None,
-    ASSET_IN_DIR / "PWarr-VWE-helenjohn.json": "ARRI LogC4",
-    ASSET_IN_DIR / "PWsjw-7QC-watchmaker.json": None,
-    ASSET_IN_DIR / "PWsjw-90G-icecave.json": None,
-    ASSET_IN_DIR / "PWsjw-FCC-closeman.json": None,
-    ASSET_IN_DIR / "PWsjw-LE4-alpinist.json": None,
-    ASSET_IN_DIR / "PAac-B01-skins.json": None,
-    ASSET_IN_DIR / "PAkp-4DO-bluehand.json": None,
-    ASSET_IN_DIR / "PAjg-MZY-nightstreet.json": None,
-    ASSET_IN_DIR / "Cblr-GFD-spring.json": "Linear Rec.709 (sRGB)",
-    ASSET_IN_DIR / "PWdc-85R-braidmaker.json": None,
-    ASSET_IN_DIR / "PPry-00M-mountain.json": None,
-    ASSET_IN_DIR / "PWdac-11H-ngohaiha.json": None,
+ASSETS_IN: dict[Path, list[str]] = {
+    ASSET_IN_DIR / "CAaf-Z37-legomovie.json": [],
+    ASSET_IN_DIR / "CAlc-D8T-dragon.json": [],
+    ASSET_IN_DIR / "CAtm-FGH-specbox.json": [],
+    ASSET_IN_DIR / "CGts-W0L-sweep.json": ["--colorspace", "Linear Rec.709 (sRGB)"],
+    ASSET_IN_DIR / "PAds-4HS-testbench.json": [],
+    ASSET_IN_DIR / "PAfl-H6O-night.json": [],
+    ASSET_IN_DIR / "PAfl-IP1-candle.json": [],
+    ASSET_IN_DIR / "PAfl-UY7-garden.json": [],
+    ASSET_IN_DIR / "PAfm-SWE-neongirl.json": [],
+    ASSET_IN_DIR / "PAmsk-8BB-bluebar.json": [],
+    ASSET_IN_DIR / "PAmsk-R65-christmas.json": [],
+    ASSET_IN_DIR / "PAtm-2QQ-space.json": [],
+    ASSET_IN_DIR / "PAtm-B2W-fire.json": [],
+    ASSET_IN_DIR / "PWarr-VWE-helenjohn.json": ["--colorspace", "ARRI LogC4"],
+    ASSET_IN_DIR / "PWsjw-7QC-watchmaker.json": [],
+    ASSET_IN_DIR / "PWsjw-90G-icecave.json": [],
+    ASSET_IN_DIR / "PWsjw-FCC-closeman.json": [],
+    ASSET_IN_DIR / "PWsjw-LE4-alpinist.json": [],
+    ASSET_IN_DIR / "PAac-B01-skins.json": [],
+    ASSET_IN_DIR / "PAkp-4DO-bluehand.json": [],
+    ASSET_IN_DIR / "PAjg-MZY-nightstreet.json": [],
+    ASSET_IN_DIR / "Cblr-GFD-spring.json": ["--colorspace", "Linear Rec.709 (sRGB)"],
+    ASSET_IN_DIR / "PWdc-85R-braidmaker.json": [],
+    ASSET_IN_DIR / "PPry-00M-mountain.json": [],
+    ASSET_IN_DIR / "PWdac-11H-ngohaiha.json": [],
 }
 
-for asset_path, colorspace in ASSETS_IN.items():
-    command = [str(asset_path), "--colorspace", colorspace]
+for asset_path, extra_args in ASSETS_IN.items():
+    command = [str(asset_path)] + extra_args
     if OVERWRITE:
         command += ["--overwrite-existing"]
     with patch_sysargv([str(ASSET_SCRIPT)] + command):
