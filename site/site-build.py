@@ -465,12 +465,12 @@ def main(argv: list[str] | None = None):
     LOGGER.debug(f"build_dir={build_dir}")
     LOGGER.debug(f"work_dir={work_dir}")
 
-    if build_dir.exists():
+    if build_dir.exists() and not publish:
         shutil.rmtree(build_dir)
 
     work_dir.mkdir(exist_ok=True)
-
     build_dir.mkdir(exist_ok=True)
+
     LOGGER.info(f"🔨 building site to '{build_dir}'")
     build(
         assets=ASSETS,
