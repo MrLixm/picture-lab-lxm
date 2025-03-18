@@ -192,7 +192,7 @@ def main():
         str(u_work_dir),
     ]
     with publish_context(BUILD_DIR, commit_msgs, dry_run=u_dev_mode):
-        with patch_sysargv(command):
+        with patch_sysargv([str(BUILD_SCRIPT)] + command):
             runpy.run_path(str(BUILD_SCRIPT), run_name="__main__")
 
     LOGGER.info("✅ site publish finished")
