@@ -32,6 +32,13 @@ def gitget(command: list[str], cwd: Path) -> str:
     return out
 
 
+def gitc(command: list[str], cwd: Path):
+    """
+    Call git.
+    """
+    subprocess.check_call(["git"] + command, cwd=cwd)
+
+
 def check_git_repo_state(repo: Path) -> tuple[str, str]:
     """
     Check the git repository is in the expected state for publishing.
@@ -86,18 +93,14 @@ def publish_context(
         dry_run: If True do not affect the repository permanently.
     """
     LOGGER.debug(f"git worktree add {build_dir} gh-pages")
-    subprocess.check_call(
-        ["git", "worktree", "add", str(build_dir), "gh-pages"], cwd=THISDIR
-    )
+    gitc(["worktree", "add", str(build_dir), "gh-pages"], cwd=THISDIR)
     try:
         # ensure to clean the gh-pages content at each build
-        subprocess.check_call(
-            ["git", "rm", "--quiet", "--ignore-unmatch", "-r", "*"], cwd=build_dir
-        )
+        gitc(["rm", "--quiet", "--ignore-unmatch", "-r", "*"], cwd=build_dir)
 
         yield
 
-        subprocess.check_call(["git", "add", "--all"], cwd=build_dir)
+        gitc(["add", "--all"], cwd=build_dir)
 
         changes = gitget(["status", "--porcelain"], cwd=build_dir)
         if not changes:
@@ -111,19 +114,16 @@ def publish_context(
             return
         else:
             LOGGER.info(f"git commit -m '{commit_msg[0]}' -m '{commit_msg[1]}'")
-            subprocess.check_call(
-                ["git", "commit", "-m", commit_msg[0], "-m", commit_msg[1]],
-                cwd=build_dir,
-            )
+            gitc(["commit", "-m", commit_msg[0], "-m", commit_msg[1]], cwd=build_dir)
             LOGGER.info("git push origin gh-pages")
-            subprocess.check_call(["git", "push", "origin", "gh-pages"], cwd=build_dir)
+            gitc(["push", "origin", "gh-pages"], cwd=build_dir)
 
     finally:
         # `git worktree remove` is supposed to delete it but fail, so we do it in python
         LOGGER.debug(f"shutil.rmtree({build_dir})")
         shutil.rmtree(build_dir, ignore_errors=True)
         LOGGER.debug(f"git worktree prune")
-        subprocess.check_call(["git", "worktree", "prune"], cwd=THISDIR)
+        gitc(["worktree", "prune"], cwd=THISDIR)
 
 
 def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
