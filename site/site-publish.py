@@ -18,7 +18,8 @@ THISDIR = Path(__file__).parent
 BUILD_SCRIPT = THISDIR / "site-build.py"
 
 WORK_DIR = WORKBENCH_DIR / "site-publish.work"
-BUILD_DIR = WORKBENCH_DIR / "site-publish.build"
+# XXX: this need to be a directory trackable by git (non-ignored).
+BUILD_DIR = THISDIR / ".publish"
 
 
 def gitget(command: list[str], cwd: Path) -> str:
