@@ -14,6 +14,6 @@
   ],
   "capture-gamut": "ALEXA-Wide-Gamut",
   "primary-color": "orange",
-  "context": "The scene offers a flickering light source with fast moving flames in front of a dim surrounding at dawn. The warm light of the campfire illuminates the persons that are surrounded by snowy scenery. The fire provides a strong color contrast to the bluish ambient light at dawn.",
+  "context": "The image was generated from the combination of 2 video sources exposed for highlights or shadows aiming at creating higher dynamic range data. Which implies compositing was required to generate a single image.",
   "type": "plate"
 }
