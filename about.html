@@ -26,15 +26,9 @@
   </div>
   <nav class="comparisons">
     
-      <a href="lxmpicturelab-set.al.html">
+      <a href="lxmpicturelab.al.sorted-color.bg-black.html">
         <div class="nav-item ">
-          <span>lxmpicturelab-set.al</span>
-        </div>
-      </a>
-    
-      <a href="CAlc-D8T-dragon.html">
-        <div class="nav-item ">
-          <span>CAlc-D8T-dragon</span>
+          <span>lxmpicturelab.al.sorted-color.bg-black</span>
         </div>
       </a>
     
@@ -44,9 +38,21 @@
         </div>
       </a>
     
-      <a href="PAac-B01-skins.html">
+      <a href="CAlc-D8T-dragon.html">
         <div class="nav-item ">
-          <span>PAac-B01-skins</span>
+          <span>CAlc-D8T-dragon</span>
+        </div>
+      </a>
+    
+      <a href="CAtm-FGH-specbox.html">
+        <div class="nav-item ">
+          <span>CAtm-FGH-specbox</span>
+        </div>
+      </a>
+    
+      <a href="PAmsk-R65-christmas.html">
+        <div class="nav-item ">
+          <span>PAmsk-R65-christmas</span>
         </div>
       </a>
     
@@ -56,15 +62,33 @@
         </div>
       </a>
     
-      <a href="PAjg-MZY-nightstreet.html">
+      <a href="PAkp-4DO-bluehand.html">
         <div class="nav-item ">
-          <span>PAjg-MZY-nightstreet</span>
+          <span>PAkp-4DO-bluehand</span>
         </div>
       </a>
     
-      <a href="PAmsk-R65-christmas.html">
+      <a href="PAtm-2QQ-space.html">
         <div class="nav-item ">
-          <span>PAmsk-R65-christmas</span>
+          <span>PAtm-2QQ-space</span>
+        </div>
+      </a>
+    
+      <a href="PWarr-VWE-helenjohn.html">
+        <div class="nav-item ">
+          <span>PWarr-VWE-helenjohn</span>
+        </div>
+      </a>
+    
+      <a href="PAac-B01-skins.html">
+        <div class="nav-item ">
+          <span>PAac-B01-skins</span>
+        </div>
+      </a>
+    
+      <a href="PAjg-MZY-nightstreet.html">
+        <div class="nav-item ">
+          <span>PAjg-MZY-nightstreet</span>
         </div>
       </a>
     
@@ -98,6 +122,23 @@
       generation can be retrieved
       at <a href="https://github.com/MrLixm/picture-lab-lxm">https://github.com/MrLixm/picture-lab-lxm</a>.
     </p>
+    <h2>Caveats</h2>
+    <p>The workflow and the image presented have the following trade-offs:</p>
+    <ul>
+      <li>sRGB colorspace encoding is not consistent: piecewise function versus
+        power function.
+      </li>
+      <li>Some assets were already designed by their author to work with a
+        specific picture-formation; their look are bias against it.
+      </li>
+      <li>Some picture-formation were not designed to be applied through OCIO
+        and might be more accurate if used in their proper context.
+      </li>
+      <li>Quickly comparing images next to each other will more easily reveal
+        differences that might not be noticeable otherwise. It's best to let
+        your eye adapt to the picture before jumping to a conclusion.
+      </li>
+    </ul>
     <h2>Software</h2>
     <p>This project is made possible thanks to the following (non-exhaustive)
       free software:</p>
@@ -128,6 +169,156 @@
       configuration, which will be ingested by OpenImageIO's oiiotool for
       transforming the pixel data.</p>
     <div class="renderers-box">
+      
+        <div class="renderer-item">
+          <h3>Native (no image formation)</h3>
+          <div class="renderer-item-content">
+            <p>No picture formation is applied, anything outside the target volume is clipped.</p>
+            <p>Source:
+              <a href="https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio">https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio</a>
+            </p>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>sRGB - Display</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>Un-tone-mapped</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      
+        <div class="renderer-item">
+          <h3>TCAMv3</h3>
+          <div class="renderer-item-content">
+            <p>Filmlight&#39;s algorithm which is best working in the context of their grading tools.</p>
+            <p>Source:
+              <a href="https://www.filmlight.ltd.uk/resources/download.php">https://www.filmlight.ltd.uk/resources/download.php</a>
+            </p>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>sRGB Display: 2.2 Gamma : Rec.709 Truelight CAM v3</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>sRGB Display: 2.2 Gamma : Rec.709</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      
+        <div class="renderer-item">
+          <h3>ARRI Reveal</h3>
+          <div class="renderer-item-content">
+            <p>The ARRI &#34;color-science&#34; pipeline, based on their provided display LUTs.</p>
+            <p>Source:
+              <a href="https://www.arri.com/resource/blob/280728/7933fd1ce4de9165b906936661ab54eb/arri-logc4-lut-package-data.zip">https://www.arri.com/resource/blob/280728/7933fd1ce4de9165b906936661ab54eb/arri-logc4-lut-package-data.zip</a>
+            </p>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>sRGB - 2.2</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>ARRI Reveal</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      
+        <div class="renderer-item">
+          <h3>AgX</h3>
+          <div class="renderer-item-content">
+            <p>The original AgX algorithm by Troy Sobotka.</p>
+            <p>Source:
+              <a href="https://github.com/sobotka/AgX/archive/refs/heads/main.zip">https://github.com/sobotka/AgX/archive/refs/heads/main.zip</a>
+            </p>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>sRGB</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>Appearance Punchy</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      
+        <div class="renderer-item">
+          <h3>AgX Blender-4.2.7</h3>
+          <div class="renderer-item-content">
+            <p>The improved AgX algorithm implemented in Blender.</p>
+            <p>Source:
+              <a href="https://projects.blender.org/blender/blender/archive/v4.2.7.zip">https://projects.blender.org/blender/blender/archive/v4.2.7.zip</a>
+            </p>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>sRGB</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>AgX</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td>AgX - Punchy</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      
+        <div class="renderer-item">
+          <h3>AgXc v1.0</h3>
+          <div class="renderer-item-content">
+            <p>Another custom variant of AgX, closer to Blender variant. Not yet released.</p>
+            <p>Source:
+              <a href="https://github.com/MrLixm/AgXc/archive/refs/heads/refacto/ocio-overhaul.zip">https://github.com/MrLixm/AgXc/archive/refs/heads/refacto/ocio-overhaul.zip</a>
+            </p>
+            <p><b>OCIO transform configuration:</b></p>
+            <table>
+              <tr>
+                <th>display</th>
+                <td>sRGB-2.2</td>
+              </tr>
+              <tr>
+                <th>view</th>
+                <td>AgXc.base Punchy</td>
+              </tr>
+              <tr>
+                <th>look</th>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+        </div>
       
         <div class="renderer-item">
           <h3>ACES v1.3 + Gamut Mapping</h3>
@@ -204,156 +395,6 @@
           </div>
         </div>
       
-        <div class="renderer-item">
-          <h3>AgX Blender-4.2.7</h3>
-          <div class="renderer-item-content">
-            <p>The improved AgX algorithm implemented in Blender.</p>
-            <p>Source:
-              <a href="https://projects.blender.org/blender/blender/archive/v4.2.7.zip">https://projects.blender.org/blender/blender/archive/v4.2.7.zip</a>
-            </p>
-            <p><b>OCIO transform configuration:</b></p>
-            <table>
-              <tr>
-                <th>display</th>
-                <td>sRGB</td>
-              </tr>
-              <tr>
-                <th>view</th>
-                <td>AgX</td>
-              </tr>
-              <tr>
-                <th>look</th>
-                <td>AgX - Punchy</td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      
-        <div class="renderer-item">
-          <h3>AgX</h3>
-          <div class="renderer-item-content">
-            <p>The original AgX algorithm by Troy Sobotka.</p>
-            <p>Source:
-              <a href="https://github.com/sobotka/AgX/archive/refs/heads/main.zip">https://github.com/sobotka/AgX/archive/refs/heads/main.zip</a>
-            </p>
-            <p><b>OCIO transform configuration:</b></p>
-            <table>
-              <tr>
-                <th>display</th>
-                <td>sRGB</td>
-              </tr>
-              <tr>
-                <th>view</th>
-                <td>Appearance Punchy</td>
-              </tr>
-              <tr>
-                <th>look</th>
-                <td></td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      
-        <div class="renderer-item">
-          <h3>AgXc v1.0.0.rc.5</h3>
-          <div class="renderer-item-content">
-            <p>Another custom variant of AgX, closer to Blender variant. Not yet released.</p>
-            <p>Source:
-              <a href="https://github.com/MrLixm/AgXc/archive/refs/heads/refacto/ocio-overhaul.zip">https://github.com/MrLixm/AgXc/archive/refs/heads/refacto/ocio-overhaul.zip</a>
-            </p>
-            <p><b>OCIO transform configuration:</b></p>
-            <table>
-              <tr>
-                <th>display</th>
-                <td>sRGB-2.2</td>
-              </tr>
-              <tr>
-                <th>view</th>
-                <td>AgXc.base Punchy</td>
-              </tr>
-              <tr>
-                <th>look</th>
-                <td></td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      
-        <div class="renderer-item">
-          <h3>ARRI Reveal</h3>
-          <div class="renderer-item-content">
-            <p>The ARRI &#34;color-science&#34; pipeline, based on their provided display LUTs.</p>
-            <p>Source:
-              <a href="https://www.arri.com/resource/blob/280728/7933fd1ce4de9165b906936661ab54eb/arri-logc4-lut-package-data.zip">https://www.arri.com/resource/blob/280728/7933fd1ce4de9165b906936661ab54eb/arri-logc4-lut-package-data.zip</a>
-            </p>
-            <p><b>OCIO transform configuration:</b></p>
-            <table>
-              <tr>
-                <th>display</th>
-                <td>sRGB - 2.2</td>
-              </tr>
-              <tr>
-                <th>view</th>
-                <td>ARRI Reveal</td>
-              </tr>
-              <tr>
-                <th>look</th>
-                <td></td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      
-        <div class="renderer-item">
-          <h3>Native (no image formation)</h3>
-          <div class="renderer-item-content">
-            <p>No picture formation is applied, anything outside the target volume is clipped.</p>
-            <p>Source:
-              <a href="https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio">https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio</a>
-            </p>
-            <p><b>OCIO transform configuration:</b></p>
-            <table>
-              <tr>
-                <th>display</th>
-                <td>sRGB - Display</td>
-              </tr>
-              <tr>
-                <th>view</th>
-                <td>Un-tone-mapped</td>
-              </tr>
-              <tr>
-                <th>look</th>
-                <td></td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      
-        <div class="renderer-item">
-          <h3>TCAMv3</h3>
-          <div class="renderer-item-content">
-            <p>Filmlight&#39;s algorithm which is best working in the context of their grading tools.</p>
-            <p>Source:
-              <a href="https://www.filmlight.ltd.uk/resources/download.php">https://www.filmlight.ltd.uk/resources/download.php</a>
-            </p>
-            <p><b>OCIO transform configuration:</b></p>
-            <table>
-              <tr>
-                <th>display</th>
-                <td>sRGB Display: 2.2 Gamma : Rec.709 Truelight CAM v3</td>
-              </tr>
-              <tr>
-                <th>view</th>
-                <td>sRGB Display: 2.2 Gamma : Rec.709</td>
-              </tr>
-              <tr>
-                <th>look</th>
-                <td></td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      
     </div>
     <h2>Contact</h2>
     <p>For any feedback/requests, see contact options at
@@ -364,6 +405,6 @@
 </main>
 </body>
 <footer>
-  <p>Static website created by Liam Collod using Python - Last built on 2025-03-17T16:32</p>
+  <p>Static website created by Liam Collod using Python - Last built on 2025-03-18T12:20</p>
 </footer>
 </html>
