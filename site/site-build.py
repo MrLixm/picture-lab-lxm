@@ -432,6 +432,7 @@ def build(
 
 def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
     argv = argv or sys.argv[1:]
+    LOGGER.debug(f"argv={argv}")
     parser = argparse.ArgumentParser(
         description="Generates the repository static website.",
     )
@@ -462,10 +463,12 @@ def main(argv: list[str] | None = None):
     build_dir: Path = cli.target_dir
     publish: bool = cli.publish
 
-    LOGGER.debug(f"build_dir={build_dir}")
-    LOGGER.debug(f"work_dir={work_dir}")
+    LOGGER.debug(f"{build_dir=}")
+    LOGGER.debug(f"{work_dir=}")
+    LOGGER.debug(f"{publish=}")
 
     if build_dir.exists() and not publish:
+        LOGGER.debug(f"shutil.rmtree({build_dir})")
         shutil.rmtree(build_dir)
 
     work_dir.mkdir(exist_ok=True)
