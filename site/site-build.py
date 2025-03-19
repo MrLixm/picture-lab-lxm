@@ -84,7 +84,9 @@ REPONAME = "picture-lab-lxm"
 SITEURL = f"https://mrlixm.github.io/{REPONAME}"
 SITEICON = "img/lxmpicturelab-icon.svg"
 
-META_DESCRIPTION = "Comparison of different picture formation algorithms."
+META_DESCRIPTION = "Comparison of different picture formation algorithms:\n" + ",".join(
+    [r.identifier for r in RENDERERS]
+)
 META_IMAGE = "img/lxmpicturelab-cover.jpg"
 
 FOOTER = "Static website created by Liam Collod using Python"

@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>{% block title %}{{ SITENAME }}{% endblock %}</title>
   <link rel="icon" href="{{ SITEICON }}" type="image/x-ico">
+  <title>{% block title %}{{ SITENAME }}{% endblock %}</title>
+  <meta property="og:title" content="{{ self.title() }}">
+  <meta property="og:type" content="website">
   <meta property="og:description" content="{{ META_DESCRIPTION }}">
-  <meta property="twitter:description" content="{{ META_DESCRIPTION }}">
   <meta property="og:image" content="{{ META_IMAGE }}">
   <meta name="fediverse:creator" content="@liamcollod@mastodon.gamedev.place">
   {%- for stylesheet in STYLESHEETS %}
