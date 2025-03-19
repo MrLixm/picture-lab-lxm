@@ -280,8 +280,15 @@ div.home {
 }
 div.home p {
     font-family: 'Martian Mono', sans-serif;
+    font-size: 0.8rem;
     text-align: center;
+    padding: 10px;
+    background-color: rgb(var(--color_l-1));
+    color: rgb(var(--bgcolor_l1));
 }
 div.home img.home {
-    width: 100%;
+    box-sizing: border-box;
+    max-width: 100%;
+    padding: 10px;
+    border: 1px solid rgba(var(--color_l-1), 0.2);
 }
