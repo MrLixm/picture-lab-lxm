@@ -87,10 +87,10 @@
                 <td>{{ Renderer.reference_url|urlize }}</td>
               </tr>
               {%- for ref in Renderer.references %}
-              <tr>
-                <th>reference</th>
-                <td>{{ ref|urlize }}</td>
-              </tr>
+                <tr>
+                  <th>reference</th>
+                  <td>{{ ref|urlize }}</td>
+                </tr>
               {%- endfor %}
             </table>
             <p><b>OCIO transform configuration:</b></p>
@@ -116,5 +116,17 @@
     <p>For any feedback/requests, see contact options at
       <a target="_blank" href="https://mrlixm.github.io/pages/contact/">https://mrlixm.github.io/pages/contact/</a>
     </p>
+    <div class="changelog">
+      <h2>CHANGELOG</h2>
+      <h3>19-03-25</h3>
+      <ul>
+        <li>fixed <i>Pbri-H34-sunflower</i> being clamped</li>
+        <li>publicly shared the site</li>
+      </ul>
+      <h3>17-03-25</h3>
+      <ul>
+        <li>initial site creation</li>
+      </ul>
+    </div>
   </div>
 {% endblock %}
