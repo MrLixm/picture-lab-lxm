@@ -35,7 +35,7 @@ assert OIIOTOOL_PATH.exists()
 ASSET_INGEST_PATH = THISDIR / "asset-generate.py"
 _ASSET_INGEST = runpy.run_path(str(ASSET_INGEST_PATH), run_name="__passthrough__")
 # to upgrade at each code change that affect the data writen to the output image
-__version__ = f"7-{_ASSET_INGEST['__version__']}"
+__version__ = f"8-{_ASSET_INGEST['__version__']}"
 
 OVERWRITE_EXISTING = True
 
