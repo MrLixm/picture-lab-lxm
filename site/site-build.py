@@ -341,7 +341,7 @@ def get_jinja_env(publish: bool) -> jinja2.Environment:
         if publish:
             if link.endswith("index.html"):
                 formatted = link.removesuffix("index.html")
-                return formatted if formatted else "/"
+                return formatted if formatted else "."
             return link.removesuffix(".html")
         return link
 
