@@ -4,6 +4,7 @@ import logging
 import os
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import Generator
 
@@ -14,7 +15,13 @@ import OpenImageIO as oiio
 from lxmpicturelab import configure_logging
 from lxmpicturelab import METADATA_PREFIX
 
-LOGGER = logging.getLogger(__name__)
+PROGNAME = Path(__file__).stem
+LOGGER = logging.getLogger(PROGNAME)
+
+
+def errorexit(msg: str, code: int = 1):
+    print(f"ERROR: {msg}", file=sys.stderr)
+    sys.exit(code)
 
 
 @contextlib.contextmanager
@@ -43,12 +50,15 @@ def convert_to_dng(src_path: Path, dst_path: Path, dng_converter: Path):
         "-u",  # uncompressed
         "-p0",  # JPEG preview size to none
         "-dng1.5",  # arbitrary choice to increase chance of read by libraw
+        "-d",
+        str(dst_path.parent),
         "-o",
-        str(dst_path),
+        str(dst_path.name),
         str(src_path),
     ]
     LOGGER.debug(f"subprocess.run({command})")
     subprocess.run(command)
+    assert dst_path.exists()
 
 
 def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
@@ -108,30 +118,36 @@ def main():
 
     # check if rawpy can read the raw file
     try:
-        rawpyread(src_path)
+        LOGGER.info(f"💿 reading '{src_path}'")
+        with rawpyread(src_path) as raw_file:
+            rgb: numpy.ndarray = raw_file.postprocess(params=debayering_options)
+
+        # retrieve original metadata from raw file
+        raw_image: oiio.ImageInput = oiio.ImageInput.open(str(src_path))
+        raw_metadata: oiio.ParamValueList = raw_image.spec().extra_attribs
+        raw_image.close()
+
+    # we need a dng conversion and retry to read
     except rawpy.LibRawDataError:
         LOGGER.info(
-            f"Cannot open file {src_path.name} with rawpy; DNG conversion required."
+            f"Cannot open file' {src_path.name}' with rawpy; DNG conversion required."
         )
         if not dng_converter:
-            print(
-                "ERROR: No Adobe DNG converter executable specified.",
-                file=sys.stderr,
-            )
-            sys.exit(1)
+            errorexit("(CLI) No Adobe DNG converter executable specified.")
 
-        dng_path = src_path.with_suffix(".dng")
-        LOGGER.debug(f"generating dng to '{dng_path}'")
-        convert_to_dng(src_path, dng_path, dng_converter)
-        src_path = dng_path
+        with tempfile.TemporaryDirectory(prefix=f"{PROGNAME}-") as tempdir:
+            dng_path = Path(tempdir) / src_path.with_suffix(".dng").name
+            LOGGER.debug(f"generating dng to '{dng_path}'")
+            convert_to_dng(src_path, dng_path, dng_converter)
+            src_path = dng_path
+            LOGGER.info(f"💿 reading again as dng '{src_path}'")
+            with rawpyread(src_path) as raw_file:
+                rgb: numpy.ndarray = raw_file.postprocess(params=debayering_options)
 
-    LOGGER.info(f"💿 reading '{src_path}'")
-    with rawpyread(src_path) as raw_file:
-        rgb: numpy.ndarray = raw_file.postprocess(params=debayering_options)
-
-    if dng_path and dng_path.exists():
-        LOGGER.debug(f"unlink({dng_path})")
-        dng_path.unlink()
+            # retrieve original metadata from DNG file
+            raw_image: oiio.ImageInput = oiio.ImageInput.open(str(dng_path))
+            raw_metadata: oiio.ParamValueList = raw_image.spec().extra_attribs
+            raw_image.close()
 
     LOGGER.info(f"💫 processing raw ...")
     exposure = 2**u_exposure
@@ -154,8 +170,7 @@ def main():
     buf = oiio.ImageBufAlgo.colormatrixtransform(buf, xyz_to_ap0_t)
 
     # set metadata
-    raw_spec: oiio.ImageSpec = oiio.ImageInput.open(str(src_path)).spec()
-    for extra_attrib in raw_spec.extra_attribs:
+    for extra_attrib in raw_metadata:
         buf.specmod().attribute(
             extra_attrib.name, extra_attrib.type, extra_attrib.value
         )
@@ -163,11 +178,7 @@ def main():
     buf.specmod().attribute(f"{METADATA_PREFIX}/debayer-exposure", u_exposure)
 
     if buf.has_error:
-        print(
-            f"OIIO ERROR: current ImageBuf has errors: {buf.geterror()}",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+        errorexit(f"(OIIO) current ImageBuf has errors: {buf.geterror()}")
 
     LOGGER.info(f"💾 writing '{dst_path}'")
     buf.write(str(dst_path), dst_bitdepth)
