@@ -46,10 +46,11 @@ class BaseRendererBuilder:
 
 class AgXBuilder(BaseRendererBuilder):
     identifier: str = "AgX"
-    source_url: str = "https://github.com/sobotka/AgX/archive/refs/heads/main.zip"
+    git_ref = "1ba3230e6f2c825003d9e139750edd233b6a906e"
+    source_url: str = f"https://github.com/sobotka/AgX/archive/{git_ref}.zip"
 
     def get_ocio_config_path(self) -> Path:
-        return self.path / "AgX-main" / "config.ocio"
+        return self.path / f"AgX-{self.git_ref}" / "config.ocio"
 
     def get_renderer(self):
         return OcioConfigRenderer(
@@ -112,14 +113,13 @@ class AgXBlenderBuilder(BaseRendererBuilder):
 
 class AgXcBuilder(BaseRendererBuilder):
     identifier: str = "AgXc"
-    source_url: str = (
-        "https://github.com/MrLixm/AgXc/archive/refs/heads/refacto/ocio-overhaul.zip"
-    )
+    git_ref = "3e78f1541b06191ae3a8e2efce1b74c2a8b8d23f"
+    source_url: str = f"https://github.com/MrLixm/AgXc/archive/{git_ref}.zip"
 
     def get_ocio_config_path(self) -> Path:
         return (
             self.path
-            / "AgXc-refacto-ocio-overhaul"
+            / f"AgXc-{self.git_ref}"
             / "ocio"
             / "AgXc_default_OCIO-v2"
             / "config.ocio"
