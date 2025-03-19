@@ -152,6 +152,8 @@ def main():
     LOGGER.info(f"💫 processing raw ...")
     exposure = 2**u_exposure
     buf = oiio.ImageBuf(rgb)
+    # convert to float internally else we will have clamped data after mul operation !
+    buf = oiio.ImageBufAlgo.copy(buf, convert=oiio.FLOAT)
     buf = oiio.ImageBufAlgo.mul(buf, exposure)
 
     # https://www.colour-science.org:8010/apps/rgb_colourspace_transformation_matrix?input-colourspace=CIE+XYZ-D65+-+Scene-referred&output-colourspace=ACES2065-1&chromatic-adaptation-transform=CAT02&formatter=opencolorio&decimals=6
