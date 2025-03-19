@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <link rel="icon" href="{{ SITEICON }}" type="image/x-ico">
+  <link rel="icon" href="{{ SITEICON|expand_siteurl }}" type="image/x-ico">
   <title>{% block title %}{{ SITENAME }}{% endblock %}</title>
   <meta property="og:title" content="{{ self.title() }}">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ PAGEURL|expand_siteurl }}">
   <meta property="og:description" content="{{ META_DESCRIPTION }}">
-  <meta property="og:image" content="{{ META_IMAGE }}">
+  <meta property="og:image" content="{{ META_IMAGE|expand_siteurl }}">
   <meta name="fediverse:creator" content="@liamcollod@mastodon.gamedev.place">
   {%- for stylesheet in STYLESHEETS %}
     <link rel="stylesheet" href="{{ stylesheet }}"/>
@@ -18,10 +19,10 @@
 <body>
 <header>
   <div class="row">
-    <a href="index.html"><h1>{{ SITENAME }}</h1></a>
+    <a href="{{ "index.html"|format_link }}"><h1>{{ SITENAME }}</h1></a>
     <nav>
-      <a href="about.html">
-        <div class="nav-item {% if NAV_ACTIVE is defined and NAV_ACTIVE == "about" %}active{% endif %}">
+      <a href="{{ "about.html"|format_link }}">
+        <div class="nav-item {% if PAGEURL == "about" %}active{% endif %}">
           <span id="nav-about">about{% include "img/icon-help.svg" %}</span>
         </div>
       </a>
@@ -29,8 +30,8 @@
   </div>
   <nav class="comparisons">
     {% for Comparison in COMPARISONS %}
-      <a href="{{ Comparison.page_slug }}.html">
-        <div class="nav-item {% if NAV_ACTIVE is defined and NAV_ACTIVE == Comparison.page_slug %}active{% endif %}">
+      <a href="{{  (Comparison.page_slug + ".html")|format_link }}">
+        <div class="nav-item {% if PAGEURL == Comparison.page_slug %}active{% endif %}">
           <span>{{ Comparison.asset_id }}</span>
         </div>
       </a>

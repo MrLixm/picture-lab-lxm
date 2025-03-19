@@ -323,12 +323,35 @@ def slugify(value, allow_unicode=False):
     return re.sub(r"[-\s]+", "-", value).strip("-_")
 
 
-def get_jinja_env(doc_build_dir: Path) -> jinja2.Environment:
+def get_jinja_env(publish: bool) -> jinja2.Environment:
+
+    def expand_siteurl(path: str) -> str:
+        """
+        Add the site url in front of the string
+        """
+        if publish:
+            return f"{SITEURL.lstrip('/')}/{path}"
+        return path
+
+    def format_link(link: str) -> str:
+        """
+        Make site cross-linking prettier by removing file format suffix
+        """
+        # XXX: this works on GitHub pages !!! no guarantee for other host
+        if publish:
+            if link.endswith("index.html"):
+                formatted = link.removesuffix("index.html")
+                return formatted if formatted else "/"
+            return link.removesuffix(".html")
+        return link
+
     jinja_env = jinja2.Environment(
         undefined=jinja2.StrictUndefined,
         loader=jinja2.FileSystemLoader(THISDIR),
     )
     jinja_env.filters["slugify"] = slugify
+    jinja_env.filters["expand_siteurl"] = expand_siteurl
+    jinja_env.filters["format_link"] = format_link
     return jinja_env
 
 
@@ -349,11 +372,6 @@ def build(
         work_dir: filesystem path to an existing directory.
         publish: true to build for web publishing else implies local testing.
     """
-
-    def expand_siteurl(path: str) -> str:
-        if publish:
-            return f"{SITEURL}/{path}"
-        return path
 
     def conformize_paths(p: str) -> str:
         p = Path(p)
@@ -390,30 +408,31 @@ def build(
 
     # // HTML generation
 
-    jinja_env = get_jinja_env(build_dir)
+    jinja_env = get_jinja_env(publish=publish)
     comparison_template = jinja_env.get_template("comparison.html")
 
     # build comparison.html
 
     global_ctx = {
         "SITENAME": SITENAME,
-        "SITEICON": expand_siteurl(SITEICON),
+        "SITEICON": SITEICON,
         "STYLESHEETS": [CSS_PATH.name],
         "COMPARISONS": comparisons,
         "FOOTER": FOOTER,
         "BUILD_DATE": datetime.datetime.today().isoformat(timespec="minutes"),
         "META_DESCRIPTION": META_DESCRIPTION,
-        "META_IMAGE": expand_siteurl(META_IMAGE),
+        "META_IMAGE": META_IMAGE,
+        "PAGEURL": NotImplemented,
     }
 
     for comparison in comparisons:
         comparison.edit_paths(callback=conformize_paths)
         comparison.sort_renders(callback=sort_renders)
         page_ctx = {
+            **global_ctx,
             "Comparison": comparison,
-            "NAV_ACTIVE": comparison.page_slug,
+            "PAGEURL": comparison.page_slug,
         }
-        page_ctx.update(global_ctx)
         html = comparison_template.render(**page_ctx)
         html_path = build_dir / f"{comparison.page_slug}.html"
         LOGGER.info(f"💾 writing html to '{html_path}'")
@@ -422,10 +441,10 @@ def build(
     # build about.html
 
     page_ctx = {
+        **global_ctx,
         "Renderers": renderers,
-        "NAV_ACTIVE": "about",
+        "PAGEURL": "about",
     }
-    page_ctx.update(global_ctx)
     about_template = jinja_env.get_template("about.html")
     html = about_template.render(**page_ctx)
     html_path = build_dir / f"about.html"
@@ -435,9 +454,9 @@ def build(
     # build index.html
 
     page_ctx = {
-        "NAV_ACTIVE": "index",
+        **global_ctx,
+        "PAGEURL": "index",
     }
-    page_ctx.update(global_ctx)
     index_template = jinja_env.get_template("index.html")
     html = index_template.render(**page_ctx)
     html_path = build_dir / f"index.html"
