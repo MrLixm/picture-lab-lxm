@@ -157,7 +157,7 @@ class TCAMBuilder(BaseRendererBuilder):
 
     def get_renderer(self):
         return OcioConfigRenderer(
-            name=f"TCAMv3",
+            name=f"T-CAM v3",
             filename=f"TCAMv3",
             description="Filmlight's color pipeline. Initially designed for their Baselight grading tool but for which they still provide an OCIO configuration.",
             config_path=self.get_ocio_config_path(),
