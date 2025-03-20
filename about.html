@@ -133,8 +133,8 @@ native,TCAMv3,ARRIreveal,AgX,AgX.blender,AgXc,ACESv1.3-gm,ACESv2.0-gm,ACESv2.0,O
     <h2>Caveats</h2>
     <p>The workflow and the image presented have the following trade-offs:</p>
     <ul>
-      <li>sRGB colorspace encoding is not consistent: piecewise function versus
-        power function.
+      <li>The comparison focus only on the SDR capabilities of all algorithm.
+        Some may be HDR-compatible while other not.
       </li>
       <li>Some assets were already designed by their author to work with a
         specific picture-formation; their look are bias against it.
@@ -171,15 +171,14 @@ native,TCAMv3,ARRIreveal,AgX,AgX.blender,AgXc,ACESv1.3-gm,ACESv2.0-gm,ACESv2.0,O
       But it's possible to download them yourself by
       checking their side-car metadata .json file.</p>
     <h2>Renderers</h2>
-    <p>A renderer correspond to a color-transform that must be applied on pixel
-      data.
-      All renderers are color-managed for an sRGB output but will showcase
-      a different picture formation algorithm.</p>
-    <p>ℹ️ Note that the preferred sRGB transfer-function is 2.2 when possible,
-      but some Renderer may use the piecewise function.</p>
-    <p>The color transforms are serialized in an OpenColorIO
-      configuration, which will be ingested by OpenImageIO's oiiotool for
-      transforming the pixel data.</p>
+    <p>A renderer correspond to a color-transform that must be applied on
+      physical pixel data to generate a viewable picture.
+      All renderers are color-managed for the same sRGB target
+      (2.2 power function).
+      Their difference lies in the picture formation algorithm they use.</p>
+    <p>In terms of workflow, the color transforms are serialized in an
+      OpenColorIO configuration, which will be ingested by OpenImageIO's
+      oiiotool for transforming the pixel data.</p>
     <div class="renderers-box">
       
         <div class="renderer-item">
@@ -196,7 +195,7 @@ native,TCAMv3,ARRIreveal,AgX,AgX.blender,AgXc,ACESv1.3-gm,ACESv2.0-gm,ACESv2.0,O
             <table>
               <tr>
                 <th>display</th>
-                <td>sRGB - Display</td>
+                <td>sRGB - 2.2</td>
               </tr>
               <tr>
                 <th>view</th>
@@ -211,7 +210,7 @@ native,TCAMv3,ARRIreveal,AgX,AgX.blender,AgXc,ACESv1.3-gm,ACESv2.0-gm,ACESv2.0,O
         </div>
       
         <div class="renderer-item">
-          <h3>TCAMv3</h3>
+          <h3>T-CAM v3</h3>
           <div class="renderer-item-content">
             <p>Filmlight&#39;s color pipeline. Initially designed for their Baselight grading tool but for which they still provide an OCIO configuration.</p>
             <table>
@@ -219,10 +218,10 @@ native,TCAMv3,ARRIreveal,AgX,AgX.blender,AgXc,ACESv1.3-gm,ACESv2.0-gm,ACESv2.0,O
                 <th>source</th>
                 <td><a href="https://www.filmlight.ltd.uk/resources/download.php" rel="noopener">https://www.filmlight.ltd.uk/resources/download.php</a></td>
               </tr>
-              <tr>
-                <th>reference</th>
-                <td><a href="https://www.filmlight.ltd.uk/support/customer-login/colourspaces/colourspaces.php" rel="noopener">https://www.filmlight.ltd.uk/support/customer-login/colourspaces/colourspaces.php</a></td>
-              </tr>
+                <tr>
+                  <th>reference</th>
+                  <td><a href="https://www.filmlight.ltd.uk/support/customer-login/colourspaces/colourspaces.php" rel="noopener">https://www.filmlight.ltd.uk/support/customer-login/colourspaces/colourspaces.php</a></td>
+                </tr>
             </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
@@ -251,14 +250,14 @@ native,TCAMv3,ARRIreveal,AgX,AgX.blender,AgXc,ACESv1.3-gm,ACESv2.0-gm,ACESv2.0,O
                 <th>source</th>
                 <td><a href="https://www.arri.com/resource/blob/280728/7933fd1ce4de9165b906936661ab54eb/arri-logc4-lut-package-data.zip" rel="noopener">https://www.arri.com/resource/blob/280728/7933fd1ce4de9165b906936661ab54eb/arri-logc4-lut-package-data.zip</a></td>
               </tr>
-              <tr>
-                <th>reference</th>
-                <td><a href="https://www.arri.com/en/learn-help/learn-help-camera-system/tools/lut-generator" rel="noopener">https://www.arri.com/en/learn-help/learn-help-camera-system/tools/lut-generator</a></td>
-              </tr>
-              <tr>
-                <th>reference</th>
-                <td><a href="https://www.arri.com/en/learn-help/learn-help-camera-system/image-science/reveal-color-science" rel="noopener">https://www.arri.com/en/learn-help/learn-help-camera-system/image-science/reveal-color-science</a></td>
-              </tr>
+                <tr>
+                  <th>reference</th>
+                  <td><a href="https://www.arri.com/en/learn-help/learn-help-camera-system/tools/lut-generator" rel="noopener">https://www.arri.com/en/learn-help/learn-help-camera-system/tools/lut-generator</a></td>
+                </tr>
+                <tr>
+                  <th>reference</th>
+                  <td><a href="https://www.arri.com/en/learn-help/learn-help-camera-system/image-science/reveal-color-science" rel="noopener">https://www.arri.com/en/learn-help/learn-help-camera-system/image-science/reveal-color-science</a></td>
+                </tr>
             </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
@@ -287,14 +286,14 @@ native,TCAMv3,ARRIreveal,AgX,AgX.blender,AgXc,ACESv1.3-gm,ACESv2.0-gm,ACESv2.0,O
                 <th>source</th>
                 <td><a href="https://github.com/sobotka/AgX/archive/1ba3230e6f2c825003d9e139750edd233b6a906e.zip" rel="noopener">https://github.com/sobotka/AgX/archive/1ba3230e6f2c825003d9e139750edd233b6a906e.zip</a></td>
               </tr>
-              <tr>
-                <th>reference</th>
-                <td><a href="https://github.com/sobotka/AgX" rel="noopener">https://github.com/sobotka/AgX</a></td>
-              </tr>
-              <tr>
-                <th>reference</th>
-                <td><a href="https://blenderartists.org/t/feedback-development-filmic-baby-step-to-a-v2/1361663" rel="noopener">https://blenderartists.org/t/feedback-development-filmic-baby-step-to-a-v2/1361663</a></td>
-              </tr>
+                <tr>
+                  <th>reference</th>
+                  <td><a href="https://github.com/sobotka/AgX" rel="noopener">https://github.com/sobotka/AgX</a></td>
+                </tr>
+                <tr>
+                  <th>reference</th>
+                  <td><a href="https://blenderartists.org/t/feedback-development-filmic-baby-step-to-a-v2/1361663" rel="noopener">https://blenderartists.org/t/feedback-development-filmic-baby-step-to-a-v2/1361663</a></td>
+                </tr>
             </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
@@ -323,18 +322,18 @@ native,TCAMv3,ARRIreveal,AgX,AgX.blender,AgXc,ACESv1.3-gm,ACESv2.0-gm,ACESv2.0,O
                 <th>source</th>
                 <td><a href="https://projects.blender.org/blender/blender/archive/v4.2.7.zip" rel="noopener">https://projects.blender.org/blender/blender/archive/v4.2.7.zip</a></td>
               </tr>
-              <tr>
-                <th>reference</th>
-                <td><a href="https://projects.blender.org/blender/blender/pulls/106355" rel="noopener">https://projects.blender.org/blender/blender/pulls/106355</a></td>
-              </tr>
-              <tr>
-                <th>reference</th>
-                <td><a href="https://github.com/EaryChow/AgX" rel="noopener">https://github.com/EaryChow/AgX</a></td>
-              </tr>
-              <tr>
-                <th>reference</th>
-                <td><a href="https://blenderartists.org/t/feedback-development-filmic-baby-step-to-a-v2/1361663" rel="noopener">https://blenderartists.org/t/feedback-development-filmic-baby-step-to-a-v2/1361663</a></td>
-              </tr>
+                <tr>
+                  <th>reference</th>
+                  <td><a href="https://projects.blender.org/blender/blender/pulls/106355" rel="noopener">https://projects.blender.org/blender/blender/pulls/106355</a></td>
+                </tr>
+                <tr>
+                  <th>reference</th>
+                  <td><a href="https://github.com/EaryChow/AgX" rel="noopener">https://github.com/EaryChow/AgX</a></td>
+                </tr>
+                <tr>
+                  <th>reference</th>
+                  <td><a href="https://blenderartists.org/t/feedback-development-filmic-baby-step-to-a-v2/1361663" rel="noopener">https://blenderartists.org/t/feedback-development-filmic-baby-step-to-a-v2/1361663</a></td>
+                </tr>
             </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
@@ -363,14 +362,14 @@ native,TCAMv3,ARRIreveal,AgX,AgX.blender,AgXc,ACESv1.3-gm,ACESv2.0-gm,ACESv2.0,O
                 <th>source</th>
                 <td><a href="https://github.com/MrLixm/AgXc/archive/3e78f1541b06191ae3a8e2efce1b74c2a8b8d23f.zip" rel="noopener">https://github.com/MrLixm/AgXc/archive/3e78f1541b06191ae3a8e2efce1b74c2a8b8d23f.zip</a></td>
               </tr>
-              <tr>
-                <th>reference</th>
-                <td><a href="https://github.com/MrLixm/AgXc" rel="noopener">https://github.com/MrLixm/AgXc</a></td>
-              </tr>
-              <tr>
-                <th>reference</th>
-                <td><a href="https://github.com/MrLixm/AgXc/pull/35" rel="noopener">https://github.com/MrLixm/AgXc/pull/35</a></td>
-              </tr>
+                <tr>
+                  <th>reference</th>
+                  <td><a href="https://github.com/MrLixm/AgXc" rel="noopener">https://github.com/MrLixm/AgXc</a></td>
+                </tr>
+                <tr>
+                  <th>reference</th>
+                  <td><a href="https://github.com/MrLixm/AgXc/pull/35" rel="noopener">https://github.com/MrLixm/AgXc/pull/35</a></td>
+                </tr>
             </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
@@ -393,22 +392,22 @@ native,TCAMv3,ARRIreveal,AgX,AgX.blender,AgXc,ACESv1.3-gm,ACESv2.0-gm,ACESv2.0,O
         <div class="renderer-item">
           <h3>ACES v1.3 + Gamut Mapping</h3>
           <div class="renderer-item-content">
-            <p>The Academy Color Encoding System on major version 1, with their &#34;Gamut Compression&#34; look.</p>
+            <p>The Academy Color Encoding System on major version 1, with their &#34;Gamut Compression&#34; look.The config has been edited to add an sRGB-2.2 Display.</p>
             <table>
               <tr>
                 <th>source</th>
                 <td><a href="https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v2.1.0-v2.2.0/studio-config-v2.1.0_aces-v1.3_ocio-v2.1.ocio" rel="noopener">https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v2.1.0-v2.2.0/studio-config-v2.1.0_aces-v1.3_ocio-v2.1.ocio</a></td>
               </tr>
-              <tr>
-                <th>reference</th>
-                <td><a href="https://community.acescentral.com/" rel="noopener">https://community.acescentral.com/</a></td>
-              </tr>
+                <tr>
+                  <th>reference</th>
+                  <td><a href="https://community.acescentral.com/" rel="noopener">https://community.acescentral.com/</a></td>
+                </tr>
             </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
               <tr>
                 <th>display</th>
-                <td>sRGB - Display</td>
+                <td>sRGB - 2.2</td>
               </tr>
               <tr>
                 <th>view</th>
@@ -425,22 +424,22 @@ native,TCAMv3,ARRIreveal,AgX,AgX.blender,AgXc,ACESv1.3-gm,ACESv2.0-gm,ACESv2.0,O
         <div class="renderer-item">
           <h3>ACES v2.0 + Gamut Mapping</h3>
           <div class="renderer-item-content">
-            <p>The Academy Color Encoding System on major version 2, with their &#34;Gamut Compression&#34; look.</p>
+            <p>The Academy Color Encoding System on major version 2, with their &#34;Gamut Compression&#34; look.The config has been edited to add an sRGB-2.2 Display.</p>
             <table>
               <tr>
                 <th>source</th>
                 <td><a href="https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio" rel="noopener">https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio</a></td>
               </tr>
-              <tr>
-                <th>reference</th>
-                <td><a href="https://community.acescentral.com/" rel="noopener">https://community.acescentral.com/</a></td>
-              </tr>
+                <tr>
+                  <th>reference</th>
+                  <td><a href="https://community.acescentral.com/" rel="noopener">https://community.acescentral.com/</a></td>
+                </tr>
             </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
               <tr>
                 <th>display</th>
-                <td>sRGB - Display</td>
+                <td>sRGB - 2.2</td>
               </tr>
               <tr>
                 <th>view</th>
@@ -457,22 +456,22 @@ native,TCAMv3,ARRIreveal,AgX,AgX.blender,AgXc,ACESv1.3-gm,ACESv2.0-gm,ACESv2.0,O
         <div class="renderer-item">
           <h3>ACES v2.0 </h3>
           <div class="renderer-item-content">
-            <p>The Academy Color Encoding System on major version 2.</p>
+            <p>The Academy Color Encoding System on major version 2.The config has been edited to add an sRGB-2.2 Display.</p>
             <table>
               <tr>
                 <th>source</th>
                 <td><a href="https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio" rel="noopener">https://github.com/AcademySoftwareFoundation/OpenColorIO-Config-ACES/releases/download/v3.0.0/studio-config-all-views-v3.0.0_aces-v2.0_ocio-v2.4.ocio</a></td>
               </tr>
-              <tr>
-                <th>reference</th>
-                <td><a href="https://community.acescentral.com/" rel="noopener">https://community.acescentral.com/</a></td>
-              </tr>
+                <tr>
+                  <th>reference</th>
+                  <td><a href="https://community.acescentral.com/" rel="noopener">https://community.acescentral.com/</a></td>
+                </tr>
             </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
               <tr>
                 <th>display</th>
-                <td>sRGB - Display</td>
+                <td>sRGB - 2.2</td>
               </tr>
               <tr>
                 <th>view</th>
@@ -495,10 +494,10 @@ native,TCAMv3,ARRIreveal,AgX,AgX.blender,AgXc,ACESv1.3-gm,ACESv2.0-gm,ACESv2.0,O
                 <th>source</th>
                 <td><a href="https://github.com/Joegenco/PixelManager/archive/c8716a42c7e03c6573915ad24f19eccfc39f687c.zip" rel="noopener">https://github.com/Joegenco/PixelManager/archive/c8716a42c7e03c6573915ad24f19eccfc39f687c.zip</a></td>
               </tr>
-              <tr>
-                <th>reference</th>
-                <td><a href="https://github.com/jedypod/open-display-transform" rel="noopener">https://github.com/jedypod/open-display-transform</a></td>
-              </tr>
+                <tr>
+                  <th>reference</th>
+                  <td><a href="https://github.com/jedypod/open-display-transform" rel="noopener">https://github.com/jedypod/open-display-transform</a></td>
+                </tr>
             </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
@@ -527,10 +526,10 @@ native,TCAMv3,ARRIreveal,AgX,AgX.blender,AgXc,ACESv1.3-gm,ACESv2.0-gm,ACESv2.0,O
                 <th>source</th>
                 <td><a href="https://github.com/Joegenco/PixelManager/archive/c8716a42c7e03c6573915ad24f19eccfc39f687c.zip" rel="noopener">https://github.com/Joegenco/PixelManager/archive/c8716a42c7e03c6573915ad24f19eccfc39f687c.zip</a></td>
               </tr>
-              <tr>
-                <th>reference</th>
-                <td><a href="https://github.com/JuanPabloZambrano/DCTL/tree/main/2499_DRT" rel="noopener">https://github.com/JuanPabloZambrano/DCTL/tree/main/2499_DRT</a></td>
-              </tr>
+                <tr>
+                  <th>reference</th>
+                  <td><a href="https://github.com/JuanPabloZambrano/DCTL/tree/main/2499_DRT" rel="noopener">https://github.com/JuanPabloZambrano/DCTL/tree/main/2499_DRT</a></td>
+                </tr>
             </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
@@ -559,20 +558,20 @@ native,TCAMv3,ARRIreveal,AgX,AgX.blender,AgXc,ACESv1.3-gm,ACESv2.0-gm,ACESv2.0,O
                 <th>source</th>
                 <td><a href="https://www.dropbox.com/s/qn62wg07f21jydp/LMT%20Kodak%202383%20Print%20Emulation.xml?dl=0" rel="noopener">https://www.dropbox.com/s/qn62wg07f21jydp/LMT%20Kodak%202383%20Print%20Emulation.xml?dl=0</a></td>
               </tr>
-              <tr>
-                <th>reference</th>
-                <td><a href="https://community.acescentral.com/t/lmts-part-1-what-are-they-and-what-can-they-do-for-me/790/10?u=mrlixm" rel="noopener">https://community.acescentral.com/t/lmts-part-1-what-are-they-and-what-can-they-do-for-me/790/10?u=mrlixm</a></td>
-              </tr>
-              <tr>
-                <th>reference</th>
-                <td><a href="https://www.kodak.com/en/motion/product/post/print-films/vision-color-2383-3383/" rel="noopener">https://www.kodak.com/en/motion/product/post/print-films/vision-color-2383-3383/</a></td>
-              </tr>
+                <tr>
+                  <th>reference</th>
+                  <td><a href="https://community.acescentral.com/t/lmts-part-1-what-are-they-and-what-can-they-do-for-me/790/10?u=mrlixm" rel="noopener">https://community.acescentral.com/t/lmts-part-1-what-are-they-and-what-can-they-do-for-me/790/10?u=mrlixm</a></td>
+                </tr>
+                <tr>
+                  <th>reference</th>
+                  <td><a href="https://www.kodak.com/en/motion/product/post/print-films/vision-color-2383-3383/" rel="noopener">https://www.kodak.com/en/motion/product/post/print-films/vision-color-2383-3383/</a></td>
+                </tr>
             </table>
             <p><b>OCIO transform configuration:</b></p>
             <table>
               <tr>
                 <th>display</th>
-                <td>sRGB - Display</td>
+                <td>sRGB - 2.2</td>
               </tr>
               <tr>
                 <th>view</th>
@@ -591,11 +590,32 @@ native,TCAMv3,ARRIreveal,AgX,AgX.blender,AgXc,ACESv1.3-gm,ACESv2.0-gm,ACESv2.0,O
     <p>For any feedback/requests, see contact options at
       <a target="_blank" href="https://mrlixm.github.io/pages/contact/">https://mrlixm.github.io/pages/contact/</a>
     </p>
+    <div class="changelog">
+      <h2>CHANGELOG</h2>
+      <h3>20-03-25</h3>
+      <ul>
+        <li>improve index page styling</li>
+        <li>added this changelog</li>
+        <li>fix name of T-CAM renderer</li>
+        <li>fix consistence of transfer-function for sRGB colorspaces in
+          renderers: we force the 2.2 power function to be used.
+        </li>
+      </ul>
+      <h3>19-03-25</h3>
+      <ul>
+        <li>fixed <i>Pbri-H34-sunflower</i> being clamped</li>
+        <li>publicly shared the site</li>
+      </ul>
+      <h3>17-03-25</h3>
+      <ul>
+        <li>initial site creation</li>
+      </ul>
+    </div>
   </div>
 
 </main>
 </body>
 <footer>
-  <p>Static website created by Liam Collod using Python - Last built on 2025-03-19T18:25</p>
+  <p>Static website created by Liam Collod using Python - Last built on 2025-03-20T20:33</p>
 </footer>
 </html>
