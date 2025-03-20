@@ -31,9 +31,6 @@
       <li>The comparison focus only on the SDR capabilities of all algorithm.
         Some may be HDR-compatible while other not.
       </li>
-      <li>sRGB colorspace encoding is not consistent: piecewise function versus
-        power function.
-      </li>
       <li>Some assets were already designed by their author to work with a
         specific picture-formation; their look are bias against it.
       </li>
@@ -69,15 +66,14 @@
       But it's possible to download them yourself by
       checking their side-car metadata .json file.</p>
     <h2>Renderers</h2>
-    <p>A renderer correspond to a color-transform that must be applied on pixel
-      data.
-      All renderers are color-managed for an sRGB output but will showcase
-      a different picture formation algorithm.</p>
-    <p>ℹ️ Note that the preferred sRGB transfer-function is 2.2 when possible,
-      but some Renderer may use the piecewise function.</p>
-    <p>The color transforms are serialized in an OpenColorIO
-      configuration, which will be ingested by OpenImageIO's oiiotool for
-      transforming the pixel data.</p>
+    <p>A renderer correspond to a color-transform that must be applied on
+      physical pixel data to generate a viewable picture.
+      All renderers are color-managed for the same sRGB target
+      (2.2 power function).
+      Their difference lies in the picture formation algorithm they use.</p>
+    <p>In terms of workflow, the color transforms are serialized in an
+      OpenColorIO configuration, which will be ingested by OpenImageIO's
+      oiiotool for transforming the pixel data.</p>
     <div class="renderers-box">
       {% for Renderer in Renderers %}
         <div class="renderer-item">

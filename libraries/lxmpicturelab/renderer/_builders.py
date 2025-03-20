@@ -275,6 +275,34 @@ class ARRIBuilder(BaseRendererBuilder):
         assert self.get_ocio_config_path().exists()
 
 
+def patch_aces_config(config: ocio.Config):
+    """
+    Add an sRGB-2.2 Display to the ACES config.
+
+    They assume a piecewise transfer-function by default so we use uniform it to 2.2 for
+    all algorithm.
+    """
+    transforms = ocio.GroupTransform()
+    transforms.appendTransform(
+        ocio.ColorSpaceTransform(
+            src="CIE XYZ-D65 - Display-referred",
+            dst="Linear Rec.709 (sRGB)",
+        )
+    )
+    transforms.appendTransform(
+        ocio.ColorSpaceTransform(
+            src="Linear Rec.709 (sRGB)",
+            dst="Gamma 2.2 Encoded Rec.709",
+        )
+    )
+    new_colorspace = ocio.ColorSpace(
+        name="sRGB - 2.2",
+        referenceSpace=ocio.REFERENCE_SPACE_DISPLAY,
+        fromReference=transforms,
+    )
+    config.addColorSpace(new_colorspace)
+
+
 class ACES13gmBuilder(BaseRendererBuilder):
     identifier: str = "ACESv1.3-gm"
     source_url: str = (
@@ -288,10 +316,13 @@ class ACES13gmBuilder(BaseRendererBuilder):
         return OcioConfigRenderer(
             name=f"ACES v1.3 + Gamut Mapping",
             filename=self.identifier,
-            description='The Academy Color Encoding System on major version 1, with their "Gamut Compression" look.',
+            description=(
+                'The Academy Color Encoding System on major version 1, with their "Gamut Compression" look.'
+                "The config has been edited to add an sRGB-2.2 Display."
+            ),
             config_path=self.get_ocio_config_path(),
             srgb_lin="Linear Rec.709 (sRGB)",
-            display="sRGB - Display",
+            display="sRGB - 2.2",
             view="ACES 1.0 - SDR Video",
             look="ACES 1.3 Reference Gamut Compression",
             source_url=self.source_url,
@@ -302,6 +333,16 @@ class ACES13gmBuilder(BaseRendererBuilder):
         config_path = self.get_ocio_config_path()
         download_file(self.source_url, config_path)
         assert config_path.exists()
+        # noinspection PyArgumentList
+        config: ocio.Config = ocio.Config.CreateFromFile(str(config_path))
+        patch_aces_config(config)
+        config.addDisplaySharedView(
+            "sRGB - 2.2",
+            "ACES 1.0 - SDR Video",
+        )
+        config.validate()
+        LOGGER.debug("writing patched ACES config with sRGB-2.2")
+        config.serialize(str(config_path))
 
 
 class ACES2gmBuilder(BaseRendererBuilder):
@@ -317,10 +358,13 @@ class ACES2gmBuilder(BaseRendererBuilder):
         return OcioConfigRenderer(
             name=f"ACES v2.0 + Gamut Mapping",
             filename=self.identifier,
-            description='The Academy Color Encoding System on major version 2, with their "Gamut Compression" look.',
+            description=(
+                'The Academy Color Encoding System on major version 2, with their "Gamut Compression" look.'
+                "The config has been edited to add an sRGB-2.2 Display."
+            ),
             config_path=self.get_ocio_config_path(),
             srgb_lin="Linear Rec.709 (sRGB)",
-            display="sRGB - Display",
+            display="sRGB - 2.2",
             view="ACES 2.0 - SDR 100 nits (Rec.709)",
             look="ACES 1.3 Reference Gamut Compression",
             source_url=self.source_url,
@@ -331,6 +375,20 @@ class ACES2gmBuilder(BaseRendererBuilder):
         config_path = self.get_ocio_config_path()
         download_file(self.source_url, config_path)
         assert config_path.exists()
+        # noinspection PyArgumentList
+        config: ocio.Config = ocio.Config.CreateFromFile(str(config_path))
+        patch_aces_config(config)
+        config.addDisplaySharedView(
+            "sRGB - 2.2",
+            "ACES 2.0 - SDR 100 nits (Rec.709)",
+        )
+        config.addDisplaySharedView(
+            "sRGB - 2.2",
+            "Un-tone-mapped",
+        )
+        config.validate()
+        LOGGER.debug("writing patched ACES config with sRGB-2.2")
+        config.serialize(str(config_path))
 
 
 class ACES2Builder(ACES2gmBuilder):
@@ -342,9 +400,12 @@ class ACES2Builder(ACES2gmBuilder):
             renderer,
             name=f"ACES v2.0 ",
             filename=self.identifier,
-            description="The Academy Color Encoding System on major version 2.",
+            description=(
+                "The Academy Color Encoding System on major version 2."
+                "The config has been edited to add an sRGB-2.2 Display."
+            ),
             srgb_lin="Linear Rec.709 (sRGB)",
-            display="sRGB - Display",
+            display="sRGB - 2.2",
             view="ACES 2.0 - SDR 100 nits (Rec.709)",
             look="",
             references=["https://community.acescentral.com/"],
@@ -362,7 +423,7 @@ class NativeBuilder(ACES2gmBuilder):
             filename="native",
             description="No picture formation is applied, anything outside the destination volume is clipped.",
             srgb_lin="Linear Rec.709 (sRGB)",
-            display="sRGB - Display",
+            display="sRGB - 2.2",
             view="Un-tone-mapped",
             look="",
             references=[],
@@ -442,7 +503,7 @@ class Kodak2383Builder(BaseRendererBuilder):
             description=f"The iconic Kodak2383 print film simulation LUT, authored by Blackmagic as an ACES LMT. Injected in the {config_name} config.",
             config_path=self.get_ocio_config_path(),
             srgb_lin="Linear Rec.709 (sRGB)",
-            display="sRGB - Display",
+            display="sRGB - 2.2",
             view="Kodak2383",
             source_url=self.source_url,
             references=[
@@ -461,6 +522,7 @@ class Kodak2383Builder(BaseRendererBuilder):
 
         # noinspection PyArgumentList
         config: ocio.Config = ocio.Config.CreateFromFile(str(aces_config_path))
+        patch_aces_config(config)
         transforms = ocio.GroupTransform()
         transforms.appendTransform(
             ocio.FileTransform(
@@ -473,7 +535,7 @@ class Kodak2383Builder(BaseRendererBuilder):
         transforms.appendTransform(
             ocio.ColorSpaceTransform(
                 src="ACES2065-1",
-                dst="sRGB - Display",
+                dst="sRGB - 2.2",
             )
         )
         new_colorspace_name = "Kodak2383 AP0"
@@ -483,7 +545,7 @@ class Kodak2383Builder(BaseRendererBuilder):
             fromReference=transforms,
         )
         config.addColorSpace(arri_colorspace)
-        config.addDisplayView("sRGB - Display", "Kodak2383", new_colorspace_name)
+        config.addDisplayView("sRGB - 2.2", "Kodak2383", new_colorspace_name)
         config.setSearchPath(".")
         config.validate()
         LOGGER.debug(f"writing patched ACES config with {self.identifier}")
