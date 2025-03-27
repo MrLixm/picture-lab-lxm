@@ -433,6 +433,76 @@ class NativeBuilder(ACES2gmBuilder):
 class OpenDRTBuilder(BaseRendererBuilder):
     identifier: str = "OpenDRT"
     source_url: str = (
+        "https://github.com/chrisbrejon/OpenDRT-OCIO-Config/archive/58a630cce6f4167c52928f6ba28ab1de083fe6cc.zip"
+    )
+
+    def get_ocio_config_path(self) -> Path:
+        return self.path / "ocio" / "config.ocio"
+
+    def get_renderer(self):
+        return OcioConfigRenderer(
+            name=f"OpenDRT v1.0.0",
+            filename=self.identifier,
+            description="An open source display rendering transform authored by Jed Smith. Using the version 1.0.0 which has been converted to OCIO by Chris Brejon.",
+            config_path=self.get_ocio_config_path(),
+            srgb_lin="linear",
+            display="sRGB - 2.2 100 nits video dim",
+            view="OpenDRT 1.0.0",
+            look="",
+            source_url=self.source_url,
+            references=["https://github.com/jedypod/open-display-transform"],
+        )
+
+    def build(self):
+        config_path = self.get_ocio_config_path()
+        repo_dir = self.path / "tmp"
+        repo_dir.mkdir(exist_ok=True)
+        repo_path = repo_dir / "OpenDRT-OCIO-Config.zip"
+        git_ref = self.source_url.split("/")[-1].split(".zip")[0]
+        download_file(self.source_url, repo_path)
+        extract_zip(repo_path, remove_zip=True)
+        os.rename(repo_dir / f"OpenDRT-OCIO-Config-{git_ref}", self.path / "ocio")
+        assert config_path.exists()
+
+        # noinspection PyArgumentList
+        config: ocio.Config = ocio.Config.CreateFromFile(str(config_path))
+        transforms = ocio.GroupTransform()
+        transforms.appendTransform(
+            ocio.ColorSpaceTransform(
+                src="lin_xyz",
+                dst="openDRT 1.0.0 - Rec.709 - 2.4 Gamma",
+            )
+        )
+        transforms.appendTransform(
+            ocio.ExponentTransform(
+                [2.4, 2.4, 2.4, 1.0],
+            )
+        )
+        transforms.appendTransform(
+            ocio.ExponentTransform(
+                [2.2, 2.2, 2.2, 1.0],
+                direction=ocio.TRANSFORM_DIR_INVERSE,
+            )
+        )
+        new_colorspace = ocio.ColorSpace(
+            name="openDRT 1.0.0 - Rec.709 - 2.2 Gamma",
+            referenceSpace=ocio.REFERENCE_SPACE_SCENE,
+            fromReference=transforms,
+        )
+        config.addColorSpace(new_colorspace)
+        config.addDisplayView(
+            "sRGB - 2.2 100 nits video dim",
+            "OpenDRT 1.0.0",
+            new_colorspace.getName(),
+        )
+        config.validate()
+        LOGGER.debug("writing patched OpenDRT config with sRGB-2.2")
+        config.serialize(str(config_path))
+
+
+class DRT2499Builder(BaseRendererBuilder):
+    identifier: str = "2499DRT"
+    source_url: str = (
         "https://github.com/Joegenco/PixelManager/archive/c8716a42c7e03c6573915ad24f19eccfc39f687c.zip"
     )
 
@@ -441,16 +511,16 @@ class OpenDRTBuilder(BaseRendererBuilder):
 
     def get_renderer(self):
         return OcioConfigRenderer(
-            name=f"OpenDRT",
+            name=f"2499DRT",
             filename=self.identifier,
-            description="An open source display rendering transform authored by Jed Smith.",
+            description="A .dctl algorithm by Juan Pablo Zambrano; targeting colorists. Converted to OCIO by Joegen.",
             config_path=self.get_ocio_config_path(),
             srgb_lin="Linear Rec.709",
             display="sRGB",
-            view="OpenDRT",
+            view="JP2499DRT",
             look="",
             source_url=self.source_url,
-            references=["https://github.com/jedypod/open-display-transform"],
+            references=["https://github.com/JuanPabloZambrano/DCTL/tree/main/2499_DRT"],
         )
 
     def build(self):
@@ -462,27 +532,6 @@ class OpenDRTBuilder(BaseRendererBuilder):
         extract_zip(repo_path, remove_zip=True)
         os.rename(repo_dir / f"PixelManager-{git_ref}", self.path / "ocio")
         assert self.get_ocio_config_path().exists()
-
-
-class DRT2499Builder(OpenDRTBuilder):
-    identifier: str = "2499DRT"
-    source_url: str = (
-        "https://github.com/Joegenco/PixelManager/archive/c8716a42c7e03c6573915ad24f19eccfc39f687c.zip"
-    )
-
-    def get_renderer(self):
-        return OcioConfigRenderer(
-            name=f"2499DRT",
-            filename=self.identifier,
-            description="A .dctl algorithm by Juan Pablo Zambrano; targeting colorists.",
-            config_path=self.get_ocio_config_path(),
-            srgb_lin="Linear Rec.709",
-            display="sRGB",
-            view="JP2499DRT",
-            look="",
-            source_url=self.source_url,
-            references=["https://github.com/JuanPabloZambrano/DCTL/tree/main/2499_DRT"],
-        )
 
 
 class Kodak2383Builder(BaseRendererBuilder):

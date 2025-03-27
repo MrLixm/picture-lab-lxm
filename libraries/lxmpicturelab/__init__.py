@@ -5,4 +5,4 @@ from . import browse
 from . import download
 from . import oiiotoolio
 
-__version__ = "1"
+__version__ = "2"
