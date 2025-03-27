@@ -18,6 +18,8 @@ from lxmpicturelab import METADATA_PREFIX
 PROGNAME = Path(__file__).stem
 LOGGER = logging.getLogger(PROGNAME)
 
+__VERSION__ = "2"
+
 
 def errorexit(msg: str, code: int = 1):
     print(f"ERROR: {msg}", file=sys.stderr)
@@ -119,7 +121,7 @@ def main():
     dst_compression = "zips"
     debayering_options = rawpy.Params(
         output_bps=16,
-        output_color=rawpy.ColorSpace.XYZ,
+        output_color=rawpy.ColorSpace.sRGB,
         no_auto_bright=True,
         gamma=(1.0, 1.0),
         demosaic_algorithm=rawpy.DemosaicAlgorithm.DHT,
@@ -169,20 +171,20 @@ def main():
     buf = oiio.ImageBufAlgo.copy(buf, convert=oiio.FLOAT)
     buf = oiio.ImageBufAlgo.mul(buf, exposure)
 
-    # https://www.colour-science.org:8010/apps/rgb_colourspace_transformation_matrix?input-colourspace=CIE+XYZ-D65+-+Scene-referred&output-colourspace=ACES2065-1&chromatic-adaptation-transform=CAT02&formatter=opencolorio&decimals=6
+    # https://www.colour-science.org:8010/apps/rgb_colourspace_transformation_matrix?input-colourspace=sRGB&output-colourspace=ACES2065-1&chromatic-adaptation-transform=CAT02&formatter=repr&decimals=6
     # fmt: off
-    xyz_to_ap0 = [
-        [+1.009732, +0.008407, -0.018139, 0.0],
-        [-0.469470, +1.371110, +0.098360, 0.0],
-        [-0.000318, -0.001037, +1.001356, 0.0],
+    srgb_to_ap0 = [
+        [0.439586, 0.383929, 0.176533],
+        [0.089540, 0.814750, 0.095684],
+        [0.017387, 0.108739, 0.873821],
         [0.0, 0.0, 0.0, 1.0],
     ]
     # fmt: on
     # OIIO need it transposed
-    xyz_to_ap0_t = numpy.transpose(xyz_to_ap0).tolist()
+    srgb_to_ap0_t = numpy.transpose(srgb_to_ap0).tolist()
     # flatten as 1D list
-    xyz_to_ap0_t = [b for a in xyz_to_ap0_t for b in a]
-    buf = oiio.ImageBufAlgo.colormatrixtransform(buf, xyz_to_ap0_t)
+    srgb_to_ap0_t = [b for a in srgb_to_ap0_t for b in a]
+    buf = oiio.ImageBufAlgo.colormatrixtransform(buf, srgb_to_ap0_t)
 
     # set metadata
     for extra_attrib in raw_metadata:
