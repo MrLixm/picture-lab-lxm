@@ -63,7 +63,9 @@ def convert_to_dng(src_path: Path, dst_path: Path, dng_converter: Path):
 
 def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
     argv = argv or sys.argv[1:]
-    parser = argparse.ArgumentParser(description="Debayer a camera raw file to EXR.")
+    parser = argparse.ArgumentParser(
+        description="Debayer a camera raw file to an ACES2065-1 EXR."
+    )
     parser.add_argument(
         "src_path",
         type=Path,
@@ -88,7 +90,16 @@ def get_cli(argv: list[str] | None = None) -> argparse.Namespace:
         "--exposure",
         type=float,
         default=2.6,
-        help="Amount of exposure in stops, to increase the debayered image by.",
+        help="Amount of exposure in stops, to increase the debayered image by. Vary between camera models.",
+    )
+    parser.add_argument(
+        "--highlights",
+        type=int,
+        default=0,
+        help=(
+            "Method to use for highlighting handling: 0=Clip; 1=Ignore; 2=Blend; "
+            "3<>9=Reconstruct where low numbers favor whites and higher favor colors."
+        ),
     )
     parsed = parser.parse_args(argv)
     return parsed
@@ -100,6 +111,7 @@ def main():
     dng_converter: Path | None = cli.adobe_dng_converter
     u_exposure: float = cli.exposure
     u_dst_path: Path | None = cli.dst_path
+    u_highlights: int = cli.highlights
 
     dst_path: Path = u_dst_path or src_path.with_suffix(".exr")
     dng_path: Path | None = None
@@ -114,6 +126,7 @@ def main():
         median_filter_passes=0,
         fbdd_noise_reduction=rawpy.FBDDNoiseReductionMode.Off,
         use_camera_wb=True,
+        highlight_mode=u_highlights,
     )
 
     # check if rawpy can read the raw file
@@ -178,6 +191,7 @@ def main():
         )
     buf.specmod().attribute("compression", dst_compression)
     buf.specmod().attribute(f"{METADATA_PREFIX}/debayer-exposure", u_exposure)
+    buf.specmod().attribute(f"{METADATA_PREFIX}/debayer-highlights-mode", u_highlights)
 
     if buf.has_error:
         errorexit(f"(OIIO) current ImageBuf has errors: {buf.geterror()}")
