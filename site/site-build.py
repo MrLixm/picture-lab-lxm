@@ -260,7 +260,8 @@ def build_comparisons(
     for asset_id, asset_args in assets.items():
         asset_dst_dir = comparisons_dir / asset_id
         comparison_dirs.append(asset_dst_dir)
-        if asset_dst_dir.exists() and not overwrite_existing:
+        is_existing = bool(list(asset_dst_dir.glob("*.json")))
+        if is_existing and not overwrite_existing:
             LOGGER.info(f"⏩ skipping building for '{asset_id}': found existing")
         else:
 
@@ -279,7 +280,10 @@ def build_comparisons(
     LOGGER.debug(f"🚦✅ completed parallel run")
 
     for asset_dst_dir in comparison_dirs:
-        session_metadadata_path = next(asset_dst_dir.glob("*.json"))
+        try:
+            session_metadadata_path = next(asset_dst_dir.glob("*.json"))
+        except StopIteration:
+            raise IOError(f"Could not find comparison metadata in '{asset_dst_dir}'")
         session_metadadata = session_metadadata_path.read_text(encoding="utf-8")
         session = ComparisonSession.from_json(json_str=session_metadadata)
         if session.asset.identifier.startswith("lxm"):
