@@ -174,9 +174,9 @@ def main():
     # https://www.colour-science.org:8010/apps/rgb_colourspace_transformation_matrix?input-colourspace=sRGB&output-colourspace=ACES2065-1&chromatic-adaptation-transform=CAT02&formatter=repr&decimals=6
     # fmt: off
     srgb_to_ap0 = [
-        [0.439586, 0.383929, 0.176533],
-        [0.089540, 0.814750, 0.095684],
-        [0.017387, 0.108739, 0.873821],
+        [0.439586, 0.383929, 0.176533, 0.0],
+        [0.089540, 0.814750, 0.095684, 0.0],
+        [0.017387, 0.108739, 0.873821, 0.0],
         [0.0, 0.0, 0.0, 1.0],
     ]
     # fmt: on
