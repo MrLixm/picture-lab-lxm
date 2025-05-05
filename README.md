@@ -5,7 +5,7 @@ various image sources.
 
 ![lxmpicturelab-cover.jpg](site/img/lxmpicturelab-cover.jpg)
 
-The results are published to https://mrlixm.github.io/lxmpicturelab.
+The results are published to https://mrlixm.github.io/picture-lab-lxm.
 
 > ⚠️ This repository is currently partially public, the source image assets
 > are not version-controlled yet.
